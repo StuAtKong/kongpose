@@ -1,0 +1,15 @@
+version: '2.1'
+
+services:
+  httpbin-2:
+    entrypoint: ["echo", "Service httpbin-2 disabled"]
+  redis:
+    entrypoint: ["echo", "Service redis disabled"]
+  zipkin:
+    entrypoint: ["echo", "Service zipkin disabled"]
+  vault:
+    entrypoint: ["echo", "Service vault disabled"]
+  keycloak:
+    entrypoint: ["echo", "Service keycloak disabled"]
+#  ad-server:
+#    entrypoint: ["echo", "Service ad-server disabled"]

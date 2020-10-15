@@ -1,0 +1,207 @@
+version: '2.1'
+
+networks:
+  case-kong-net:
+    name: case-kong-net
+
+services:
+  kong-migrations:
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.6-alpine
+    container_name: case-kong-ee-mig
+    networks:
+      - case-kong-net
+    command: kong migrations bootstrap
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: K1ngK0ng
+      KONG_PASSWORD: password
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+    restart: on-failure
+
+  kong:
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.6-alpine
+    container_name: case-kong-ee
+    networks:
+      - case-kong-net
+    user: "${KONG_USER:-kong}"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - /Users/sroberts/Documents/certs:/usr/local/kong/ssl/customcerts
+      - /Users/sroberts/Documents/tracing:/usr/local/kong/tracing
+    environment:
+      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
+      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
+      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:48002, 0.0.0.0:48445 ssl"
+      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:48003, 0.0.0.0:48446 ssl"
+      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
+      KONG_STATUS_LISTEN: "0.0.0.0:48100"
+      KONG_CASSANDRA_CONTACT_POINTS: db
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_AUDIT_LOG: "on"
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_VITALS: "on"
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+      KONG_LOG_LEVEL: "debug"
+      KONG_PROXY_URL: "https://kong-proxy.heronwood.co.uk:48443"
+      KONG_SSL_CERT_KEY: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/privkey.pem"
+      KONG_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/cert.pem"
+      KONG_ENFORCE_RBAC: "on"
+      KONG_ADMIN_API_URI: "https://kong-api.heronwood.co.uk:48444"
+      KONG_ADMIN_SSL_CERT_KEY: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/privkey.pem"
+      KONG_ADMIN_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/fullchain.pem"
+      KONG_ADMIN_GUI_URL: "https://kong-manager.heronwood.co.uk:48445"
+      KONG_ADMIN_GUI_SSL_CERT_KEY: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/privkey.pem"
+      KONG_ADMIN_GUI_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/cert.pem"
+      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
+      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
+      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager_session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      KONG_PORTAL: "on"
+      KONG_PORTAL_GUI_PROTOCOL: "https"
+      KONG_PORTAL_GUI_HOST: "kong-portal.heronwood.co.uk:48446"
+      KONG_PORTAL_GUI_SSL_CERT_KEY: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/privkey.pem"
+      KONG_PORTAL_GUI_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/cert.pem"
+      KONG_PORTAL_API_URL: "https://kong-portal.heronwood.co.uk:48447"
+      KONG_PORTAL_API_SSL_CERT_KEY: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/privkey.pem"
+      KONG_PORTAL_API_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/cert.pem"
+      KONG_PORTAL_AUTH: "openid-connect"
+      KONG_PORTAL_AUTH_CONF: ${KONG_PORTAL_AUTH_CONF}
+      KONG_PORTAL_SESSION_CONF: ${KONG_PORTAL_SESSION_CONF}
+      KONG_PORTAL_EMAIL_VERIFICATION: "on"
+      KONG_PORTAL_EMAILS_FROM: "kong@heronwood.co.uk"
+      KONG_PORTAL_EMAILS_REPLY_TO: "kong@heronwood.co.uk"
+      KONG_ADMIN_EMAILS_FROM: "kong@heronwood.co.uk"
+      KONG_ADMIN_EMAILS_REPLY_TO: "kong@heronwood.co.uk"
+      KONG_SMTP_MOCK: "off"
+      KONG_SMTP_ADMIN_EMAILS: "stu.roberts@konghq.com"
+      KONG_SMTP_HOST: "192.168.1.3"
+      KONG_SMTP_DOMAIN: "heronwood.co.uk"
+      KONG_SMTP_USERNAME: "stu"
+      KONG_SMTP_PASSWORD: "idoo6Ta"
+      KONG_SMTP_AUTH_TYPE: "login"
+      KONG_TRACING: "off"
+      KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
+      KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
+      KONG_GENERATE_TRACE_DETAILS: "on"
+    ports:
+      - "48000:48000/tcp"
+      - "48001:48001/tcp"
+      - "48002:48002/tcp"
+      - "48003:48003/tcp"
+      - "48004:48004/tcp"
+      - "48443:48443/tcp"
+      - "48444:48444/tcp"
+      - "48445:48445/tcp"
+      - "48446:48446/tcp"
+      - "48447:48447/tcp"
+      - "48100:48100/tcp"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure
+
+  db:
+    networks:
+      - case-kong-net
+    image: postgres:9.5
+    container_name: case-kong-db
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+      POSTGRES_USER: kong
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
+  ad-server:
+    networks:
+      - case-kong-net
+    container_name: case-ad-server
+    image: nginx:1.17.3-alpine
+    volumes:
+      - /Users/sroberts/Documents/code/ldap-server:/setup-ad/
+    # run as privileged to workaround this issue
+    # set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
+    privileged: true
+    ports:
+      - "389:389/tcp"
+
+  httpbin-1:
+    networks:
+      - case-kong-net
+    container_name: case-httpbin-1
+    image: "kennethreitz/httpbin"
+#    ports:
+#      - "80:80/tcp"
+
+  httpbin-2:
+    networks:
+      - case-kong-net
+    container_name: case-httpbin-2
+    image: "kennethreitz/httpbin"
+#    ports:
+#      - "80:80/tcp"
+
+  keycloak:
+    networks:
+      - case-kong-net
+    container_name: case-keycloak
+    image: jboss/keycloak:9.0.0
+    volumes:
+      - /Users/sroberts/Documents/config/keycloak/kong-realm.json:/tmp/kong-realm.json
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
+    ports:
+      - "8080:8080/tcp"
+      - "8443:8443/tcp"
+
+  redis:
+    networks:
+      - case-kong-net
+    container_name: case-redis
+    image: redis:latest
+#    ports:
+#      - "6379:6379/tcp"
+
+  zipkin:
+    networks:
+      - case-kong-net
+    container_name: case-zipkin
+    image: openzipkin/zipkin
+#    ports:
+#      - "9411:9411/tcp"
+
+  vault:
+    networks:
+      - case-kong-net
+    container_name: case-vault
+    image: vault:latest
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: myroot
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+#    ports:
+#      - "8200:8200/tcp"
