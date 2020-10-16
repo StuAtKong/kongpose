@@ -1,8 +1,11 @@
+# Initial Setup
+
 Set and env var for the license;
 
 `export KONG_LICENSE_DATA=`cat /Users/sroberts/Documents/config/license.json`;`
 
 Then run;
+
 `docker-compose up -d`
 
 This will start Kong EE, Postgres, Keycloak and an LDAP (AD) server. There are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
@@ -61,7 +64,10 @@ $ curl https://kong-proxy.heronwood.co.uk:48443/httpbin/anything
 }
 ```
 
-Keycloak:
+# Keycloak:
+
 URL: http://localhost:8080
+
 Username: admin
+
 Password: password
