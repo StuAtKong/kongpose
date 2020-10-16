@@ -9,7 +9,7 @@ services:
     entrypoint: ["echo", "Service zipkin disabled"]
   vault:
     entrypoint: ["echo", "Service vault disabled"]
-  keycloak:
-    entrypoint: ["echo", "Service keycloak disabled"]
+#  keycloak:
+#    entrypoint: ["echo", "Service keycloak disabled"]
 #  ad-server:
 #    entrypoint: ["echo", "Service ad-server disabled"]
