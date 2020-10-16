@@ -19,7 +19,7 @@ services:
       KONG_PG_HOST: db
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
-      KONG_PG_PASSWORD: K1ngK0ng
+      KONG_PG_PASSWORD: kong
       KONG_PASSWORD: password
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
@@ -70,7 +70,7 @@ services:
       KONG_ADMIN_GUI_SSL_CERT: "/usr/local/kong/ssl/customcerts/kong.heronwood.co.uk/cert.pem"
       KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
       KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
-      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager_session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "kong-portal.heronwood.co.uk:48446"
