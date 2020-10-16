@@ -3,7 +3,7 @@
 set -e
 
 # add samba
-apk add --no-cache samba-dc bash ldb-tools
+apk add --no-cache samba-dc bash ldb-tools openldap-clients
 
 # verify samba version
 smbstatus | grep version
