@@ -141,7 +141,7 @@ services:
     container_name: case-ad-server
     image: nginx:1.17.3-alpine
     volumes:
-      - /Users/sroberts/Documents/code/ldap-server:/setup-ad/
+      - ./ldap-server:/setup-ad/
     # run as privileged to workaround this issue
     # set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
     privileged: true
@@ -170,7 +170,7 @@ services:
     container_name: case-keycloak
     image: jboss/keycloak:9.0.0
     volumes:
-      - /Users/sroberts/Documents/config/keycloak/kong-realm.json:/tmp/kong-realm.json
+      - ./kong-realm.json:/tmp/kong-realm.json
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
