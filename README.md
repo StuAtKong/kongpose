@@ -2,7 +2,7 @@
 
 Set and env var for the license;
 
-`export KONG_LICENSE_DATA=`cat /Users/sroberts/Documents/config/license.json`;`
+`export KONG_LICENSE_DATA=`cat /home/stu/kongpose/license.json`;`
 
 Then run;
 
@@ -26,7 +26,7 @@ Populate a default Route/Service with deck;
 ```
 $ cat ~/.deck.yaml
 # sample configuration file for global parameters of deck CLI.
-kong-addr: https://kong-api.heronwood.co.uk:48444
+kong-addr: https://mrdizzy.heronwood.co.uk:48444
 headers:
 - "kong-admin-token:password"
 #- "kong-admin-user:super"
@@ -44,7 +44,7 @@ verbose: 0
 Test the default API;
 
 ```
-$ curl https://kong-proxy.heronwood.co.uk:48443/httpbin/anything
+$ curl https://mrdizzy.heronwood.co.uk:48443/httpbin/anything
 {
   "args": {},
   "data": "",
