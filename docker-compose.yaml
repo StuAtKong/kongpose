@@ -100,7 +100,8 @@ services:
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
     ports:
-      - "48000:48000/tcp"
+      # HTTP Proxt port is only available via haproxy
+      #- "48000:48000/tcp"
       - "48001:48001/tcp"
       - "48002:48002/tcp"
       - "48003:48003/tcp"
@@ -206,3 +207,15 @@ services:
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
 #    ports:
 #      - "8200:8200/tcp"
+
+
+  ha-proxy:
+    networks:
+      - case-kong-net
+    container_name: case-ha-proxy
+    image: haproxy:2.2.4-alpine
+    volumes:
+      - /home/stu/kongpose/ha-proxy:/usr/local/etc/haproxy:ro
+    ports:
+      - "8888:8888/tcp"
+
