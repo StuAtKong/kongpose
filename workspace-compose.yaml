@@ -3,6 +3,27 @@ _workspace: debian
 services:
 - connect_timeout: 60000
   host: httpbin-1
+  name: Status
+  path: /status/200
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: Status
+    paths:
+    - /status
+    path_handling: v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+- connect_timeout: 60000
+  host: httpbin-1
   name: local_httpbin
   port: 80
   protocol: http
