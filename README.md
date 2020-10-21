@@ -71,3 +71,17 @@ URL: http://localhost:8080
 Username: admin
 
 Password: password
+
+# HAProxy
+
+To use the haproxy API;
+
+```
+echo "help" | socat stdio tcp4-connect:127.0.0.1:9999
+```
+
+Test the default API via haproxy;
+
+```
+$ curl http://mrdizzy.heronwood.co.uk:8888/httpbin/anything
+```
