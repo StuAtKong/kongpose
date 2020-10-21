@@ -218,4 +218,5 @@ services:
       - /home/stu/kongpose/ha-proxy:/usr/local/etc/haproxy:ro
     ports:
       - "8888:8888/tcp"
+      - "8404:8404/tcp"
 
