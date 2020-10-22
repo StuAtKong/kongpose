@@ -74,6 +74,8 @@ Password: password
 
 # HAProxy
 
+https://www.haproxy.com/blog/dynamic-configuration-haproxy-runtime-api/
+
 To use the haproxy API;
 
 ```
