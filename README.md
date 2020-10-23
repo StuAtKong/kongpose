@@ -6,6 +6,12 @@ Set and env var for the license;
 
 Then run;
 
+Start the "service" containers (database, ldap, httpbin, etc);
+
+`docker-compose -f docker-compose-infra.yaml up -d`
+
+Start Kong CP and DPx2;
+
 `docker-compose up -d`
 
 This will start Kong EE, Postgres, Keycloak and an LDAP (AD) server. There are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
