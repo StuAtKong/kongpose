@@ -6,15 +6,13 @@ Set and env var for the license;
 
 Then run;
 
-Start the "service" containers (database, ldap, httpbin, etc);
-
-`docker-compose -f docker-compose-infra.yaml up -d`
-
-Start Kong CP and DPx2;
+Start the service & kong containers
 
 `docker-compose up -d`
 
-This will start Kong EE, Postgres, Keycloak and an LDAP (AD) server. There are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
+This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server and an HAProxy server. 
+
+By default, basic-auth is enabled and you can login with kong_admin/password but there are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
 
 ```
 docker exec -it --user root case-ad-server /bin/sh
@@ -27,7 +25,7 @@ samba -D
 ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com" -w "Passw0rd" -b "dc=ldap,dc=kong,dc=com" "(sAMAccountName=kong_admin)"
 ```
 
-Populate a default Route/Service with deck;
+Populate a healthcheck endpoint and a default Route/Service with deck;
 
 ```
 $ cat ~/.deck.yaml
@@ -47,10 +45,10 @@ verbose: 0
 
 `deck sync -s workspace-compose.yaml`
 
-Test the default API;
+Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);;
 
 ```
-$ curl https://mrdizzy.heronwood.co.uk:48443/httpbin/anything
+$ curl https://mrdizzy.heronwood.co.uk/httpbin/anything
 {
   "args": {},
   "data": "",

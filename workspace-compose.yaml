@@ -1,5 +1,5 @@
 _format_version: "1.1"
-_workspace: debian
+_workspace: default
 services:
 - connect_timeout: 60000
   host: status-upstream
@@ -141,5 +141,5 @@ upstreams:
   hash_fallback: none
   hash_on_cookie_path: /
   targets:
-  - target: kong:48001
+  - target: kong-cp1:48001
     weight: 100
