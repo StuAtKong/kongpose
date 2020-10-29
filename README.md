@@ -45,9 +45,30 @@ verbose: 0
 
 `deck sync -s workspace-compose.yaml`
 
-Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);;
+Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);
 
 ```
+$ curl http://mrdizzy.heronwood.co.uk/httpbin/anything
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "httpbin-1",
+    "User-Agent": "curl/7.64.1",
+    "X-Forwarded-Host": "mrdizzy.heronwood.co.uk",
+    "X-Forwarded-Path": "/httpbin/anything",
+    "X-Forwarded-Prefix": "/httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "192.168.1.73, 172.26.0.13",
+  "url": "http://mrdizzy.heronwood.co.uk/anything"
+}
+
 $ curl https://mrdizzy.heronwood.co.uk/httpbin/anything
 {
   "args": {},
@@ -59,14 +80,15 @@ $ curl https://mrdizzy.heronwood.co.uk/httpbin/anything
     "Connection": "keep-alive",
     "Host": "httpbin-1",
     "User-Agent": "curl/7.64.1",
-    "X-Forwarded-Host": "kong-proxy.heronwood.co.uk"
+    "X-Forwarded-Host": "mrdizzy.heronwood.co.uk",
+    "X-Forwarded-Path": "/httpbin/anything",
+    "X-Forwarded-Prefix": "/httpbin"
   },
   "json": null,
   "method": "GET",
-  "origin": "192.168.0.1",
-  "url": "https://kong-proxy.heronwood.co.uk/anything"
-}
-```
+  "origin": "172.26.0.13",
+  "url": "https://mrdizzy.heronwood.co.uk/anything"
+}```
 
 # Keycloak:
 
