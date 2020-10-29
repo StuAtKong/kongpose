@@ -1,5 +1,7 @@
 # Initial Setup
 
+## Start containers
+
 Set and env var for the license;
 
 `export KONG_LICENSE_DATA=`cat /home/stu/kongpose/license.json`;`
@@ -11,6 +13,8 @@ Start the service & kong containers
 `docker-compose up -d`
 
 This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server and an HAProxy server. 
+
+## Authentication
 
 By default, basic-auth is enabled and you can login with kong_admin/password but there are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
 
@@ -24,6 +28,8 @@ samba -D
 ```
 ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com" -w "Passw0rd" -b "dc=ldap,dc=kong,dc=com" "(sAMAccountName=kong_admin)"
 ```
+
+## Default endpoints for HAProxy healthcheck & httpbin
 
 Populate a healthcheck endpoint and a default Route/Service with deck;
 
@@ -45,9 +51,32 @@ verbose: 0
 
 `deck sync -s workspace-compose.yaml`
 
-Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);;
+## Test a proxy
+
+Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);
 
 ```
+$ curl http://mrdizzy.heronwood.co.uk/httpbin/anything
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "httpbin-1",
+    "User-Agent": "curl/7.64.1",
+    "X-Forwarded-Host": "mrdizzy.heronwood.co.uk",
+    "X-Forwarded-Path": "/httpbin/anything",
+    "X-Forwarded-Prefix": "/httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "192.168.1.73, 172.26.0.13",
+  "url": "http://mrdizzy.heronwood.co.uk/anything"
+}
+
 $ curl https://mrdizzy.heronwood.co.uk/httpbin/anything
 {
   "args": {},
@@ -59,12 +88,14 @@ $ curl https://mrdizzy.heronwood.co.uk/httpbin/anything
     "Connection": "keep-alive",
     "Host": "httpbin-1",
     "User-Agent": "curl/7.64.1",
-    "X-Forwarded-Host": "kong-proxy.heronwood.co.uk"
+    "X-Forwarded-Host": "mrdizzy.heronwood.co.uk",
+    "X-Forwarded-Path": "/httpbin/anything",
+    "X-Forwarded-Prefix": "/httpbin"
   },
   "json": null,
   "method": "GET",
-  "origin": "192.168.0.1",
-  "url": "https://kong-proxy.heronwood.co.uk/anything"
+  "origin": "172.26.0.13",
+  "url": "https://mrdizzy.heronwood.co.uk/anything"
 }
 ```
 
@@ -84,10 +115,4 @@ To use the haproxy API;
 
 ```
 echo "help" | socat stdio tcp4-connect:127.0.0.1:9999
-```
-
-Test the default API via haproxy;
-
-```
-$ curl http://mrdizzy.heronwood.co.uk:8888/httpbin/anything
 ```
