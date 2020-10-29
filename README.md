@@ -1,5 +1,7 @@
 # Initial Setup
 
+## Start containers
+
 Set and env var for the license;
 
 `export KONG_LICENSE_DATA=`cat /home/stu/kongpose/license.json`;`
@@ -11,6 +13,8 @@ Start the service & kong containers
 `docker-compose up -d`
 
 This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server and an HAProxy server. 
+
+## Authentication
 
 By default, basic-auth is enabled and you can login with kong_admin/password but there are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng.
 
@@ -24,6 +28,8 @@ samba -D
 ```
 ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com" -w "Passw0rd" -b "dc=ldap,dc=kong,dc=com" "(sAMAccountName=kong_admin)"
 ```
+
+## Default endpoints for HAProxy healthcheck & httpbin
 
 Populate a healthcheck endpoint and a default Route/Service with deck;
 
@@ -44,6 +50,8 @@ verbose: 0
 ```
 
 `deck sync -s workspace-compose.yaml`
+
+## Test a proxy
 
 Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);
 
