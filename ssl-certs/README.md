@@ -201,3 +201,8 @@ total 44
 $ chmod 644 server.key
 ```
 
+## Optional
+
+To use the certificate for GUI functions, you will need to import the rootCA.pem certificate to the truststore. For OSX, double click on the rootCA.pem file and make sure to trust the CA;
+
+![OSX keystore](images/import-ca-cert.png)
