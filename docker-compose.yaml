@@ -7,8 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.1-alpine
     container_name: case-kong-ee-mig
     networks:
       - case-kong-net
@@ -24,8 +24,8 @@ services:
     restart: on-failure
 
   kong-cp1:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.1-alpine
     container_name: case-kong-cp1
     networks:
       - case-kong-net
@@ -45,9 +45,8 @@ services:
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
       KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
       KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
-      KONG_CASSANDRA_CONTACT_POINTS: db
       KONG_DATABASE: postgres
-      KONG_PG_HOST: db
+      KONG_PG_HOST: ${KONG_PG_HOST:-db}"
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
@@ -121,8 +120,8 @@ services:
     restart: on-failure
 
   kong-dp1:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.1-alpine
     container_name: case-kong-dp1
     networks:
       - case-kong-net
@@ -165,8 +164,8 @@ services:
     restart: on-failure
 
   kong-dp2:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-beta1-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.1-alpine
     networks:
       - case-kong-net
     container_name: case-kong-dp2
@@ -297,6 +296,22 @@ services:
 #    ports:
 #      - "8200:8200/tcp"
 
+  toxiproxy:
+    networks:
+      - case-kong-net
+    container_name: case-toxiproxy
+    image: "shopify/toxiproxy"
+    ports:
+       - "8474:8474"
+
+  # Create a toxiproxy configuration for postgres latency
+  toxiproxy-config:
+    networks:
+      - case-kong-net
+    image: "shopify/toxiproxy"
+    entrypoint: > 
+      sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;"
 
   ha-proxy:
     networks:
