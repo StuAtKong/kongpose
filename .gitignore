@@ -7,3 +7,4 @@ ssl-certs/server.crt
 ssl-certs/server.csr
 ssl-certs/server.key
 ssl-certs/v3.ext
+locust/__pycache__/*
