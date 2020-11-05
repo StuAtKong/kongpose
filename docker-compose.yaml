@@ -46,7 +46,8 @@ services:
       KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
       KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
       KONG_DATABASE: postgres
-      KONG_PG_HOST: ${KONG_PG_HOST:-db}"
+      KONG_PG_HOST: db
+      #KONG_PG_HOST: toxiproxy
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
@@ -331,3 +332,13 @@ services:
       - "8404:8404/tcp"
       - "9999:9999/tcp"
 
+  locust:
+    networks:
+      - case-kong-net
+    container_name: case-locust
+    image: locustio/locust
+    ports:
+     - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py
