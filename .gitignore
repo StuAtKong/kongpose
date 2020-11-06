@@ -1,3 +1,4 @@
+setup.sh
 license.json
 ssl-certs/hybrid/cluster.crt
 ssl-certs/hybrid/cluster.key
