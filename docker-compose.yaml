@@ -89,11 +89,9 @@ services:
       KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
       KONG_SMTP_MOCK: "off"
       KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "${SMTP_HOST}"
-      KONG_SMTP_DOMAIN: "${SMTP_DOMAIN}"
-      KONG_SMTP_USERNAME: "${SMTP_USERNAME}"
-      KONG_SMTP_PASSWORD: "${SMTP_PASSWORD}"
-      KONG_SMTP_AUTH_TYPE: "login"
+      KONG_SMTP_HOST: "fake-smtp-server"
+      KONG_SMTP_PORT: 1025
+      KONG_SMTP_DOMAIN: "api.konglan"
       KONG_TRACING: "off"
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
@@ -342,3 +340,13 @@ services:
     volumes:
       - ./locust:/mnt/locust
     command: -f /mnt/locust/locustfile.py
+
+  fake-smtp-server:
+    networks:
+      - case-kong-net
+    container_name: case-fake-smtp-server
+    image: reachfive/fake-smtp-server
+    ports:
+      #- "25:1025/tcp"
+      - "1080:1080/tcp"
+
