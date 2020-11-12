@@ -36,7 +36,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
-      - ./plugins/kong-plugin-support-info/:/plugins/kong/plugins/support-info
+      - ./plugins/kong-plugin-support-info/:/usr/local/share/lua/5.1/kong/plugins/support-info
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
@@ -101,7 +101,7 @@ services:
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
-      KONG_PLUGINS=bundled,support-info
+      KONG_PLUGINS: bundled,support-info
     ports:
       # HTTP Proxy port is only available via haproxy
       - "48001:48001/tcp"
@@ -132,7 +132,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
-      - ./plugins/kong-plugin-support-info/:/plugins/kong/plugins/support-info
+      - ./plugins/kong-plugin-support-info/:/usr/local/share/lua/5.1/kong/plugins/support-info
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
@@ -158,7 +158,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
-      KONG_PLUGINS=bundled,support-info
+      KONG_PLUGINS: bundled,support-info
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -178,7 +178,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
-      - ./plugins/kong-plugin-support-info/:/plugins/kong/plugins/support-info
+      - ./plugins/kong-plugin-support-info/:/usr/local/share/lua/5.1/kong/plugins/support-info
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
@@ -204,7 +204,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
-      KONG_PLUGINS=bundled,support-info
+      KONG_PLUGINS: bundled,support-info
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
