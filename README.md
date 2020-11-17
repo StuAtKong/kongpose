@@ -170,6 +170,10 @@ Password: password
 
 # HAProxy
 
+There is an hap-proxy GUI for statistics;
+
+http://api.kong.lan:8404/stats
+
 https://www.haproxy.com/blog/dynamic-configuration-haproxy-runtime-api/
 
 To use the haproxy API;
