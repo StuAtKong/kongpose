@@ -100,6 +100,7 @@ services:
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
+      KONG_NGINX_WORKER_PROCESSES: 1
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -144,6 +145,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
+      KONG_NGINX_WORKER_PROCESSES: 1
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -188,6 +190,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
+      KONG_NGINX_WORKER_PROCESSES: 1
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -255,7 +258,7 @@ services:
       KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - "8080:8080/tcp"
-      - "8443:8443/tcp"
+      - "18443:8443/tcp"
 
   redis:
     networks:
