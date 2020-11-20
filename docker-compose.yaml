@@ -101,6 +101,7 @@ services:
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
       KONG_NGINX_WORKER_PROCESSES: 1
+      KONG_EVENT_HOOKS_ENABLED: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -146,6 +147,7 @@ services:
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
+      KONG_EVENT_HOOKS_ENABLED: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -191,6 +193,7 @@ services:
       KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
+      KONG_EVENT_HOOKS_ENABLED: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -312,6 +315,8 @@ services:
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
     depends_on:
+      kong-cp1:
+        condition: service_healthy
       kong-dp1:
         condition: service_healthy
       kong-dp2:
