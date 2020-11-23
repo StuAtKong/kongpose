@@ -61,6 +61,8 @@ services:
   read_timeout: 60000
   retries: 5
   write_timeout: 60000
+  tags:
+  - rl-test
   routes:
   - name: limit-httpbin
     paths:
@@ -72,8 +74,26 @@ services:
     - https
     regex_priority: 0
     strip_path: true
+    tags:
+    - rl-test
     https_redirect_status_code: 426
     plugins:
+    - name: key-auth
+      config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - rl-test
     - name: rate-limiting-advanced
       config:
         dictionary_name: kong_rate_limiting_counters
@@ -98,7 +118,7 @@ services:
           ssl_verify: false
           timeout: 2000
         strategy: redis
-        sync_rate: 10
+        sync_rate: 0
         window_size:
         - 30
         window_type: sliding
@@ -108,6 +128,8 @@ services:
       - grpcs
       - http
       - https
+      tags:
+      - rl-test
   - name: localhttpbin
     paths:
     - /httpbin
@@ -119,6 +141,13 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+consumers:
+- username: consA
+  keyauth_credentials:
+  - key: abc
+- username: consB
+  keyauth_credentials:
+  - key: "123"
 upstreams:
 - name: local-httpbin
   algorithm: round-robin
