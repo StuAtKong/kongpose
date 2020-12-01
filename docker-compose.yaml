@@ -277,7 +277,6 @@ services:
     container_name: case-redis-commander
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
-    restart: always
     environment:
       REDIS_HOSTS: redis
     ports:
@@ -342,16 +341,47 @@ services:
       - "8404:8404/tcp"
       - "9999:9999/tcp"
 
-  locust:
+  deck:
     networks:
       - case-kong-net
-    container_name: case-locust
+    container_name: case-deck
+    image: kong/deck:v1.2.3
+    volumes:
+        - .:/tmp:ro
+    environment:
+        DECK_ANALYTICS: "off"
+        DECK_KONG_ADDR: "http://api.kong.lan:8001"
+        #DECK_KONG_ADDR: "https://api.kong.lan:8444"
+        DECK_HEADERS: "kong-admin-token:password"
+    depends_on:
+      kong-cp1:
+        condition: service_healthy
+      kong-dp1:
+        condition: service_healthy
+      kong-dp2:
+        condition: service_healthy
+    #command: sync --ca-cert=$(cat /tmp/ssl-certs/rootCA.pem) --state=/tmp/workspace-compose.yaml
+    command: sync --state=/tmp/workspace-compose.yaml
+
+  locust-master:
+    networks:
+      - case-kong-net
+    container_name: case-locust-master
     image: locustio/locust
     ports:
      - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --master
+
+  locust-worker:
+    networks:
+      - case-kong-net
+    container_name: case-locust-worker
+    image: locustio/locust
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host locust-master
 
   fake-smtp-server:
     networks:
