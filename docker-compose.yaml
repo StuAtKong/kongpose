@@ -67,9 +67,9 @@ services:
       KONG_ADMIN_GUI_URL: "https://api.kong.lan:8445"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_GUI_AUTH: "basic-auth"
-      #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
+      #KONG_ADMIN_GUI_AUTH: "basic-auth"
+      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
+      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
@@ -223,12 +223,16 @@ services:
     networks:
       - case-kong-net
     container_name: case-ad-server
-    image: nginx:1.17.3-alpine
+    image: alpine:3.12.1
     volumes:
-      - ./ldap-server:/setup-ad/
+            - ./ldap-server:/setup-ad/:ro
     # run as privileged to workaround this issue
     # set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
     privileged: true
+    command: >
+        sh -c "/setup-ad/setup.sh &&
+        bash /setup-ad/seed.sh &&
+        samba -i --debuglevel=1"
     ports:
       - "389:389/tcp"
 

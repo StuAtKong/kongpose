@@ -24,16 +24,9 @@ This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy ser
 
 ## Authentication
 
-By default, basic-auth is enabled and you can login with kong_admin/password.
+By default, ldap-auth is enabled and you can login with kong_admin/K1ngK0ng
 
-There are scripts to populate the LDAP server with seed data. After population, it should be possible to login to Kong Manager with LDAP auth and kong_admin/K1ngK0ng (you will also need to edit the docker-compose.yaml file to change the admin_gui_auth and admin_gui_auth_conf (commented values in this file) and restart the kong CP.
-
-~~~
-docker exec -it --user root case-ad-server /bin/sh
-sh /setup-ad/setup.sh
-bash /setup-ad/seed.sh
-samba -D
-~~~
+You can look at the LDAP tree by searching as below;
 
 ~~~
 ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com" -w "Passw0rd" -b "dc=ldap,dc=kong,dc=com" "(sAMAccountName=kong_admin)"
