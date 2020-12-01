@@ -360,7 +360,7 @@ services:
         condition: service_healthy
       kong-dp2:
         condition: service_healthy
-    #command: sync --ca-cert=$(cat /tmp/ssl-certs/rootCA.pem) --state=/tmp/workspace-compose.yaml
+    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
     command: sync --state=/tmp/workspace-compose.yaml
 
   locust-master:
