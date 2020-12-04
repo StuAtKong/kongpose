@@ -7,7 +7,7 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-ee-mig
     networks:
       - case-kong-net
@@ -23,7 +23,7 @@ services:
     restart: on-failure
 
   kong-node1:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-node1
     networks:
       - case-kong-net
@@ -101,7 +101,7 @@ services:
     restart: on-failure
 
   kong-node2:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-node2
     networks:
       - case-kong-net
@@ -238,7 +238,7 @@ services:
       KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - "8080:8080/tcp"
-      - "8443:8443/tcp"
+      - "18443:8443/tcp"
 
   redis:
     networks:
@@ -298,6 +298,8 @@ services:
       kong-node2:
         condition: service_healthy
     ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
       - "8000-8004:8000-8004/tcp"
       - "8443-8447:8443-8447/tcp"
       - "8100:8100/tcp"
