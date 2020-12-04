@@ -9,6 +9,8 @@ services:
   read_timeout: 60000
   retries: 5
   write_timeout: 60000
+  tags:
+  - ha-proxy_healthcheck
   routes:
   - name: Healthcheck
     paths:
@@ -20,6 +22,8 @@ services:
     - https
     regex_priority: 0
     strip_path: true
+    tags:
+    - ha-proxy_healthcheck
     https_redirect_status_code: 426
   plugins:
   - name: request-transformer
@@ -53,6 +57,8 @@ services:
     - grpcs
     - http
     - https
+    tags:
+    - ha-proxy_healthcheck
 - connect_timeout: 60000
   host: local-httpbin
   name: local_httpbin
@@ -143,6 +149,8 @@ services:
     https_redirect_status_code: 426
 consumers:
 - username: consA
+  tags:
+  - ha-proxy_healthcheck
   keyauth_credentials:
   - key: abc
 - username: consB
@@ -286,6 +294,10 @@ upstreams:
   hash_on: none
   hash_fallback: none
   hash_on_cookie_path: /
+  tags:
+  - ha-proxy_healthcheck
   targets:
   - target: kong-cp1:48001
     weight: 100
+    tags:
+    - ha-proxy_healthcheck
