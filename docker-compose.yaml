@@ -261,6 +261,14 @@ services:
 #    ports:
 #      - "80:80/tcp"
 
+  echo-server:
+    networks:
+      - case-kong-net
+    container_name: case-echo-server
+    image: "jmalloc/echo-server"
+#    ports:
+#      - "8080:8080/tcp"
+
   keycloak:
     networks:
       - case-kong-net
