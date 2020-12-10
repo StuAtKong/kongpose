@@ -446,6 +446,7 @@ services:
       # Password: admin
       - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
       - GRAYLOG_HTTP_EXTERNAL_URI=http://api.kong.lan:9000/
+      - GRAYLOG_HTTP_PUBLISH_URI=http://api.kong.lan:9000/
     links:
       - mongodb:mongo
       - elasticsearch

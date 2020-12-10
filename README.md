@@ -122,3 +122,10 @@ Add a fake-smtp-server service. View the UI at http://api.kong.lan:1080/
 
 Need to see what is stored in redis? Try redis-commander at http://ap.kong.lan:8081
 
+# Graylog
+
+For Syslog/TCP/UDP log plugins, use Graylog. The default username/password to login is admin/admin
+
+http://api.kong.lan:9000/
+
+Create an Input (System/Inputs) to listen on port 5555 for TCP and UDP.
