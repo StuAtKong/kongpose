@@ -102,6 +102,9 @@ services:
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
+      KONG_TRUSTED_IPS: "0.0.0.0/0"
+      KONG_REAL_IP_HEADER: "X-Forwarded-For"
+      KONG_REAL_IP_RECURSIVE: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -148,6 +151,9 @@ services:
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
+      KONG_TRUSTED_IPS: "0.0.0.0/0"
+      KONG_REAL_IP_HEADER: "X-Forwarded-For"
+      KONG_REAL_IP_RECURSIVE: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -194,6 +200,9 @@ services:
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
+      KONG_TRUSTED_IPS: "0.0.0.0/0"
+      KONG_REAL_IP_HEADER: "X-Forwarded-For"
+      KONG_REAL_IP_RECURSIVE: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -395,4 +404,58 @@ services:
     ports:
       #- "25:1025/tcp"
       - "1080:1080/tcp"
+
+  mongodb:
+    networks:
+      - case-kong-net
+    container_name: case-mongodb
+    image: mongo:4.2
+
+  elasticsearch:
+    networks:
+      - case-kong-net
+    container_name: case-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+
+  graylog:
+    networks:
+      - case-kong-net
+    container_name: case-graylog
+    image: graylog/graylog:4.0
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://api.kong.lan:9000/
+    links:
+      - mongodb:mongo
+      - elasticsearch
+    restart: always
+    depends_on:
+      - mongodb
+      - elasticsearch
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # Syslog TCP
+      - 1514:1514
+      # Syslog UDP
+      - 1514:1514/udp
+      # GELF TCP
+      - 12201:12201
+      # GELF UDP
+      - 12201:12201/udp
+      - "5555:5555"
+      - "5555:5555/udp"
 

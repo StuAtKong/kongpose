@@ -147,6 +147,21 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+    plugins:
+    - name: tcp-log
+      config:
+        host: graylog
+        keepalive: 60000
+        port: 5555
+        timeout: 10000
+        tls: false
+        tls_sni: null
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
 consumers:
 - username: consA
   tags:
