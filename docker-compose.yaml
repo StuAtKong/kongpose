@@ -238,7 +238,7 @@ services:
       KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - "8080:8080/tcp"
-      - "8443:8443/tcp"
+      - "18443:8443/tcp"
 
   redis:
     networks:
