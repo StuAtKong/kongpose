@@ -7,7 +7,7 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-ee-mig
     networks:
       - case-kong-net
@@ -23,7 +23,7 @@ services:
     restart: on-failure
 
   kong-node1:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-node1
     networks:
       - case-kong-net
@@ -101,7 +101,7 @@ services:
     restart: on-failure
 
   kong-node2:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
     container_name: case-kong-node2
     networks:
       - case-kong-net
@@ -298,11 +298,33 @@ services:
       kong-node2:
         condition: service_healthy
     ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
       - "8000-8004:8000-8004/tcp"
       - "8443-8447:8443-8447/tcp"
       - "8100:8100/tcp"
       - "8404:8404/tcp"
       - "9999:9999/tcp"
+
+  deck:
+    networks:
+      - case-kong-net
+    container_name: case-deck
+    image: kong/deck:v1.2.3
+    volumes:
+        - .:/tmp:ro
+    environment:
+        DECK_ANALYTICS: "off"
+        DECK_KONG_ADDR: "http://api.kong.lan:8001"
+        #DECK_KONG_ADDR: "https://api.kong.lan:8444"
+        DECK_HEADERS: "kong-admin-token:password"
+    depends_on:
+      kong-node1:
+        condition: service_healthy
+      kong-node2:
+        condition: service_healthy
+    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
+    command: sync --state=/tmp/workspace-compose.yaml
 
   locust:
     networks:
