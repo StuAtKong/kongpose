@@ -23,192 +23,55 @@ services:
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
 
-  kong-cp1:
+  kong-ee:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.2-alpine
-    container_name: case-kong-cp1
+    container_name: case-kong-ee
     networks:
       - case-kong-net
     user: "${KONG_USER:-kong}"
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
     environment:
-      KONG_PROXY_LISTEN: "off"
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
-      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:48002, 0.0.0.0:48445 ssl"
-      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:48003, 0.0.0.0:48446 ssl"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
-      KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:8002"
+      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:8003"
+      KONG_PORTAL_API_LISTEN: "0.0.0.0:8004"
+      KONG_STATUS_LISTEN: "0.0.0.0:8100"
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
-      #KONG_PG_HOST: toxiproxy
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_AUDIT_LOG: "on"
+      KONG_AUDIT_LOG: "off"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ENFORCE_RBAC: "on"
-      KONG_ADMIN_API_URI: "https://api.kong.lan:8444"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_GUI_URL: "https://api.kong.lan:8445"
-      KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      #KONG_ADMIN_GUI_AUTH: "basic-auth"
-      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
+      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
+      KONG_ADMIN_GUI_URL: "http://api.kong.lan:8002"
+      KONG_ADMIN_GUI_AUTH: "basic-auth"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
-      KONG_PORTAL_GUI_PROTOCOL: "https"
-      KONG_PORTAL_GUI_HOST: "api.kong.lan:8446"
-      KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_API_URL: "https://api.kong.lan:8447"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_AUTH: "openid-connect"
-      KONG_PORTAL_AUTH_CONF: "{\"leeway\":100,\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"client_id\":[\"kong\"],\"redirect_uri\":[\"https://api.kong.lan:8446//default\"],\"login_action\":\"redirect\",\"login_redirect_uri\":[\"https://api.kong.lan:8446//default\"],\"login_redirect_mode\":\"query\",\"logout_redirect_uri\":[\"https://api.kong.lan:8446//default\"],\"logout_methods\":[\"GET\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"hhttps://api.kong.lan:8446/default/unauthorized\"],\"issuer\":\"http://10.0.10.1:8080/auth/realms/kong/.well-known/openid-configuration\",\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"ssl_verify\":false}"
+      KONG_PORTAL_GUI_PROTOCOL: "http"
+      KONG_PORTAL_GUI_HOST: "api.kong.lan:8003"
+      KONG_PORTAL_API_URL: "http://api.kong.lan:8004"
       KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true}"
-      KONG_PORTAL_EMAIL_VERIFICATION: "on"
-      KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
-      KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_FROM: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_SMTP_MOCK: "off"
-      KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "fake-smtp-server"
-      KONG_SMTP_PORT: 1025
-      KONG_SMTP_DOMAIN: "api.konglan"
-      KONG_TRACING: "off"
-      KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
-      KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
-      KONG_GENERATE_TRACE_DETAILS: "on"
-      KONG_ROLE: control_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
+      KONG_SMTP_MOCK: "on"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 10s
       retries: 10
     restart: on-failure
-
-  kong-dp1:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.2-alpine
-    container_name: case-kong-dp1
-    networks:
-      - case-kong-net
-    depends_on:
-      kong-cp1:
-        condition: service_healthy
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
-    environment:
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_DATABASE: "off"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_LOG_LEVEL: "debug"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ROLE: data_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
-
-  kong-dp2:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.2-alpine
-    networks:
-      - case-kong-net
-    container_name: case-kong-dp2
-    depends_on:
-      kong-cp1:
-        condition: service_healthy
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
-    environment:
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_DATABASE: "off"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_LOG_LEVEL: "debug"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ROLE: data_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
+    ports:
+      - "8000-8004:8000-8004/tcp"
+      - "8100:8100/tcp"
 
   db:
     networks:
@@ -228,23 +91,6 @@ services:
     stdin_open: true
     tty: true
 
-  ad-server:
-    networks:
-      - case-kong-net
-    container_name: case-ad-server
-    image: alpine:3.12.1
-    volumes:
-            - ./ldap-server:/setup-ad/:ro
-    # run as privileged to workaround this issue
-    # set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
-    privileged: true
-    command: >
-        sh -c "/setup-ad/setup.sh &&
-        bash /setup-ad/seed.sh &&
-        samba -i --debuglevel=1"
-    ports:
-      - "389:389/tcp"
-
   httpbin-1:
     networks:
       - case-kong-net
@@ -252,115 +98,6 @@ services:
     image: "kennethreitz/httpbin"
 #    ports:
 #      - "80:80/tcp"
-
-  httpbin-2:
-    networks:
-      - case-kong-net
-    container_name: case-httpbin-2
-    image: "kennethreitz/httpbin"
-#    ports:
-#      - "80:80/tcp"
-
-  echo-server:
-    networks:
-      - case-kong-net
-    container_name: case-echo-server
-    image: "jmalloc/echo-server"
-#    ports:
-#      - "8080:8080/tcp"
-
-  keycloak:
-    networks:
-      - case-kong-net
-    container_name: case-keycloak
-    image: jboss/keycloak:9.0.0
-    volumes:
-      - ./kong-realm.json:/tmp/kong-realm.json
-    environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
-      KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
-    ports:
-      - "8080:8080/tcp"
-      - "18443:8443/tcp"
-
-  redis:
-    networks:
-      - case-kong-net
-    container_name: case-redis
-    image: redis:latest
-#    ports:
-#      - "6379:6379/tcp"
-
-  redis-commander:
-    networks:
-      - case-kong-net
-    container_name: case-redis-commander
-    hostname: redis-commander
-    image: rediscommander/redis-commander:latest
-    environment:
-      REDIS_HOSTS: redis
-    ports:
-    - "8081:8081"
-
-  zipkin:
-    networks:
-      - case-kong-net
-    container_name: case-zipkin
-    image: openzipkin/zipkin
-#    ports:
-#      - "9411:9411/tcp"
-
-  vault:
-    networks:
-      - case-kong-net
-    container_name: case-vault
-    image: vault:latest
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: myroot
-      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
-#    ports:
-#      - "8200:8200/tcp"
-
-  toxiproxy:
-    networks:
-      - case-kong-net
-    container_name: case-toxiproxy
-    image: "shopify/toxiproxy"
-    ports:
-       - "8474:8474"
-
-  # Create a toxiproxy configuration for postgres latency
-  toxiproxy-config:
-    networks:
-      - case-kong-net
-    image: "shopify/toxiproxy"
-    entrypoint: > 
-      sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;"
-
-  ha-proxy:
-    networks:
-      - case-kong-net
-    container_name: case-ha-proxy
-    image: haproxy:2.2.4-alpine
-    volumes:
-      - ./ha-proxy:/usr/local/etc/haproxy:ro
-    depends_on:
-      kong-cp1:
-        condition: service_healthy
-      kong-dp1:
-        condition: service_healthy
-      kong-dp2:
-        condition: service_healthy
-    ports:
-      - "80:80/tcp"
-      - "443:443/tcp"
-      - "8000-8004:8000-8004/tcp"
-      - "8443-8447:8443-8447/tcp"
-      - "8100:8100/tcp"
-      - "8404:8404/tcp"
-      - "9999:9999/tcp"
 
   deck:
     networks:
@@ -371,100 +108,10 @@ services:
         - .:/tmp:ro
     environment:
         DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://api.kong.lan:8001"
-        #DECK_KONG_ADDR: "https://api.kong.lan:8444"
+        DECK_KONG_ADDR: "http://kong-ee:8001"
         DECK_HEADERS: "kong-admin-token:password"
     depends_on:
-      kong-cp1:
+      kong-ee:
         condition: service_healthy
-      kong-dp1:
-        condition: service_healthy
-      kong-dp2:
-        condition: service_healthy
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
     command: sync --state=/tmp/workspace-compose.yaml
-
-  locust-master:
-    networks:
-      - case-kong-net
-    container_name: case-locust-master
-    image: locustio/locust
-    ports:
-     - "8089:8089"
-    volumes:
-      - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master
-
-  locust-worker:
-    networks:
-      - case-kong-net
-    container_name: case-locust-worker
-    image: locustio/locust
-    volumes:
-      - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --worker --master-host locust-master
-
-  fake-smtp-server:
-    networks:
-      - case-kong-net
-    container_name: case-fake-smtp-server
-    image: reachfive/fake-smtp-server
-    ports:
-      #- "25:1025/tcp"
-      - "1080:1080/tcp"
-
-  mongodb:
-    networks:
-      - case-kong-net
-    container_name: case-mongodb
-    image: mongo:4.2
-
-  elasticsearch:
-    networks:
-      - case-kong-net
-    container_name: case-elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
-    environment:
-      - http.host=0.0.0.0
-      - transport.host=localhost
-      - network.host=0.0.0.0
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    mem_limit: 1g
-
-  graylog:
-    networks:
-      - case-kong-net
-    container_name: case-graylog
-    image: graylog/graylog:4.0
-    environment:
-      # CHANGE ME (must be at least 16 characters)!
-      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
-      # Password: admin
-      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://api.kong.lan:9000/
-      - GRAYLOG_HTTP_PUBLISH_URI=http://api.kong.lan:9000/
-    links:
-      - mongodb:mongo
-      - elasticsearch
-    restart: always
-    depends_on:
-      - mongodb
-      - elasticsearch
-    ports:
-      # Graylog web interface and REST API
-      - 9000:9000
-      # Syslog TCP
-      - 1514:1514
-      # Syslog UDP
-      - 1514:1514/udp
-      # GELF TCP
-      - 12201:12201
-      # GELF UDP
-      - 12201:12201/udp
-      - "5555:5555"
-      - "5555:5555/udp"
 
