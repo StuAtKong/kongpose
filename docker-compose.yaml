@@ -16,7 +16,8 @@ services:
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
-      KONG_PG_DATABASE: kong
+      #KONG_PG_DATABASE: kong
+      KONG_PG_DATABASE: customer_kong_db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_PASSWORD: password
@@ -48,7 +49,8 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
       #KONG_PG_HOST: toxiproxy
-      KONG_PG_DATABASE: kong
+      #KONG_PG_DATABASE: kong
+      KONG_PG_DATABASE: customer_kong_db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
@@ -67,9 +69,9 @@ services:
       KONG_ADMIN_GUI_URL: "https://api.kong.lan:8445"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      #KONG_ADMIN_GUI_AUTH: "basic-auth"
-      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
+      KONG_ADMIN_GUI_AUTH: "basic-auth"
+      #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
+      #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
@@ -382,7 +384,8 @@ services:
       kong-dp2:
         condition: service_healthy
     #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
-    command: sync --state=/tmp/workspace-compose.yaml
+    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --workspace haproxy-hc --state=/tmp/haproxy-hc.yaml"
+    command: sync --workspace haproxy-hc --state=/tmp/haproxy-hc.yaml
 
   locust-master:
     networks:
