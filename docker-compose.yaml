@@ -213,7 +213,7 @@ services:
   db:
     networks:
       - case-kong-net
-    image: postgres:9.5
+    image: postgres:13.1
     container_name: case-kong-db
     environment:
       POSTGRES_DB: kong
