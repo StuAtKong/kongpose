@@ -17,7 +17,7 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
       #KONG_PG_DATABASE: kong
-      KONG_PG_DATABASE: customer_kong_db
+      KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_PASSWORD: password
@@ -50,7 +50,7 @@ services:
       KONG_PG_HOST: db
       #KONG_PG_HOST: toxiproxy
       #KONG_PG_DATABASE: kong
-      KONG_PG_DATABASE: customer_kong_db
+      KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
