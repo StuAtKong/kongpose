@@ -55,6 +55,12 @@ services:
       KONG_PG_PASSWORD: kong
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_GUI_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_API_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_API_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
@@ -131,8 +137,8 @@ services:
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
       KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_DATABASE: "off"
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
