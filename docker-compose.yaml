@@ -374,7 +374,7 @@ services:
     networks:
       - case-kong-net
     container_name: case-deck
-    image: kong/deck:v1.2.3
+    image: kong/deck:v1.2.4
     volumes:
         - .:/tmp:ro
     environment:
