@@ -136,6 +136,20 @@ services:
       - grpcs
       - http
       - https
+    - name: zipkin
+      config:
+        default_service_name: null
+        header_type: preserve
+        http_endpoint: http://zipkin:9411/api/v2/spans
+        include_credential: true
+        sample_ratio: 1
+        traceid_byte_count: 16
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
 consumers:
 - username: consA
   keyauth_credentials:
@@ -215,3 +229,76 @@ upstreams:
     weight: 100
   - target: httpbin-2:80
     weight: 100
+- name: status-upstream
+  algorithm: round-robin
+  slots: 10000
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      type: http
+      timeout: 1
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        tcp_failures: 0
+        timeouts: 0
+        interval: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 0
+  hash_on: none
+  hash_fallback: none
+  hash_on_cookie_path: /
+  tags:
+  - ha-proxy_healthcheck
+  targets:
+  - target: kong-cp1:48001
+    weight: 100
+    tags:
+    - ha-proxy_healthcheck
