@@ -283,7 +283,7 @@ services:
     container_name: case-keycloak
     image: jboss/keycloak:9.0.0
     volumes:
-      - ./kong-realm.json:/tmp/kong-realm.json
+      - ./keycloak/kong-realm.json:/tmp/kong-realm.json
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
@@ -376,7 +376,7 @@ services:
     container_name: case-deck
     image: kong/deck:v1.2.4
     volumes:
-        - .:/tmp:ro
+        - ./deck:/tmp/deck:ro
     environment:
         DECK_ANALYTICS: "off"
         DECK_KONG_ADDR: "http://api.kong.lan:8001"
@@ -389,8 +389,8 @@ services:
         condition: service_healthy
       kong-dp2:
         condition: service_healthy
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/default-entities.yaml --state=/tmp/hc-entities.yaml
-    command: sync --state=/tmp/default-entities.yaml --state=/tmp/hc-entities.yaml
+    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/deck
+    command: sync --state=/tmp/deck
 
   locust-master:
     networks:
