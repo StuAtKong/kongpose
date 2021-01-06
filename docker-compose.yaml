@@ -389,9 +389,8 @@ services:
         condition: service_healthy
       kong-dp2:
         condition: service_healthy
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --workspace haproxy-hc --state=/tmp/haproxy-hc.yaml"
-    command: sync --workspace haproxy-hc --state=/tmp/haproxy-hc.yaml
+    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/default-entities.yaml --state=/tmp/hc-entities.yaml
+    command: sync --state=/tmp/default-entities.yaml --state=/tmp/hc-entities.yaml
 
   locust-master:
     networks:
