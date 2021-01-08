@@ -150,7 +150,7 @@ $ curl http://api.kong.lan/limit-httpbin/anything?apikey=123
 }
 ~~~
 
-Send a few requests, get a 429 response and take a look in redis ;-)
+Send a few requests, get a 429 response and take a look in [redis](README.md#redis) ;-)
 
 # Keycloak:
 
