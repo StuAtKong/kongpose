@@ -348,11 +348,21 @@ services:
     networks:
       - case-kong-net
     image: mongo:4.2
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin --quiet | grep 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
 
   elasticsearch:
     networks:
       - case-kong-net
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
+    healthcheck:
+        test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+        interval: 30s
+        timeout: 30s
+        retries: 3    
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
@@ -368,18 +378,26 @@ services:
     networks:
       - case-kong-net
     image: graylog/graylog:4.0
+    volumes:
+      #- ./graylog/server.conf:/etc/graylog/server.conf
+      - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     environment:
       # CHANGE ME (must be at least 16 characters)!
-      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
       # Password: admin
-      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://api.kong.lan:9000/
-      - GRAYLOG_HTTP_PUBLISH_URI=http://api.kong.lan:9000/
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_HTTP_EXTERNAL_URI: http://api.kong.lan:9000/
+      GRAYLOG_HTTP_PUBLISH_URI: http://api.kong.lan:9000/
+      GRAYLOG_CONTENT_PACKS_LOADER_ENABLED: "true"
+      GRAYLOG_CONTENT_PACKS_DIR: /usr/share/graylog/data/contentpacks
+      GRAYLOG_CONTENT_PACKS_AUTO_INSTALL: kong-log-endpoints.json
     links:
       - mongodb:mongo
-      - elasticsearch
-    depends_on:
-      - mongodb
       - elasticsearch
     ports:
       # Graylog web interface and REST API
