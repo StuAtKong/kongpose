@@ -86,7 +86,7 @@ services:
         redis:
           cluster_addresses: null
           database: 0
-          host: redis
+          host: kongpose_redis_1
           password: null
           port: 6379
           sentinel_addresses: null

@@ -242,7 +242,7 @@ services:
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
-      REDIS_HOSTS: redis
+      REDIS_HOSTS: kongpose_redis_1
     ports:
     - "8081:8081"
 
