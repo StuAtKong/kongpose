@@ -130,7 +130,7 @@ upstreams:
   tags:
   - ha-proxy_healthcheck
   targets:
-  - target: kong-cp1:48001
+  - target: kongpose_kong-cp_1:48001
     weight: 100
     tags:
     - ha-proxy_healthcheck

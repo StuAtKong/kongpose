@@ -108,6 +108,10 @@ To use the haproxy API;
 echo "help" | socat stdio tcp4-connect:127.0.0.1:9999
 ~~~
 
+To view some HAProxy stats, look here;
+
+http://api.kong.lan:8404/stats
+
 # Locust
 
 For some loadtesting ability, checkout locust; https://locust.io/

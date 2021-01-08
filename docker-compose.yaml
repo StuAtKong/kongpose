@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.2'
 
 networks:
   case-kong-net:
@@ -9,7 +9,6 @@ services:
   kong-migrations:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
-    container_name: case-kong-ee-mig
     networks:
       - case-kong-net
     command: kong migrations bootstrap
@@ -24,10 +23,9 @@ services:
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
 
-  kong-cp1:
+  kong-cp:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
-    container_name: case-kong-cp1
     networks:
       - case-kong-net
     user: "${KONG_USER:-kong}"
@@ -120,14 +118,14 @@ services:
       retries: 10
     restart: on-failure
 
-  kong-dp1:
+  kong-dp:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
-    container_name: case-kong-dp1
+    scale: 3
     networks:
       - case-kong-net
     depends_on:
-      kong-cp1:
+      kong-cp:
         condition: service_healthy
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
@@ -155,57 +153,8 @@ services:
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
-
-  kong-dp2:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
-    networks:
-      - case-kong-net
-    container_name: case-kong-dp2
-    depends_on:
-      kong-cp1:
-        condition: service_healthy
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
-    environment:
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_DATABASE: "off"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_LOG_LEVEL: "debug"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ROLE: data_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CONTROL_PLANE: kong-cp1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp1:48006
+      KONG_CLUSTER_CONTROL_PLANE: kongpose_kong-cp_1:48005
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: kongpose_kong-cp_1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
       KONG_TRUSTED_IPS: "0.0.0.0/0"
@@ -222,7 +171,6 @@ services:
     networks:
       - case-kong-net
     image: postgres:13.1
-    container_name: case-kong-db
     environment:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
@@ -239,7 +187,6 @@ services:
   ad-server:
     networks:
       - case-kong-net
-    container_name: case-ad-server
     image: alpine:3.12.1
     volumes:
             - ./ldap-server:/setup-ad/:ro
@@ -253,26 +200,17 @@ services:
     ports:
       - "389:389/tcp"
 
-  httpbin-1:
+  httpbin:
     networks:
       - case-kong-net
-    container_name: case-httpbin-1
     image: "kennethreitz/httpbin"
-#    ports:
-#      - "80:80/tcp"
-
-  httpbin-2:
-    networks:
-      - case-kong-net
-    container_name: case-httpbin-2
-    image: "kennethreitz/httpbin"
+    scale: 2
 #    ports:
 #      - "80:80/tcp"
 
   echo-server:
     networks:
       - case-kong-net
-    container_name: case-echo-server
     image: "jmalloc/echo-server"
 #    ports:
 #      - "8080:8080/tcp"
@@ -280,7 +218,6 @@ services:
   keycloak:
     networks:
       - case-kong-net
-    container_name: case-keycloak
     image: jboss/keycloak:9.0.0
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
@@ -295,7 +232,6 @@ services:
   redis:
     networks:
       - case-kong-net
-    container_name: case-redis
     image: redis:latest
 #    ports:
 #      - "6379:6379/tcp"
@@ -303,7 +239,6 @@ services:
   redis-commander:
     networks:
       - case-kong-net
-    container_name: case-redis-commander
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
@@ -314,7 +249,6 @@ services:
   zipkin:
     networks:
       - case-kong-net
-    container_name: case-zipkin
     image: openzipkin/zipkin
     ports:
       - "9411:9411/tcp"
@@ -322,7 +256,6 @@ services:
   vault:
     networks:
       - case-kong-net
-    container_name: case-vault
     image: vault:latest
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: myroot
@@ -333,7 +266,6 @@ services:
   toxiproxy:
     networks:
       - case-kong-net
-    container_name: case-toxiproxy
     image: "shopify/toxiproxy"
     ports:
        - "8474:8474"
@@ -350,16 +282,13 @@ services:
   ha-proxy:
     networks:
       - case-kong-net
-    container_name: case-ha-proxy
     image: haproxy:2.2.4-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
     depends_on:
-      kong-cp1:
+      kong-cp:
         condition: service_healthy
-      kong-dp1:
-        condition: service_healthy
-      kong-dp2:
+      kong-dp:
         condition: service_healthy
     ports:
       - "80:80/tcp"
@@ -373,7 +302,6 @@ services:
   deck:
     networks:
       - case-kong-net
-    container_name: case-deck
     image: kong/deck:v1.2.4
     volumes:
         - ./deck:/tmp/deck:ro
@@ -383,19 +311,16 @@ services:
         #DECK_KONG_ADDR: "https://api.kong.lan:8444"
         DECK_HEADERS: "kong-admin-token:password"
     depends_on:
-      kong-cp1:
+      kong-cp:
         condition: service_healthy
-      kong-dp1:
-        condition: service_healthy
-      kong-dp2:
+      kong-dp:
         condition: service_healthy
     #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/deck
-    command: sync --state=/tmp/deck
+    command: sync --verbose 2 --state=/tmp/deck
 
   locust-master:
     networks:
       - case-kong-net
-    container_name: case-locust-master
     image: locustio/locust
     ports:
      - "8089:8089"
@@ -406,7 +331,6 @@ services:
   locust-worker:
     networks:
       - case-kong-net
-    container_name: case-locust-worker
     image: locustio/locust
     volumes:
       - ./locust:/mnt/locust
@@ -415,7 +339,6 @@ services:
   fake-smtp-server:
     networks:
       - case-kong-net
-    container_name: case-fake-smtp-server
     image: reachfive/fake-smtp-server
     ports:
       #- "25:1025/tcp"
@@ -424,13 +347,11 @@ services:
   mongodb:
     networks:
       - case-kong-net
-    container_name: case-mongodb
     image: mongo:4.2
 
   elasticsearch:
     networks:
       - case-kong-net
-    container_name: case-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     environment:
       - http.host=0.0.0.0
@@ -446,7 +367,6 @@ services:
   graylog:
     networks:
       - case-kong-net
-    container_name: case-graylog
     image: graylog/graylog:4.0
     environment:
       # CHANGE ME (must be at least 16 characters)!
