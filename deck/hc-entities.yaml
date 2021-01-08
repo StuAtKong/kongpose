@@ -3,7 +3,7 @@ _workspace: haproxy-hc
 services:
 - connect_timeout: 60000
   host: status-upstream
-  name: Healthcheck
+  name: healthcheck
   path: /status
   port: 80
   protocol: http
@@ -13,7 +13,7 @@ services:
   tags:
   - ha-proxy_healthcheck
   routes:
-  - name: Healthcheck
+  - name: healthcheck
     paths:
     - /health
     path_handling: v1
