@@ -90,6 +90,68 @@ $ curl -s --cacert ./ssl-certs/rootCA.pem https://api.kong.lan/httpbin/anything
 }
 ~~~
 
+There is also a rate limited example, secured with key-auth and two consumers
+
+~~~
+$ curl http://api.kong.lan/limit-httpbin/anything?apikey=abc
+{
+  "args": {
+    "apikey": "abc"
+  },
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "kongpose_httpbin_2",
+    "User-Agent": "curl/7.72.0",
+    "X-Consumer-Id": "ef320150-1b41-4af7-b567-bce8e093c6a6",
+    "X-Consumer-Username": "consA",
+    "X-Credential-Identifier": "c507fb51-1af9-4ca9-b8bf-5a520c83be58",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Path": "/limit-httpbin/anything",
+    "X-Forwarded-Prefix": "/limit-httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.26.0.1, 172.26.0.23",
+  "url": "http://api.kong.lan/anything?apikey=abc"
+}
+~~~
+
+and
+
+~~~
+$ curl http://api.kong.lan/limit-httpbin/anything?apikey=123
+{
+  "args": {
+    "apikey": "123"
+  },
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "kongpose_httpbin_2",
+    "User-Agent": "curl/7.72.0",
+    "X-Consumer-Id": "36fb326f-e011-4d2b-8acc-dd9638615d8b",
+    "X-Consumer-Username": "consB",
+    "X-Credential-Identifier": "a01449f0-bf58-44ec-8a5c-1f38deabcb93",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Path": "/limit-httpbin/anything",
+    "X-Forwarded-Prefix": "/limit-httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.26.0.1, 172.26.0.23",
+  "url": "http://api.kong.lan/anything?apikey=123"
+}
+~~~
+
+Send a few requests, get a 429 response and take a look in redis ;-)
+
 # Keycloak:
 
 URL: http://localhost:8080
