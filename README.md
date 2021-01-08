@@ -101,11 +101,42 @@ Password: password
 # HAProxy
 
 https://www.haproxy.com/blog/dynamic-configuration-haproxy-runtime-api/
+https://www.haproxy.com/documentation/hapee/1-9r1/onepage/management/#9.3
 
 To use the haproxy API;
 
 ~~~
-echo "help" | socat stdio tcp4-connect:127.0.0.1:9999
+echo "help" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+# Gracefully remove server from rotation
+~~~
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 state drain" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_https_proxy_nodes/kongpose_kong-dp_3 state drain" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+# Disable healthchecks for server
+~~~
+echo "disable health kong_http_proxy_nodes/kongpose_kong-dp_3" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "disable health kong_https_proxy_nodes/kongpose_kong-dp_3" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+# Set weight for server
+~~~
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 weight 50%" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_https_proxy_nodes/kongpose_kong-dp_3 weight 50%" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+# Enable healthchecks for server
+~~~
+echo "enable health kong_http_proxy_nodes/kongpose_kong-dp_3" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "enable health kong_https_proxy_nodes/kongpose_kong-dp_3" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+# Add server back to rotation
+~~~
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_https_proxy_nodes/kongpose_kong-dp_3 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
 ~~~
 
 To view some HAProxy stats, look here;
