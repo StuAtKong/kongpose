@@ -33,6 +33,35 @@ services:
       - grpcs
       - http
       - https
+  - name: auth-hmac
+    paths:
+    - /auth/hmac
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: hmac-auth
+      config:
+        algorithms:
+        - hmac-sha256
+        anonymous: null
+        clock_skew: 600
+        enforce_headers:
+        - date
+        - request-line
+        hide_credentials: false
+        validate_request_body: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
 - connect_timeout: 60000
   host: local-httpbin
   name: local_httpbin
@@ -157,6 +186,10 @@ consumers:
 - username: consB
   keyauth_credentials:
   - key: "123"
+- username: hmac-consumer
+  hmacauth_credentials:
+  - username: hmac-user
+    secret: K1ngK0ng
 upstreams:
 - name: local-httpbin
   algorithm: round-robin
