@@ -226,7 +226,7 @@ For Syslog/TCP/UDP log plugins, use Graylog. The default username/password to lo
 
 http://api.kong.lan:9000/
 
-Create an Input (System/Inputs) to listen on port 5555 for TCP and UDP.
+Two example inputs (System/Inputs) have been created via the "content packs" JSON file to listen on port 5555 for TCP and UDP.
 
 # Zipkin
 
