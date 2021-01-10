@@ -277,7 +277,9 @@ services:
     image: "shopify/toxiproxy"
     entrypoint: > 
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;"
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream kongpose_httpbin_1:80;
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency -t latency -a latency=250 -a jitter=150;"
 
   ha-proxy:
     networks:
@@ -305,6 +307,7 @@ services:
     image: kong/deck:v1.2.4
     volumes:
         - ./deck:/tmp/deck:ro
+        - ./ssl-certs:/tmp/ssl-certs:ro
     environment:
         DECK_ANALYTICS: "off"
         DECK_KONG_ADDR: "http://api.kong.lan:8001"
@@ -315,8 +318,10 @@ services:
         condition: service_healthy
       kong-dp:
         condition: service_healthy
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/deck
     command: sync --verbose 2 --state=/tmp/deck
+    #command: sync --verbose 2 --ca-cert="$$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/deck
+    #command: ['sync', '--verbose 2', '--ca-cert="$$(cat /tmp/ssl-certs/rootCA.pem)"', '--state=/tmp/deck']
+    
 
   locust-master:
     networks:
