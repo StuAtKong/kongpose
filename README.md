@@ -156,6 +156,17 @@ $ curl http://api.kong.lan/limit-httpbin/anything?apikey=123
 
 Send a few requests, get a 429 response and take a look in [redis](README.md#redis) ;-)
 
+# Websocket demo
+
+The echo-server can be used for websocket echo functionality. There is a default route setup on `/echo` that can be connected to with `websocat` or a websocket client of your choice. This server will echo back any data sent to it;
+
+```
+$ websocat ws://api.kong.lan/echo
+Request served by d5dd815f8b0d
+this is an echo
+this is an echo
+```
+
 # Keycloak:
 
 URL: http://localhost:8080
