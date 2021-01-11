@@ -18,7 +18,7 @@ class QuickstartUser(HttpUser):
 
     @task(32)
     def slow_response(self):
-        self.client.get("/slow_httpbin/anything")
+        self.client.get("/slow-httpbin/anything")
 
     @task(32)
     def hmac_auth_response(self):
