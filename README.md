@@ -167,6 +167,27 @@ this is an echo
 this is an echo
 ```
 
+Compared to an HTTP request to this server;
+
+```
+$ curl http://api.kong.lan/echo
+Request served by d5dd815f8b0d
+
+HTTP/1.1 GET /
+
+Host: echo-server:8080
+Connection: keep-alive
+X-Forwarded-Proto: http
+X-Forwarded-Path: /echo
+User-Agent: curl/7.74.0
+X-Real-Ip: 192.168.80.1
+Accept: */*
+X-Forwarded-For: 192.168.80.1, 192.168.80.22
+X-Forwarded-Host: api.kong.lan
+X-Forwarded-Port: 48000
+X-Forwarded-Prefix: /echo
+```
+
 # Keycloak:
 
 URL: http://localhost:8080
