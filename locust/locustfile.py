@@ -8,15 +8,19 @@ class QuickstartUser(HttpUser):
     wait_time = between(0.5, 1)
     host = "http://api.kong.lan"
 
-    @task(100)
+    @task(32)
     def good_response(self):
         self.client.get("/httpbin/status/200")
 
-    @task()
+    @task(4)
     def bad_response(self):
         self.client.get("/httpbin/status/503")
 
-    @task(50)
+    @task(32)
+    def slow_response(self):
+        self.client.get("/slow_httpbin/anything")
+
+    @task(32)
     def hmac_auth_response(self):
 
         now = datetime.now()
