@@ -156,7 +156,37 @@ $ curl http://api.kong.lan/limit-httpbin/anything?apikey=123
 
 Send a few requests, get a 429 response and take a look in [redis](README.md#redis) ;-)
 
-# Websocket demo
+# OIDC Example
+
+An enpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A users exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set wit the default Keycloak configuration.
+
+### Bearer
+
+Get an auth token by calling the Keycloak `/token` endpoint and assigning the token to an ENV var;
+
+```
+TOKEN=`curl -s -X POST 'http://api.kong.lan:8080/auth/realms/kong/protocol/openid-connect/token' \
+       --header 'content-type: application/x-www-form-urlencoded'  \
+      --data-urlencode 'client_id=kong' \
+      --data-urlencode 'client_secret=ab523f45-e04a-43ec-bac7-2e268c2ff05c'  \
+      --data-urlencode 'username=keycloak_user'  \
+      --data-urlencode 'password=password'  \
+      --data-urlencode 'grant_type=password' | jq -r '.access_token'`
+```
+
+Call the Kong proxy protected by the OIDC plugin with the access token in the header;
+
+```
+curl -v -H "Authorization: Bearer $TOKEN" http://api.kong.lan/auth/oid
+```
+
+## Auth Code
+
+Open this link in a browser and login with the `keycloak_user` user;
+
+http://api.kong.lan/auth/oidc
+
+# Websocket Example
 
 The echo-server can be used for websocket echo functionality. There is a default route setup on `/echo` that can be connected to with `websocat` or a websocket client of your choice. This server will echo back any data sent to it;
 
