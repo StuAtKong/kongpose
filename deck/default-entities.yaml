@@ -78,6 +78,45 @@ services:
       tags:
       - plugin-example
 - connect_timeout: 60000
+  host: kongpose_grpc-server_1
+  name: local-grpc-server
+  port: 9000
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: local-grpc-lotsOfReplies
+    paths:
+    - /hello.HelloService/LotsOfReplies
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    https_redirect_status_code: 426
+  - name: local-grpc-reflection
+    paths:
+    - /
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    https_redirect_status_code: 426
+  - name: local-grpc-sayHello
+    paths:
+    - /hello.HelloService/SayHello
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    https_redirect_status_code: 426
+- connect_timeout: 60000
   host: local-httpbin
   name: local-httpbin
   port: 80

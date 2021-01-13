@@ -73,7 +73,7 @@ $ curl http://api.kong.lan/httpbin/anything
   "url": "http://api.kong.lan/anything"
 }
 
-$ curl -s --cacert ./ssl-certs/rootCA.pem https://api.kong.lan/httpbin/anything
+$ curl -s --cacert ./ssl-certs/rootCA.pem --http2 https://api.kong.lan/httpbin/anything
 {
   "args": {},
   "data": "",
@@ -186,6 +186,117 @@ X-Forwarded-For: 192.168.80.1, 192.168.80.22
 X-Forwarded-Host: api.kong.lan
 X-Forwarded-Port: 48000
 X-Forwarded-Prefix: /echo
+```
+
+# GRPC Example
+
+## TLS
+
+```
+$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  api.kong.lan:443 hello.HelloService.SayHello
+
+Resolved method descriptor:
+rpc SayHello ( .hello.HelloRequest ) returns ( .hello.HelloResponse );
+
+Request metadata to send:
+kong-debug: 1
+
+Response headers received:
+content-type: application/grpc
+date: Wed, 13 Jan 2021 12:20:23 GMT
+kong-route-id: 126677da-3ebb-4d72-b52e-b2cb31309383
+kong-route-name: local-grpc-sayHello
+kong-service-id: 70ff022b-b275-4d49-8f5a-a7b16ed8c78e
+kong-service-name: local-grpc-server
+server: openresty
+via: kong/2.2.1.0-enterprise-edition
+x-kong-proxy-latency: 1
+x-kong-upstream-latency: 2
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response trailers received:
+(empty)
+Sent 1 request and received 1 response
+```
+
+```
+$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  api.kong.lan:443 hello.HelloService.LotsOfReplies
+
+Resolved method descriptor:
+rpc LotsOfReplies ( .hello.HelloRequest ) returns ( stream .hello.HelloResponse );
+
+Request metadata to send:
+kong-debug: 1
+
+Response headers received:
+content-type: application/grpc
+date: Wed, 13 Jan 2021 12:19:17 GMT
+kong-route-id: 1307e24e-0c3d-40bf-875a-d0ff61861c8d
+kong-route-name: local-grpc-lotsOfReplies
+kong-service-id: 70ff022b-b275-4d49-8f5a-a7b16ed8c78e
+kong-service-name: local-grpc-server
+server: openresty
+via: kong/2.2.1.0-enterprise-edition
+x-kong-proxy-latency: 1
+x-kong-upstream-latency: 1
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response trailers received:
+(empty)
+Sent 1 request and received 10 responses
 ```
 
 # Keycloak:
