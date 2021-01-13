@@ -41,7 +41,7 @@ ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong
 It is necessary to pass the CA certificate with the request to allow curl to verify the certs (or use -k which is not recommended);
 
 ~~~
-curl --cacert ./ssl-certs/rootCA.pem -H "kong-admin-token: password" https://api.kong.lan:48444/default/kong
+curl --cacert ./ssl-certs/rootCA.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
 ~~~
 
 ## Default endpoints for HAProxy healthcheck & httpbin
