@@ -18,4 +18,4 @@ kong hybrid gen_cert
 exit
 ```
 
-Make sure the permissions for the cluster certs are correct (they will be owned by root).
+Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need to run `sudo chmod 644 cluster.key` for the hybrid cluster ssl key.
