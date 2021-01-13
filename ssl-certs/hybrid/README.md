@@ -14,7 +14,7 @@ Then run;
 
 ```
 cd /tmp/ssl/hybrid
-kong hybrid certs
+kong hybrid gen_cert
 exit
 ```
 
