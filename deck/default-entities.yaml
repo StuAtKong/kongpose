@@ -326,7 +326,7 @@ services:
     https_redirect_status_code: 426
   - name: local-grpc-reflection
     paths:
-    - /
+    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
     path_handling: v0
     preserve_host: false
     protocols:
