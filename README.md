@@ -301,7 +301,7 @@ Sent 1 request and received 10 responses
 
 # Keycloak:
 
-URL: http://localhost:8080
+URL: http://api.kong.lan:8080
 
 Username: admin
 
