@@ -158,9 +158,9 @@ Send a few requests, get a 429 response and take a look in [redis](README.md#red
 
 # OIDC Example
 
-An enpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A users exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set wit the default Keycloak configuration.
+An endpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A user exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set during the default Keycloak configuration.
 
-### Bearer
+## Bearer
 
 Get an auth token by calling the Keycloak `/token` endpoint and assigning the token to an ENV var;
 
