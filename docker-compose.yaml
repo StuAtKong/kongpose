@@ -313,7 +313,8 @@ services:
   deck:
     networks:
       - case-kong-net
-    image: kong/deck:v1.3.0
+    #image: kong/deck:v1.3.0
+    image: kong/deck:v1.2.4
     volumes:
         - ./deck:/tmp/deck:ro
         - ./ssl-certs:/tmp/ssl-certs:ro
@@ -327,10 +328,9 @@ services:
         condition: service_healthy
       kong-dp:
         condition: service_healthy
-    command: sync --verbose 2 --state=/tmp/deck
-    #command: sync --verbose 2 --ca-cert="$$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/deck
-    #command: ['sync', '--verbose 2', '--ca-cert="$$(cat /tmp/ssl-certs/rootCA.pem)"', '--state=/tmp/deck']
-    
+    entrypoint: >
+      sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
+             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;"
 
   locust-master:
     networks:
