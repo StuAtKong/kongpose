@@ -8,6 +8,9 @@ ssl-certs/rootCA.srl
 ssl-certs/server.crt
 ssl-certs/server.csr
 ssl-certs/server.key
+ssl-certs/proxy.crt
+ssl-certs/proxy.csr
+ssl-certs/proxy.key
 ssl-certs/v3.ext
 locust/__pycache__/*
 zookeeper/*
