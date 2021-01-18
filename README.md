@@ -410,3 +410,9 @@ Two example inputs (System/Inputs) have been created via the "content packs" JSO
 View traces here;
 
 http://api.kong.lan:9411/
+
+# PGAdmin
+
+Need to view the postgres database? Try pgadmin
+
+http://api.kong.lan:7071
