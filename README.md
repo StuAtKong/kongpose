@@ -4,12 +4,12 @@ A comprehensive docker-compose file to get Kong EE up and running with minimal e
 
 ## Setup
 
-The initial setup is detailed in [Setup.md](Setup.md)
+The initial setup is detailed in [Setup](Setup.md)
 
 ## Examples
 
-Some Kong examples are described in [Examples.md](Examples.md)
+Some Kong examples are described in [Examples](Examples.md)
 
 ## Administration
 
-There are some administration tools/utilities in [Admin.md](Admin.md)
+There are some administration tools/utilities in [Admin](Admin.md)
