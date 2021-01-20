@@ -1,17 +1,5 @@
 setup.sh
 license.json
-ssl-certs/hybrid/cluster.crt
-ssl-certs/hybrid/cluster.key
-ssl-certs/rootCA.key
-ssl-certs/rootCA.pem
-ssl-certs/rootCA.srl
-ssl-certs/server.crt
-ssl-certs/server.csr
-ssl-certs/server.key
-ssl-certs/proxy.crt
-ssl-certs/proxy.csr
-ssl-certs/proxy.key
-ssl-certs/v3.ext
 locust/__pycache__/*
 zookeeper/*
 kafka/*
