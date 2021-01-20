@@ -38,7 +38,7 @@ ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong
 
 ## Developer Portal
 
-By default, the Developer Portal is configured to used OIDC (keycloak) for authentication. The keycloak instance has some accounts seeded in it that can be used to login to the DevPortal. Firstly, we need to create and approve a Kong Developer, which can be done either via the DevPortal signup and Kong Manager Developer accouint approval or via a couple of Admin API calls. We are using email for the user id and the keycloak user is setup with the email of `stu+dp@konghq.com` and the password value of `password`. You can also add your own user to Keycloak if you prefer to use a different email address.
+By default, the Developer Portal is configured to used OIDC (keycloak) for authentication. The keycloak instance has some accounts seeded in it that can be used to login to the DevPortal. Firstly, we need to create and approve a Kong Developer, which can be done either via the DevPortal signup and Kong Manager Developer account approval or via a couple of Admin API calls. We are using email for the user id and the keycloak user is setup with the email of `stu+dp@konghq.com` and the password value of `password`. You can also add your own user to Keycloak if you prefer to use a different email address.
 
 ### Create a Developer
 
