@@ -469,6 +469,19 @@ services:
       - https
       tags:
       - plugin-example
+  plugins:
+  - name: application-registration
+    config:
+      auto_approve: false
+      description: A simple API that echos the request
+      display_name: Echo Server
+      show_issuer: false
+    enabled: true
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
 - connect_timeout: 60000
   host: kongpose_toxiproxy_1
   name: slow-httpbin
