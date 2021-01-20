@@ -46,6 +46,8 @@ keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
 subjectAltName = @alt_names
 [alt_names]
 DNS.1 = api.kong.lan
+DNS.2 = proxy.kong.lan
+DNS.3 = client.kong.lan
 
 EOF
 ```

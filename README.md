@@ -8,7 +8,7 @@ The initial setup is detailed in [Setup.md](Setup.md)
 
 ## Examples
 
-Some Kong examples are described in [Examples,md](Examples.md)
+Some Kong examples are described in [Examples.md](Examples.md)
 
 ## Administration
 
