@@ -1,0 +1,292 @@
+# Examples
+
+## Test kong is working by making an Admin API request
+
+It is necessary to pass the CA certificate with the request to allow curl to verify the certs (or use -k which is not recommended);
+
+~~~
+curl --cacert ./ssl-certs/rootCA.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
+~~~
+
+## Simple echo proxy
+
+Test the default API via the HAProxy (the Kong proxy ports are not exposed externally so access in *ONLY* via HaProxy);
+
+~~~
+$ curl http://api.kong.lan/httpbin/anything
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "httpbin-1",
+    "User-Agent": "curl/7.64.0",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Prefix": "/httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.28.0.1, 172.28.0.13",
+  "url": "http://api.kong.lan/anything"
+}
+
+$ curl -s --cacert ./ssl-certs/rootCA.pem --http2 https://api.kong.lan/httpbin/anything
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "httpbin-1",
+    "User-Agent": "curl/7.64.0",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Prefix": "/httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.28.0.13",
+  "url": "https://api.kong.lan/anything"
+}
+~~~
+
+## Rate limited proxy
+
+There is also a rate limited example, secured with key-auth and two consumers
+
+~~~
+$ curl http://api.kong.lan/limit-httpbin/anything?apikey=abc
+{
+  "args": {
+    "apikey": "abc"
+  },
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "kongpose_httpbin_2",
+    "User-Agent": "curl/7.72.0",
+    "X-Consumer-Id": "ef320150-1b41-4af7-b567-bce8e093c6a6",
+    "X-Consumer-Username": "consA",
+    "X-Credential-Identifier": "c507fb51-1af9-4ca9-b8bf-5a520c83be58",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Path": "/limit-httpbin/anything",
+    "X-Forwarded-Prefix": "/limit-httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.26.0.1, 172.26.0.23",
+  "url": "http://api.kong.lan/anything?apikey=abc"
+}
+~~~
+
+and
+
+~~~
+$ curl http://api.kong.lan/limit-httpbin/anything?apikey=123
+{
+  "args": {
+    "apikey": "123"
+  },
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "kongpose_httpbin_2",
+    "User-Agent": "curl/7.72.0",
+    "X-Consumer-Id": "36fb326f-e011-4d2b-8acc-dd9638615d8b",
+    "X-Consumer-Username": "consB",
+    "X-Credential-Identifier": "a01449f0-bf58-44ec-8a5c-1f38deabcb93",
+    "X-Forwarded-Host": "api.kong.lan",
+    "X-Forwarded-Path": "/limit-httpbin/anything",
+    "X-Forwarded-Prefix": "/limit-httpbin"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "172.26.0.1, 172.26.0.23",
+  "url": "http://api.kong.lan/anything?apikey=123"
+}
+~~~
+
+Send a few requests, get a 429 response and take a look in [redis](Admin.md#redis) ;-)
+
+## OIDC Auth
+
+An endpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A user exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set during the default Keycloak configuration.
+
+### Bearer
+
+Get an auth token by calling the Keycloak `/token` endpoint and assigning the token to an ENV var;
+
+```
+TOKEN=`curl -s -X POST 'http://api.kong.lan:8080/auth/realms/kong/protocol/openid-connect/token' \
+       --header 'content-type: application/x-www-form-urlencoded'  \
+      --data-urlencode 'client_id=kong' \
+      --data-urlencode 'client_secret=ab523f45-e04a-43ec-bac7-2e268c2ff05c'  \
+      --data-urlencode 'username=keycloak_user'  \
+      --data-urlencode 'password=password'  \
+      --data-urlencode 'grant_type=password' | jq -r '.access_token'`
+```
+
+Call the Kong proxy protected by the OIDC plugin with the access token in the header;
+
+```
+curl -v -H "Authorization: Bearer $TOKEN" http://api.kong.lan/auth/oid
+```
+
+### Auth Code
+
+Open this link in a browser and login with the `keycloak_user` user;
+
+http://api.kong.lan/auth/oidc
+
+## Websocket Example
+
+The echo-server can be used for websocket echo functionality. There is a default route setup on `/echo` that can be connected to with `websocat` or a websocket client of your choice. This server will echo back any data sent to it;
+
+```
+$ websocat ws://api.kong.lan/echo
+Request served by d5dd815f8b0d
+this is an echo
+this is an echo
+```
+
+Compared to an HTTP request to this server;
+
+```
+$ curl http://api.kong.lan/echo
+Request served by d5dd815f8b0d
+
+HTTP/1.1 GET /
+
+Host: echo-server:8080
+Connection: keep-alive
+X-Forwarded-Proto: http
+X-Forwarded-Path: /echo
+User-Agent: curl/7.74.0
+X-Real-Ip: 192.168.80.1
+Accept: */*
+X-Forwarded-For: 192.168.80.1, 192.168.80.22
+X-Forwarded-Host: api.kong.lan
+X-Forwarded-Port: 48000
+X-Forwarded-Prefix: /echo
+```
+
+## GRPC Example
+
+### TLS
+
+```
+$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  api.kong.lan:443 hello.HelloService.SayHello
+
+Resolved method descriptor:
+rpc SayHello ( .hello.HelloRequest ) returns ( .hello.HelloResponse );
+
+Request metadata to send:
+kong-debug: 1
+
+Response headers received:
+content-type: application/grpc
+date: Wed, 13 Jan 2021 12:20:23 GMT
+kong-route-id: 126677da-3ebb-4d72-b52e-b2cb31309383
+kong-route-name: local-grpc-sayHello
+kong-service-id: 70ff022b-b275-4d49-8f5a-a7b16ed8c78e
+kong-service-name: local-grpc-server
+server: openresty
+via: kong/2.2.1.0-enterprise-edition
+x-kong-proxy-latency: 1
+x-kong-upstream-latency: 2
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response trailers received:
+(empty)
+Sent 1 request and received 1 response
+```
+
+```
+$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  api.kong.lan:443 hello.HelloService.LotsOfReplies
+
+Resolved method descriptor:
+rpc LotsOfReplies ( .hello.HelloRequest ) returns ( stream .hello.HelloResponse );
+
+Request metadata to send:
+kong-debug: 1
+
+Response headers received:
+content-type: application/grpc
+date: Wed, 13 Jan 2021 12:19:17 GMT
+kong-route-id: 1307e24e-0c3d-40bf-875a-d0ff61861c8d
+kong-route-name: local-grpc-lotsOfReplies
+kong-service-id: 70ff022b-b275-4d49-8f5a-a7b16ed8c78e
+kong-service-name: local-grpc-server
+server: openresty
+via: kong/2.2.1.0-enterprise-edition
+x-kong-proxy-latency: 1
+x-kong-upstream-latency: 1
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response contents:
+{
+  "reply": "hello Kong 1.3!"
+}
+
+Response trailers received:
+(empty)
+Sent 1 request and received 10 responses
+```
