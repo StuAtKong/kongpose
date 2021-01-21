@@ -112,7 +112,6 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
-      TZ: "Europe/London"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
