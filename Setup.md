@@ -32,7 +32,7 @@ This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy ser
 
 ## Authentication
 
-By default, ldap-auth is enabled and you can login with kong_admin/K1ngK0ng
+By default, ldap-auth is enabled and you can login to Kong Manager with `kong_admin`/`K1ngK0ng` at https://api.kong.lan:8445
 
 You can look at the LDAP tree by searching as below;
 
