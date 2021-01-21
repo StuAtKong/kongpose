@@ -1,8 +1,8 @@
 version: '2.2'
 
 networks:
-  case-kong-net:
-    name: case-kong-net
+  kongpose-net:
+    name: kongpose-net
     driver: bridge
 
 services:
@@ -10,7 +10,7 @@ services:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
-      - case-kong-net
+      - kongpose-net
     command: kong migrations bootstrap
     environment:
       KONG_DATABASE: postgres
@@ -27,7 +27,7 @@ services:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
-      - case-kong-net
+      - kongpose-net
     user: "${KONG_USER:-kong}"
     depends_on:
       db:
@@ -124,7 +124,7 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     scale: 3
     networks:
-      - case-kong-net
+      - kongpose-net
     depends_on:
       kong-cp:
         condition: service_healthy
@@ -170,7 +170,7 @@ services:
 
   db:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: postgres:13.1
     environment:
       POSTGRES_DB: kong
@@ -187,7 +187,7 @@ services:
 
   ad-server:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: alpine:3.12.1
     volumes:
             - ./ldap-server:/setup-ad/:ro
@@ -203,7 +203,7 @@ services:
 
   httpbin:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: "kennethreitz/httpbin"
     scale: 2
 #    ports:
@@ -211,14 +211,14 @@ services:
 
   echo-server:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: "jmalloc/echo-server"
 #    ports:
 #      - "8080:8080/tcp"
 
   grpc-server:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: "moul/grpcbin"
     ports:
       - "7000:9000/tcp"
@@ -226,7 +226,7 @@ services:
 
   keycloak:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: jboss/keycloak:9.0.0
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
@@ -240,14 +240,14 @@ services:
 
   redis:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: redis:latest
 #    ports:
 #      - "6379:6379/tcp"
 
   redis-commander:
     networks:
-      - case-kong-net
+      - kongpose-net
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
@@ -257,14 +257,14 @@ services:
 
   zipkin:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: openzipkin/zipkin
     ports:
       - "9411:9411/tcp"
 
   vault:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: vault:latest
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: myroot
@@ -274,7 +274,7 @@ services:
 
   toxiproxy:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: "shopify/toxiproxy"
     ports:
        - "8474:8474"
@@ -282,7 +282,7 @@ services:
   # Create a toxiproxy configuration for postgres latency
   toxiproxy-config:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: "shopify/toxiproxy"
     entrypoint: > 
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
@@ -292,7 +292,7 @@ services:
 
   ha-proxy:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: haproxy:2.2.4-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
@@ -312,7 +312,7 @@ services:
 
   deck:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: kong/deck:v1.3.0
     volumes:
         - ./deck:/tmp/deck:ro
@@ -333,7 +333,7 @@ services:
 
   locust-master:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: locustio/locust
     ports:
      - "8089:8089"
@@ -343,7 +343,7 @@ services:
 
   locust-worker:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: locustio/locust
     volumes:
       - ./locust:/mnt/locust
@@ -351,7 +351,7 @@ services:
 
   fake-smtp-server:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: reachfive/fake-smtp-server
     ports:
       #- "25:1025/tcp"
@@ -359,7 +359,7 @@ services:
 
   mongodb:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: mongo:4.2
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin --quiet | grep 1
@@ -369,7 +369,7 @@ services:
 
   elasticsearch:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     healthcheck:
         test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
@@ -389,7 +389,7 @@ services:
 
   graylog:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: graylog/graylog:4.0
     volumes:
       #- ./graylog/server.conf:/etc/graylog/server.conf
@@ -428,7 +428,7 @@ services:
 
   pgadmin:
     networks:
-      - case-kong-net
+      - kongpose-net
     image: dpage/pgadmin4
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
