@@ -112,6 +112,7 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+      TZ: "Europe/London"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -319,7 +320,7 @@ services:
         - ./ssl-certs:/tmp/ssl-certs:ro
     environment:
         DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://api.kong.lan:8001"
+        DECK_KONG_ADDR: "http://kongpose_kong-cp_1:48001"
         #DECK_KONG_ADDR: "https://api.kong.lan:8444"
         DECK_HEADERS: "kong-admin-token:password"
     depends_on:
