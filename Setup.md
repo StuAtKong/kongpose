@@ -2,11 +2,14 @@
 
 ## Configuration
 
-The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. COnfigure the below hostnames;
+IMPORTANT
+The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. Configure the below hostnames, either directly in /etc/hosts of via your DNS provider. All these hostnames should resolve to the host running Kong.
 
-api.kong.lan
-proxy.kong.lan
-client.kong.lan
+Hostname |
+------------ |
+api.kong.lan |
+proxy.kong.lan |
+client.kong.lan |
 
 The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/hybrid` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are two sets of certificates required, the first for HTTPS access to Kong Manager and the second is for Control Plane/Data Plane communication.
 
