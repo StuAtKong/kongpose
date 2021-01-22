@@ -2,7 +2,7 @@
 
 ## Configuration
 
-IMPORTANT
+:anger: IMPORTANT :anger:
 The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. Configure the below hostnames, either directly in /etc/hosts of via your DNS provider. All these hostnames should resolve to the host running Kong.
 
 Hostname |
