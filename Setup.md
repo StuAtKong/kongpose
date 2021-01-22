@@ -11,7 +11,7 @@ api.kong.lan |
 proxy.kong.lan |
 client.kong.lan |
 
-The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/hybrid` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are two sets of certificates required, the first for HTTPS access to Kong Manager and the second is for Control Plane/Data Plane communication.
+The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/client` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are two sets of certificates required, the first for HTTPS access to Kong Manager and the second is for Control Plane/Data Plane communication.
 
 1) Create the SSL certificates for the api.kong.lan hostname [here](ssl-certs/README.md)
 
