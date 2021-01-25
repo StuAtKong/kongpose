@@ -47,7 +47,6 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
       #KONG_PG_HOST: toxiproxy
-      #KONG_PG_DATABASE: kong
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
@@ -215,6 +214,14 @@ services:
     image: "jmalloc/echo-server"
 #    ports:
 #      - "8080:8080/tcp"
+
+  dadjokes:
+    networks:
+      - kongpose-net
+    image: yesinteractive/dadjokes
+    container_name: dadjokes
+#    ports:
+#      - "8081:80"
 
   grpc-server:
     networks:

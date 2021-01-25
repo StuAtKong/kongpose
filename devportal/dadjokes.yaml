@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Dad Jokes Demo API
+  version: 0.0.1
+  description: A simple API that just provides some humour
+servers:
+  - url: http://api.kong.lan
+paths:
+  /dadjokes:
+    get:
+      summary: Show a Dad Joke
+      description: Returns possibly one of the funniest jokes you have ever heard.
+      tags:
+        - jokes
+      responses:
+        '200':
+          description: A very funny joke
+          content:
+            application/json:
+
+tags:
+  - name: jokes
+    description: API providing some poor puns

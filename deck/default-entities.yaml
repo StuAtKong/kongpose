@@ -533,6 +533,55 @@ services:
     - http
     - https
 - connect_timeout: 60000
+  host: dadjokes
+  name: local_dadjokes
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: local-dadjokes
+    methods:
+    - OPTIONS
+    - GET
+    paths:
+    - /dadjokes
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: cors
+      config:
+        credentials: false
+        exposed_headers: null
+        headers: null
+        max_age: null
+        methods:
+        - GET
+        - HEAD
+        - PUT
+        - PATCH
+        - POST
+        - DELETE
+        - OPTIONS
+        - TRACE
+        - CONNECT
+        origins:
+        - '*'
+        preflight_continue: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+- connect_timeout: 60000
   host: kongpose_toxiproxy_1
   name: slow-httpbin
   port: 8000
