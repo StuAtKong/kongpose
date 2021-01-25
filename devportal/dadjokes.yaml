@@ -4,7 +4,7 @@ info:
   version: 0.0.1
   description: A simple API that just provides some humour
 servers:
-  - url: http://api.kong.lan
+  - url: https://api.kong.lan
 paths:
   /dadjokes:
     get:
