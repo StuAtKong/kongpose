@@ -236,6 +236,8 @@ services:
     image: jboss/keycloak:9.0.0
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
+      - ./ssl-certs/server.key:/etc/x509/https/tls.key
+      - ./ssl-certs/server.crt:/etc/x509/https/tls.crt
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
