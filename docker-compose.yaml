@@ -219,7 +219,6 @@ services:
     networks:
       - kongpose-net
     image: yesinteractive/dadjokes
-    container_name: dadjokes
 #    ports:
 #      - "8081:80"
 
