@@ -22,11 +22,6 @@ paths:
     get:
       summary: Show a Dad Joke
       description: Returns possibly one of the funniest jokes you have ever heard.
-      parameters:
-      - in: header
-        name: apikey
-        schema:
-          type: string
       security:
         - ApiKeyAuth: []
       tags:
