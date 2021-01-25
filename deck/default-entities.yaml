@@ -565,6 +565,16 @@ services:
       - grpcs
       - http
       - https
+    - name: basic-auth
+      config:
+        anonymous: null
+        hide_credentials: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
     - name: cors
       config:
         credentials: false
@@ -592,7 +602,7 @@ services:
       - https
     - name: key-auth
       config:
-        anonymous: null
+        anonymous: 73de3498-1ef4-4231-be71-ca9cb56c7053
         hide_credentials: false
         key_in_body: false
         key_names:
@@ -662,14 +672,21 @@ services:
     strip_path: true
     https_redirect_status_code: 426
 consumers:
+- username: anonymous
 - username: consA
   keyauth_credentials:
   - key: abc
+  basicauth_credentials:
+  - username: consA
+    password: 14b65ae8807feed5bea2f83ecd6f13769b945c2f
   acls:
   - group: jokes
 - username: consB
   keyauth_credentials:
   - key: "123"
+  basicauth_credentials:
+  - username: consB
+    password: 6f5bf19bba52aff85bfd896bc59843f449c9e8bb
 - username: hmac-consumer
   hmacauth_credentials:
   - username: hmac-user

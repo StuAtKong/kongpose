@@ -15,22 +15,19 @@ paths:
       responses:
         '200':
           description: A very funny joke
-          content:
-            application/json:
 
   /auth/dadjokes:
     get:
-      summary: Show a Dad Joke
+      summary: Show a Dad Joke with authentication
       description: Returns possibly one of the funniest jokes you have ever heard.
       security:
         - ApiKeyAuth: []
+        - basicAuth: []
       tags:
         - jokes
       responses:
         '200':
           description: A very funny joke
-          content:
-            application/json:
 
 components:
   securitySchemes:
@@ -38,7 +35,11 @@ components:
       type: apiKey
       in: header
       name: apikey
+    basicAuth:     # <-- arbitrary name for the security scheme
+      type: http
+      scheme: basic
 
 tags:
   - name: jokes
     description: API providing some poor puns
+
