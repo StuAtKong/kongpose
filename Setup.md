@@ -69,3 +69,14 @@ curl --cacert ./ssl-certs/rootCA.pem -X PATCH 'https://api.kong.lan:8444/default
 ~~~
 
 You should now be able to login to the Developer Portal using `stu+dp@konghq.com`/`password` as the credentials.
+
+### Upload a spec file
+
+Add a very simple OAS 3.0 spec file for the Dad Jokes API
+
+~~~
+curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8444/default/files' \
+--header 'Kong-Admin-Token: password' \
+--form 'path="specs/dadjokes.yaml"' \
+--form 'contents=@"./devportal/dadjokes.yaml"'
+~~~
