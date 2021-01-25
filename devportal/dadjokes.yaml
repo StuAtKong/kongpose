@@ -23,6 +23,7 @@ paths:
       security:
         - ApiKeyAuth: []
         - basicAuth: []
+        - oAuth2ClientCredentials: []
       tags:
         - jokes
       responses:
@@ -33,11 +34,18 @@ components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
+      description: Pass an apikey from the 'jokes' ACL for authentication
       in: header
       name: apikey
     basicAuth:     # <-- arbitrary name for the security scheme
       type: http
       scheme: basic
+    oAuth2ClientCredentials:
+      type: oauth2
+      flows: 
+        clientCredentials: 
+          tokenUrl: https://api.kong.lan:18443/auth/realms/kong/protocol/openid-connect/token
+          scopes: {} # Getty Images does not use scopes
 
 tags:
   - name: jokes
