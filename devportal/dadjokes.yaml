@@ -18,6 +18,32 @@ paths:
           content:
             application/json:
 
+  /auth/dadjokes:
+    get:
+      summary: Show a Dad Joke
+      description: Returns possibly one of the funniest jokes you have ever heard.
+      parameters:
+      - in: header
+        name: apikey
+        schema:
+          type: string
+      security:
+        - ApiKeyAuth: []
+      tags:
+        - jokes
+      responses:
+        '200':
+          description: A very funny joke
+          content:
+            application/json:
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
+
 tags:
   - name: jokes
     description: API providing some poor puns
