@@ -4,7 +4,7 @@ info:
   version: 0.0.1
   description: A simple API that just provides some humour
 servers:
-  - url: https://api.kong.lan
+  - url: https://proxy.kong.lan
 paths:
   /dadjokes:
     get:
@@ -23,7 +23,7 @@ paths:
       security:
         - ApiKeyAuth: []
         - basicAuth: []
-        - oAuth2ClientCredentials: []
+        - oAuth2ClientCredentials: [email]
       tags:
         - jokes
       responses:
@@ -37,17 +37,17 @@ components:
       description: Pass an apikey from the 'jokes' ACL for authentication
       in: header
       name: apikey
-    basicAuth:     # <-- arbitrary name for the security scheme
+    basicAuth:
       type: http
       scheme: basic
     oAuth2ClientCredentials:
       type: oauth2
-      flows: 
-        clientCredentials: 
+      flows:
+        clientCredentials:
           tokenUrl: https://api.kong.lan:18443/auth/realms/kong/protocol/openid-connect/token
-          scopes: {} # Getty Images does not use scopes
+          scopes:
+            email: email access
 
 tags:
   - name: jokes
     description: API providing some poor puns
-
