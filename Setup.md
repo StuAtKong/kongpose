@@ -17,7 +17,7 @@ It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong
 sudo ifconfig lo0 alias 10.0.10.1
 ~~~
 
-Now you can configure the hostname resolution to use 10.0.10.1 for the IP address. Note, this setting will not survive a reboot. You can setup a alias automatically on a boot like [this](https://medium.com/@david.limkys/permanently-create-an-ifconfig-loopback-alias-macos-b7c93a8b0db)
+Now you can configure the hostname resolution to use 10.0.10.1 for the IP address. Note, this setting will not survive a reboot but you can setup an alias automatically on a boot like [this](https://medium.com/@david.limkys/permanently-create-an-ifconfig-loopback-alias-macos-b7c93a8b0db)
 
 
 The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/client` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are two sets of certificates required, the first for HTTPS access to Kong Manager and the second is for Control Plane/Data Plane communication.
