@@ -3,3 +3,4 @@ license.json
 locust/__pycache__/*
 zookeeper/*
 kafka/*
+ssl-certs/rootCA.srl

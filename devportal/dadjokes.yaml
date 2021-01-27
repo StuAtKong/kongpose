@@ -16,6 +16,16 @@ paths:
         '200':
           description: A very funny joke
 
+  /dadjokes/echo:
+    get:
+      summary: Show a Dad Joke and details of the Request
+      description: Returns possibly one of the funniest jokes you have ever heard.
+      tags:
+        - jokes
+      responses:
+        '200':
+          description: A very funny joke and an echo of the request is returned in the response
+
   /auth/dadjokes:
     get:
       summary: Show a Dad Joke with authentication
