@@ -13,7 +13,7 @@ client.kong.lan |
 
 It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong. Using localhost will give issues when trying to access services as the requests will not be looking at the correct endpoints. If needed, you can add a 2nd IP address to the lo0 interface in OSX with this command;
 
-~~~
+~~~shell
 sudo ifconfig lo0 alias 10.0.10.1
 ~~~
 
@@ -30,13 +30,13 @@ The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-c
 
 Set and env var for the license;
 
-~~~
+~~~shell
 export KONG_LICENSE_DATA=`cat ./license.json`;
 ~~~
 
 Then start the utility services & kong containers
 
-~~~
+~~~shell
 docker-compose up -d
 ~~~
 
@@ -48,7 +48,7 @@ By default, ldap-auth is enabled and you can login to Kong Manager with `kong_ad
 
 You can look at the LDAP tree by searching as below;
 
-~~~
+~~~shell
 ldapsearch -H "ldap://0.0.0.0:389" -D "cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com" -w "Passw0rd" -b "dc=ldap,dc=kong,dc=com" "(sAMAccountName=kong_admin)"
 ~~~
 
@@ -58,7 +58,7 @@ By default, the Developer Portal is configured to used OIDC (keycloak) for authe
 
 ### Create a Developer
 
-~~~
+~~~shell
 curl --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8447/default/register' \
 -H 'Content-Type: application/json' \
 -D 'Kong-Admin-Token: password' \
@@ -70,7 +70,7 @@ curl --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8447/default/
 
 ### Approve the Developer
 
-~~~
+~~~shell
 curl --cacert ./ssl-certs/rootCA.pem -X PATCH 'https://api.kong.lan:8444/default/developers/stu+dp@konghq.com' \
 --header 'Content-Type: application/json' \
 --header 'Kong-Admin-Token: password' \
@@ -83,7 +83,7 @@ You should now be able to login to the Developer Portal using `stu+dp@konghq.com
 
 Add a very simple OAS 3.0 spec file for the Dad Jokes API
 
-~~~
+~~~shell
 curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8444/default/files' \
 --header 'Kong-Admin-Token: password' \
 --form 'path="specs/dadjokes.yaml"' \
