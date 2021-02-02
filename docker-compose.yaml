@@ -425,17 +425,3 @@ services:
       #- "5555:5555"
       #- "5555:5555/udp"
 
-  pgadmin:
-    networks:
-      - kongpose-net
-    image: dpage/pgadmin4
-    volumes:
-      - ./pgadmin/servers.json:/pgadmin4/servers.json
-      - ./pgadmin/config_local.py:/pgadmin4/config_local.py
-        #  - ./pgadmin_data/pgadmin:/var/lib/pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "stu@konghq.com"
-      PGADMIN_DEFAULT_PASSWORD: "password"
-      PGADMIN_LISTEN_PORT: 7071
-    ports:
-     - "7071:7071"
