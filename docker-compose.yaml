@@ -14,12 +14,9 @@ services:
       - kongpose-net
     command: kong migrations bootstrap
     environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      #KONG_PG_DATABASE: kong
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
+      KONG_DATABASE: cassandra
+      KONG_CASSANDRA_CONTACT_POINTS: db
+      KONG_DB_UPDATE_PROPAGATION: 1
       KONG_PASSWORD: password
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
@@ -46,12 +43,9 @@ services:
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
       KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
       KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      #KONG_PG_HOST: toxiproxy
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
+      KONG_DATABASE: cassandra
+      KONG_CASSANDRA_CONTACT_POINTS: db
+      KONG_DB_UPDATE_PROPAGATION: 1
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
@@ -173,19 +167,13 @@ services:
   db:
     networks:
       - kongpose-net
-    image: postgres:13.1
-    environment:
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
-      POSTGRES_USER: kong
+    image: cassandra:3
+    container_name: case-kong-db
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
       interval: 30s
-      timeout: 30s
-      retries: 3
-    restart: on-failure
-    stdin_open: true
-    tty: true
+      timeout: 10s
+      retries: 5
 
   ad-server:
     networks:
@@ -324,7 +312,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.4.0
+    image: kong/deck:v1.3.0
     volumes:
         - ./deck:/tmp/deck:ro
         - ./ssl-certs:/tmp/ssl-certs:ro
