@@ -84,8 +84,8 @@ View traces here;
 
 http://api.kong.lan:9411/
 
-## PGAdmin
+## Cassandra-web
 
-Need to view the postgres database? Try pgadmin
+Need to view the Cassandra database? Try cassandra-web
 
-http://api.kong.lan:7071
+http://api.kong.lan:9080

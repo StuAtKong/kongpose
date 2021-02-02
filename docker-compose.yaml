@@ -355,6 +355,17 @@ services:
       #- "25:1025/tcp"
       - "1080:1080/tcp"
 
+  cassandra-web:
+    networks:
+      - kongpose-net
+    image: ipushc/cassandra-web
+    environment:
+      HOST_PORT: ":80"
+      CASSANDRA_HOST: db
+      CASSANDRA_PORT: 9042
+    ports:
+      - "9080:80/tcp"
+
   mongodb:
     networks:
       - kongpose-net
