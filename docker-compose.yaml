@@ -168,7 +168,6 @@ services:
     networks:
       - kongpose-net
     image: cassandra:3
-    container_name: case-kong-db
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
       interval: 30s
