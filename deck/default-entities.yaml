@@ -371,6 +371,20 @@ services:
     - rl-test
     https_redirect_status_code: 426
     plugins:
+    - name: key-auth
+      config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
     - name: rate-limiting-advanced
       config:
         dictionary_name: kong_rate_limiting_counters
@@ -539,7 +553,7 @@ consumers:
   - key: abc
   basicauth_credentials:
   - username: consA
-    password: 8f45e546cc9c1c73c12fbbdef0c904c1c1ed9ebf
+    password: c0afdf2593c6d4b25f898d07b1889e89e07e807b
   acls:
   - group: jokes
 - username: consB
@@ -547,7 +561,7 @@ consumers:
   - key: "123"
   basicauth_credentials:
   - username: consB
-    password: f73a03ec56f6896be5240bf8f9139587172443dd
+    password: 254e069e9bf4e0a2c861e33c7e986baff7de42a4
 - username: hmac-consumer
   hmacauth_credentials:
   - username: hmac-user
