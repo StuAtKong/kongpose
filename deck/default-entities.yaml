@@ -155,7 +155,7 @@ services:
         introspection_post_args_client: null
         introspection_post_args_names: null
         introspection_post_args_values: null
-        issuer: http://api.kong.lan:8080/auth/realms/kong
+        issuer: http://proxy.kong.lan:8080/auth/realms/kong
         issuers_allowed: null
         jwt_session_claim: sid
         jwt_session_cookie: null
