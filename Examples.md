@@ -139,7 +139,7 @@ TOKEN=`curl -s -X POST 'http://proxy.kong.lan:8080/auth/realms/kong/protocol/ope
 Call the Kong proxy protected by the OIDC plugin with the access token in the header;
 
 ```
-curl -v -H "Authorization: Bearer $TOKEN" http://proxy.kong.lan/auth/oid
+curl -v -H "Authorization: Bearer $TOKEN" http://proxy.kong.lan/auth/oidc
 ```
 
 ### Auth Code
