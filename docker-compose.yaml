@@ -7,8 +7,7 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-gateway-docker.bintray.io/kong-enterprise-edition:2.3.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
       - kongpose-net
@@ -25,8 +24,7 @@ services:
     restart: on-failure
 
   kong-cp:
-    image: kong-docker-kong-gateway-docker.bintray.io/kong-enterprise-edition:2.3.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
       - kongpose-net
@@ -43,7 +41,7 @@ services:
       KONG_ADMIN_GUI_LISTEN: "0.0.0.0:48002, 0.0.0.0:48445 http2 ssl"
       KONG_PORTAL_GUI_LISTEN: "0.0.0.0:48003, 0.0.0.0:48446 http2 ssl"
       KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 http2 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
+      KONG_STATUS_LISTEN: "0.0.0.0:48100 ssl"
       KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
       KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
       KONG_DATABASE: postgres
@@ -60,6 +58,10 @@ services:
       KONG_PORTAL_API_ERROR_LOG: /dev/stderr
       KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
       KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
+      KONG_STATUS_ACCESS_LOG: /dev/stdout
+      KONG_STATUS_ERROR_LOG: /dev/stderr
+      KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
+      KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
@@ -121,8 +123,7 @@ services:
     restart: on-failure
 
   kong-dp:
-    image: kong-docker-kong-gateway-docker.bintray.io/kong-enterprise-edition:2.3.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.1.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     scale: 3
     networks:
@@ -324,7 +325,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.4.0
+    image: kong/deck:v1.3.0
     volumes:
         - ./deck:/tmp/deck:ro
         - ./ssl-certs:/tmp/ssl-certs:ro
@@ -340,7 +341,8 @@ services:
         condition: service_healthy
     entrypoint: >
       sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;"
+             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
+             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
 
   locust-master:
     networks:
