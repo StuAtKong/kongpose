@@ -7,7 +7,7 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.8-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
     networks:
       - case-kong-net
     depends_on:
@@ -24,7 +24,7 @@ services:
     restart: on-failure
 
   kong-node:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.8-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
     scale: 2
     networks:
       - case-kong-net
@@ -214,14 +214,16 @@ services:
         - .:/tmp:ro
     environment:
         DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://api.kong.lan:8001"
+        #DECK_KONG_ADDR: "http://api.kong.lan:8001"
         #DECK_KONG_ADDR: "https://api.kong.lan:8444"
+        DECK_KONG_ADDR: "http://kongpose_kong-node_1:48001"
         DECK_HEADERS: "kong-admin-token:password"
     depends_on:
       kong-node:
         condition: service_healthy
-    #command: "sync --ca-cert="$(cat /tmp/ssl-certs/rootCA.pem)" --state=/tmp/workspace-compose.yaml"
-    command: sync --state=/tmp/workspace-compose.yaml
+    entrypoint: >
+      sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
+             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;"
 
   locust:
     networks:
