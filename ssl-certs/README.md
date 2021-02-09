@@ -203,8 +203,8 @@ total 44
 $ chmod 644 server.key
 ```
 
-## Optional
+## Add the private CA to the OS trustore
 
-To use the certificate for GUI functions, you will need to import the rootCA.pem certificate to the truststore. For OSX, double click on the rootCA.pem file and make sure to trust the CA;
+This step is optional-ish. It is not required but some browsers (Chrome, and others) will not allow access to sites using unknown CA certificates. To use the certificate for GUI functions, you will need to import the rootCA.pem certificate to the truststore. For OSX, double click on the rootCA.pem file and make sure to trust the CA;
 
 ![OSX keystore](/images/import-ca-cert.png)
