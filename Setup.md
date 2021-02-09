@@ -26,6 +26,8 @@ The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-c
 
 2) Create the hybrid CP/DP certs [here](ssl-certs/hybrid/README.md)
 
+Make sure to install the private CA certificate to the OS truststore or you will have issues connecting to Kong Manager via the browser. Details can be found [here](ssl-certs/README.md#add-the-private-ca-to-the-os-trustore)
+
 ## Start containers
 
 Set and env var for the license;
