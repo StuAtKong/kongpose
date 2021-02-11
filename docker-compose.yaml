@@ -55,6 +55,14 @@ services:
       KONG_VITALS: "on"
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_GUI_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_API_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_API_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ENFORCE_RBAC: "on"
