@@ -308,6 +308,7 @@ services:
     image: haproxy:2.2.4-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
+      - ./ssl-certs:/tmp/ssl/customcerts
     depends_on:
       kong-cp:
         condition: service_healthy
