@@ -14,7 +14,7 @@ api.kong.lan | Admin API |
 portal.kong.lan | Kong Developer Portal |
 portal-api.kong.lan | Kong Developer Portal API |
 proxy.kong.lan | API Proxies |
-client.kong.lan | | Mutual TLS Proxies |
+client.kong.lan | Mutual TLS Proxies |
 
 It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong. Using localhost will give issues when trying to access services as the requests will not be looking at the correct endpoints. If needed, you can add a 2nd IP address to the lo0 interface in OSX with this command;
 
@@ -54,7 +54,7 @@ This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy ser
 
 ## Authentication
 
-By default, ldap-auth is enabled and you can login to Kong Manager with `kong_admin`/`K1ngK0ng` at https://api.kong.lan:8445
+By default, ldap-auth is enabled and you can login to Kong Manager with `kong_admin`/`K1ngK0ng` at https://manager.kong.lan
 
 You can look at the LDAP tree by searching as below;
 
@@ -69,7 +69,7 @@ By default, the Developer Portal is configured to used OIDC (keycloak) for authe
 ### Create a Developer
 
 ~~~shell
-curl --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8447/default/register' \
+curl --cacert ./ssl-certs/rootCA.pem -X POST 'https://portal-api.kong.lan/default/register' \
 -H 'Content-Type: application/json' \
 -D 'Kong-Admin-Token: password' \
 --data-raw '{"email":"stu+dp@konghq.com",
@@ -81,7 +81,7 @@ curl --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8447/default/
 ### Approve the Developer
 
 ~~~shell
-curl --cacert ./ssl-certs/rootCA.pem -X PATCH 'https://api.kong.lan:8444/default/developers/stu+dp@konghq.com' \
+curl --cacert ./ssl-certs/rootCA.pem -X PATCH 'https://api.kong.lan/default/developers/stu+dp@konghq.com' \
 --header 'Content-Type: application/json' \
 --header 'Kong-Admin-Token: password' \
 --data-raw '{"status": 0}'
@@ -94,7 +94,7 @@ You should now be able to login to the Developer Portal using `stu+dp@konghq.com
 Add a very simple OAS 3.0 spec file for the Dad Jokes API
 
 ~~~shell
-curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan:8444/default/files' \
+curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan/default/files' \
 --header 'Kong-Admin-Token: password' \
 --form 'path="specs/dadjokes.yaml"' \
 --form 'contents=@"./devportal/dadjokes.yaml"'
