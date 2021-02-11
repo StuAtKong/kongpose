@@ -7,8 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
       - case-kong-net
     depends_on:
@@ -25,8 +25,8 @@ services:
     restart: on-failure
 
   kong-node:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     scale: 2
     networks:
       - case-kong-net
@@ -66,26 +66,26 @@ services:
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ENFORCE_RBAC: "on"
-      KONG_ADMIN_API_URI: "https://api.kong.lan:8444"
+      KONG_ADMIN_API_URI: "https://api.kong.lan"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_GUI_URL: "https://api.kong.lan:8445"
-      KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
+      KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
+      KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
+      KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_ADMIN_GUI_AUTH: "basic-auth"
       #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
       #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
-      KONG_PORTAL_GUI_HOST: "portal.kong.lan:8446"
+      KONG_PORTAL_GUI_HOST: "portal.kong.lan"
       KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_PORTAL_API_URL: "https://portal-api.kong.lan:8447"
+      KONG_PORTAL_API_URL: "https://portal-api.kong.lan"
       KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_PORTAL_AUTH: "openid-connect"
-      KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan:8447/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan:8446/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://portal.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan:8446/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan:8446/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
+      KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
       KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true}"
       KONG_PORTAL_EMAIL_VERIFICATION: "on"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
@@ -150,8 +150,8 @@ services:
     image: jboss/keycloak:9.0.0
     volumes:
       - ./kong-realm.json:/tmp/kong-realm.json
-      - ./ssl-certs/server.key:/etc/x509/https/tls.key
-      - ./ssl-certs/server.crt:/etc/x509/https/tls.crt
+      - ./ssl-certs/wild.key:/etc/x509/https/tls.key
+      - ./ssl-certs/wild.crt:/etc/x509/https/tls.crt
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: password
@@ -206,6 +206,7 @@ services:
     image: haproxy:2.2.4-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
+      - ./ssl-certs:/tmp/ssl/customcerts
     depends_on:
       kong-node:
         condition: service_healthy
