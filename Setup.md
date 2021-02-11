@@ -2,14 +2,19 @@
 
 ## Configuration
 
-:anger: IMPORTANT :anger:
-The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. Configure the below hostnames, either directly in /etc/hosts of via your DNS provider. All these hostnames should resolve to the host running Kong.
+### DNS Resolution
 
-Hostname |
------------- |
-api.kong.lan |
-proxy.kong.lan |
-client.kong.lan |
+:anger: IMPORTANT :anger:
+The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. Configure the below hostnames, either directly in /etc/hosts of via your DNS provider. All these hostnames should resolve to the host running Kong. If using OSX, then it is possible to use a local dnsmasq server to answer all queries for a particular domain. For example, resolve all hostname for kong.lan to the IP of the host as per [this](https://passingcuriosity.com/2013/dnsmasq-dev-osx/)
+
+Hostname | Purpose |
+------------ |------------ |
+manager.kong.lan | Kong Manager |
+api.kong.lan | Admin API |
+portal.kong.lan | Kong Developer Portal |
+portal-api.kong.lan | Kong Developer Portal API |
+proxy.kong.lan | API Proxies |
+client.kong.lan | | Mutual TLS Proxies |
 
 It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong. Using localhost will give issues when trying to access services as the requests will not be looking at the correct endpoints. If needed, you can add a 2nd IP address to the lo0 interface in OSX with this command;
 
@@ -19,8 +24,11 @@ sudo ifconfig lo0 alias 10.0.10.1
 
 Now you can configure the hostname resolution to use 10.0.10.1 for the IP address. Note, this setting will not survive a reboot but you can setup an alias automatically on a boot like [this](https://medium.com/@david.limkys/permanently-create-an-ifconfig-loopback-alias-macos-b7c93a8b0db)
 
+### SSL Certificates
 
-The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/client` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are two sets of certificates required, the first for HTTPS access to Kong Manager and the second is for Control Plane/Data Plane communication.
+The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/client` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are a few pairs of certificates required for HTTPS access to Kong Manager, the Developer Portal, etc and a final set for the Control Plane/Data Plane communication.
+
+Some default certificates are included, but you can also create you own by following the steps below;
 
 1) Create the SSL certificates for the api.kong.lan hostname [here](ssl-certs/README.md)
 
