@@ -60,7 +60,9 @@ http://api.kong.lan:8404/stats
 
 For some loadtesting ability, checkout locust; https://locust.io/
 
-Locust is available in this case testing environment at http://api.kong.lan:8089/ and a simple test will hit the `httpbin/status/200` and `httpbin/status/503` endpoints in a 100-to-1 split. Edit the [locustfile.py](locust/locustfile.py) file to make the test more interesting.
+Locust is available in this case testing environment at https://locust.kong.lan/ 
+
+A simple test will hit the `httpbin/status/200` and `httpbin/status/503` endpoints in a 100-to-1 split. Edit the [locustfile.py](locust/locustfile.py) file to make the test more interesting.
 
 ## SMTP Server
 

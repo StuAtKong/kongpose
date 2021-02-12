@@ -98,9 +98,9 @@ services:
       KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
       KONG_SMTP_MOCK: "off"
       KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "fake-smtp-server"
+      KONG_SMTP_HOST: "kongpose_fake-smtp-server_1"
       KONG_SMTP_PORT: 1025
-      KONG_SMTP_DOMAIN: "api.konglan"
+      KONG_SMTP_DOMAIN: "api.kong.lan"
       KONG_TRACING: "off"
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
@@ -343,31 +343,23 @@ services:
              /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
              /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
 
-  locust-master:
+  locust:
     networks:
       - kongpose-net
     image: locustio/locust
-    ports:
-     - "8089:8089"
+    #ports:
+    # - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --master
-
-  locust-worker:
-    networks:
-      - kongpose-net
-    image: locustio/locust
-    volumes:
-      - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py --worker --master-host locust-master
+    command: -f /mnt/locust/locustfile.py
 
   fake-smtp-server:
     networks:
       - kongpose-net
     image: reachfive/fake-smtp-server
-    ports:
+    #ports:
       #- "25:1025/tcp"
-      - "1080:1080/tcp"
+      #- "1080:1080/tcp"
 
   mongodb:
     networks:
