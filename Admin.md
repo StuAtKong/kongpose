@@ -64,7 +64,7 @@ Locust is available in this case testing environment at http://api.kong.lan:8089
 
 ## SMTP Server
 
-Add a fake-smtp-server service. View the UI at http://api.kong.lan:1080/
+Add a fake-smtp-server service. View the UI at https://mail.kong.lan/
 
 ## Redis
 
