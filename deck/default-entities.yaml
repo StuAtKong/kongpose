@@ -1,0 +1,728 @@
+_format_version: "1.1"
+_workspace: default
+services:
+- connect_timeout: 60000
+  host: echo-server
+  name: local-echo-server
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: auth-hmac
+    paths:
+    - /auth/hmac
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: hmac-auth
+      config:
+        algorithms:
+        - hmac-sha256
+        anonymous: null
+        clock_skew: 600
+        enforce_headers:
+        - date
+        - request-line
+        hide_credentials: false
+        validate_request_body: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - plugin-example
+  - name: auth-oidc
+    paths:
+    - /auth/oidc
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: openid-connect
+      config:
+        anonymous: null
+        audience: null
+        audience_claim:
+        - aud
+        audience_required: null
+        auth_methods:
+        - authorization_code
+        - session
+        - bearer
+        authenticated_groups_claim: null
+        authorization_cookie_domain: null
+        authorization_cookie_httponly: true
+        authorization_cookie_lifetime: 600
+        authorization_cookie_name: authorization
+        authorization_cookie_path: /
+        authorization_cookie_samesite: "off"
+        authorization_cookie_secure: null
+        authorization_endpoint: null
+        authorization_query_args_client: null
+        authorization_query_args_names: null
+        authorization_query_args_values: null
+        bearer_token_cookie_name: null
+        bearer_token_param_type:
+        - header
+        - query
+        - body
+        cache_introspection: true
+        cache_token_exchange: true
+        cache_tokens: true
+        cache_tokens_salt: BuyomT43fVRupfzBOu76aAq6XPK5mj6X
+        cache_ttl: 3600
+        cache_ttl_max: null
+        cache_ttl_min: null
+        cache_ttl_neg: null
+        cache_ttl_resurrect: null
+        cache_user_info: true
+        client_alg: null
+        client_arg: client_id
+        client_auth: null
+        client_credentials_param_type:
+        - header
+        - query
+        - body
+        client_id:
+        - kong
+        client_jwk: null
+        client_secret:
+        - ab523f45-e04a-43ec-bac7-2e268c2ff05c
+        consumer_by:
+        - username
+        - custom_id
+        consumer_claim: null
+        consumer_optional: false
+        credential_claim:
+        - sub
+        discovery_headers_names: null
+        discovery_headers_values: null
+        display_errors: false
+        domains: null
+        downstream_access_token_header: null
+        downstream_access_token_jwk_header: null
+        downstream_headers_claims: null
+        downstream_headers_names: null
+        downstream_id_token_header: null
+        downstream_id_token_jwk_header: null
+        downstream_introspection_header: null
+        downstream_refresh_token_header: null
+        downstream_session_id_header: null
+        downstream_user_info_header: null
+        enable_hs_signatures: false
+        end_session_endpoint: null
+        extra_jwks_uris: null
+        forbidden_destroy_session: true
+        forbidden_error_message: Forbidden
+        forbidden_redirect_uri: null
+        groups_claim:
+        - groups
+        groups_required: null
+        hide_credentials: false
+        http_proxy: null
+        http_proxy_authorization: null
+        http_version: 1.1
+        https_proxy: null
+        https_proxy_authorization: null
+        id_token_param_name: null
+        id_token_param_type:
+        - header
+        - query
+        - body
+        ignore_signature: []
+        introspect_jwt_tokens: false
+        introspection_endpoint: null
+        introspection_endpoint_auth_method: null
+        introspection_headers_client: null
+        introspection_headers_names: null
+        introspection_headers_values: null
+        introspection_hint: access_token
+        introspection_post_args_client: null
+        introspection_post_args_names: null
+        introspection_post_args_values: null
+        issuer: http://proxy.kong.lan:8080/auth/realms/kong
+        issuers_allowed: null
+        jwt_session_claim: sid
+        jwt_session_cookie: null
+        keepalive: true
+        leeway: 0
+        login_action: response
+        login_methods:
+        - authorization_code
+        login_redirect_mode: fragment
+        login_redirect_uri: null
+        login_tokens:
+        - tokens
+        logout_methods:
+        - POST
+        - DELETE
+        logout_post_arg: null
+        logout_query_arg: null
+        logout_redirect_uri: null
+        logout_revoke: false
+        logout_revoke_access_token: true
+        logout_revoke_refresh_token: true
+        logout_uri_suffix: null
+        max_age: null
+        no_proxy: null
+        password_param_type:
+        - header
+        - query
+        - body
+        preserve_query_args: false
+        redirect_uri:
+        - http://api.kong.lan/auth/oidc
+        rediscovery_lifetime: 30
+        refresh_token_param_name: null
+        refresh_token_param_type:
+        - header
+        - query
+        - body
+        refresh_tokens: true
+        response_mode: query
+        response_type:
+        - code
+        reverify: false
+        revocation_endpoint: null
+        revocation_endpoint_auth_method: null
+        roles_claim:
+        - roles
+        roles_required: null
+        run_on_preflight: true
+        scopes:
+        - openid
+        scopes_claim:
+        - scope
+        scopes_required: null
+        search_user_info: false
+        session_compressor: none
+        session_cookie_domain: null
+        session_cookie_httponly: true
+        session_cookie_idletime: null
+        session_cookie_lifetime: 3600
+        session_cookie_maxsize: 4000
+        session_cookie_name: session
+        session_cookie_path: /
+        session_cookie_renew: 600
+        session_cookie_samesite: Lax
+        session_cookie_secure: null
+        session_memcache_host: 127.0.0.1
+        session_memcache_port: 11211
+        session_memcache_prefix: sessions
+        session_memcache_socket: null
+        session_redis_auth: null
+        session_redis_cluster_maxredirections: null
+        session_redis_cluster_nodes: null
+        session_redis_connect_timeout: null
+        session_redis_host: 127.0.0.1
+        session_redis_port: 6379
+        session_redis_prefix: sessions
+        session_redis_read_timeout: null
+        session_redis_send_timeout: null
+        session_redis_server_name: null
+        session_redis_socket: null
+        session_redis_ssl: false
+        session_redis_ssl_verify: false
+        session_secret: null
+        session_storage: cookie
+        session_strategy: default
+        ssl_verify: false
+        timeout: 10000
+        token_endpoint: null
+        token_endpoint_auth_method: null
+        token_exchange_endpoint: null
+        token_headers_client: null
+        token_headers_grants: null
+        token_headers_names: null
+        token_headers_prefix: null
+        token_headers_replay: null
+        token_headers_values: null
+        token_post_args_client: null
+        token_post_args_names: null
+        token_post_args_values: null
+        unauthorized_error_message: Unauthorized
+        unauthorized_redirect_uri: null
+        unexpected_redirect_uri: null
+        upstream_access_token_header: authorization:bearer
+        upstream_access_token_jwk_header: null
+        upstream_headers_claims: null
+        upstream_headers_names: null
+        upstream_id_token_header: x_id_token
+        upstream_id_token_jwk_header: null
+        upstream_introspection_header: null
+        upstream_refresh_token_header: null
+        upstream_session_id_header: null
+        upstream_user_info_header: null
+        userinfo_endpoint: null
+        verify_claims: true
+        verify_nonce: true
+        verify_parameters: false
+        verify_signature: true
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+  - name: echo
+    paths:
+    - /echo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: udp-log
+      config:
+        host: kongpose_graylog_1
+        port: 5555
+        timeout: 10000
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - plugin-example
+- connect_timeout: 60000
+  host: kongpose_grpc-server_1
+  name: local-grpc-server
+  port: 9000
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: local-grpc-lotsOfReplies
+    paths:
+    - /hello.HelloService/LotsOfReplies
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - name: local-grpc-reflection
+    paths:
+    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - name: local-grpc-sayHello
+    paths:
+    - /hello.HelloService/SayHello
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+- connect_timeout: 60000
+  host: local-httpbin
+  name: local-httpbin
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  tags:
+  - rl-test
+  routes:
+  - name: limit-httpbin
+    paths:
+    - /limit-httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    tags:
+    - rl-test
+    https_redirect_status_code: 426
+    plugins:
+    - name: key-auth
+      config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - name: rate-limiting-advanced
+      config:
+        dictionary_name: kong_rate_limiting_counters
+        header_name: null
+        hide_client_headers: false
+        identifier: consumer
+        limit:
+        - 5
+        namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
+        redis:
+          cluster_addresses: null
+          database: 0
+          host: kongpose_redis_1
+          password: null
+          port: 6379
+          sentinel_addresses: null
+          sentinel_master: null
+          sentinel_password: null
+          sentinel_role: null
+          server_name: null
+          ssl: false
+          ssl_verify: false
+          timeout: 2000
+        strategy: redis
+        sync_rate: 0
+        window_size:
+        - 30
+        window_type: sliding
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - rl-test
+      - plugin-example
+  - name: local-httpbin
+    paths:
+    - /httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+  plugins:
+  - name: application-registration
+    config:
+      auto_approve: false
+      description: A simple API that echos the request
+      display_name: Echo Server
+      show_issuer: false
+    enabled: false
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+- connect_timeout: 60000
+  host: dadjokes
+  name: local_dadjokes
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: auth-dadjokes
+    paths:
+    - /auth/dadjokes
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: acl
+      config:
+        allow:
+        - jokes
+        deny: null
+        hide_groups_header: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - name: basic-auth
+      config:
+        anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
+        hide_credentials: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+  - name: local-dadjokes
+    paths:
+    - /dadjokes
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - name: cors
+      config:
+        credentials: false
+        exposed_headers: null
+        headers: null
+        max_age: null
+        methods:
+        - GET
+        - HEAD
+        - PUT
+        - PATCH
+        - POST
+        - DELETE
+        - OPTIONS
+        - TRACE
+        - CONNECT
+        origins:
+        - '*'
+        preflight_continue: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+- connect_timeout: 60000
+  host: kongpose_toxiproxy_1
+  name: slow-httpbin
+  port: 8000
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: slow-httpbin
+    paths:
+    - /slow-httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+consumers:
+- username: anonymous
+- username: consA
+  keyauth_credentials:
+  - key: abc
+  basicauth_credentials:
+  - username: consA
+    password: c0afdf2593c6d4b25f898d07b1889e89e07e807b
+  acls:
+  - group: jokes
+- username: consB
+  keyauth_credentials:
+  - key: "123"
+  basicauth_credentials:
+  - username: consB
+    password: 254e069e9bf4e0a2c861e33c7e986baff7de42a4
+- username: hmac-consumer
+  hmacauth_credentials:
+  - username: hmac-user
+    secret: K1ngK0ng
+- username: oidc-consumer
+upstreams:
+- name: local-httpbin
+  algorithm: round-robin
+  slots: 10000
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 7
+        successes: 1
+      http_path: /
+      https_verify_certificate: true
+      type: http
+      timeout: 1
+      unhealthy:
+        http_failures: 1
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        tcp_failures: 1
+        timeouts: 1
+        interval: 7
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 1
+      type: http
+      unhealthy:
+        http_failures: 1
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 1
+        timeouts: 1
+    threshold: 0
+  hash_on: none
+  hash_fallback: none
+  hash_on_cookie_path: /
+  targets:
+  - target: kongpose_httpbin_1:80
+    weight: 100
+  - target: kongpose_httpbin_2:80
+    weight: 100
+certificates:
+- id: 507cc555-5b92-496d-9e89-bfc78dfcddbe
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIECTCCAvGgAwIBAgIUAusYGP9BwoLFFAJdB/jY6eUzUyAwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMTAxMTUxMTE5NDNaFw0yMjA1MzAxMTE5NDNaMIGRMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxFzAVBgNVBAMMDnBy
+    b3h5LmtvbmcubGFuMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29uZ2hxLmNvbTCCASIw
+    DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJUbKiqoCK1BTNk/7l42n6ukyTEu
+    eLyB23e/90PzT/oz8wZzgwTodzbFAS2VtFr1EKqFzor0DrXp9CLnebOdiAR3I6LD
+    /WY/x0KW3lx3F35fGiUOSLPTH8zeiDTMx11CcKDxesA+M2/s5q0igkOQ4z4w3voz
+    m5a52IcQTSA8K5knNU1qUZBLpc+khxFcaheEK1jsISJJhcdizZBfGdk8S1vpyj5F
+    uCZ7oaRvNA6imHjSJwpgo36zd84TgrIgVj9R4QtJysWy/X+bbaKUiKBWwAtd4+DT
+    EP90l/ny9szu2fijk4/6k1ntXufGTyvM+J0/qJ13e99TVYOVanITnpTO+6cCAwEA
+    AaNWMFQwHwYDVR0jBBgwFoAUdskpf0wJRQxjtzQFZciWmUfl2bcwCQYDVR0TBAIw
+    ADALBgNVHQ8EBAMCBPAwGQYDVR0RBBIwEIIOcHJveHkua29uZy5sYW4wDQYJKoZI
+    hvcNAQELBQADggEBAJVrTWQRQzNtypa9OXFYADm8Fay1VMop3BY2kh0tfYgQEJ/4
+    pJUj6CaszQZ/Aix6LaPnXFcoPCDqqv00mgju86PMamr/zA9USXk8eTmzJkp5RklS
+    GdqiXboqESiQVvaNz3kdW7wgNz4FwaGCzkEi/dcc2LdtzLpWizx+TlxMMqjonUUM
+    ovZgZo+OlhWRsDVT/qy5SFtA0vlVNtdBr2egXb1H7J8UDC+fax/iKa7+fBUHZOO9
+    Fk9U8bxgfQ+jPIVVL8CfAtR68Sos7NpWH0S2emqZRnQvf0MSNdkTQKWn4qR9sckj
+    Ewxs5FbrMmgCOgwk1PtgRmdP3RME0HwK/B03saQ=
+    -----END CERTIFICATE-----
+  key: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCVGyoqqAitQUzZ
+    P+5eNp+rpMkxLni8gdt3v/dD80/6M/MGc4ME6Hc2xQEtlbRa9RCqhc6K9A616fQi
+    53mznYgEdyOiw/1mP8dClt5cdxd+XxolDkiz0x/M3og0zMddQnCg8XrAPjNv7Oat
+    IoJDkOM+MN76M5uWudiHEE0gPCuZJzVNalGQS6XPpIcRXGoXhCtY7CEiSYXHYs2Q
+    XxnZPEtb6co+Rbgme6GkbzQOoph40icKYKN+s3fOE4KyIFY/UeELScrFsv1/m22i
+    lIigVsALXePg0xD/dJf58vbM7tn4o5OP+pNZ7V7nxk8rzPidP6idd3vfU1WDlWpy
+    E56UzvunAgMBAAECggEAcq7lHNAHdHLgT8yrY41x/AwPryNGO/9JNW7SGVKAdjoU
+    tyaLZHAEmXynLk+R28/YFMA8H4Yd9m9OlrYhVjRZFM4p+5vxP/7YHPB7cPUsfcda
+    DZxR8PX25JVYf/vtb16V0ERLnKd62qCEwC/lr2A2WHQwXJLrHeAtmZzBJYUCJ5Xj
+    Dv1ZhyFjknswaV0vGXe6njTI6CzMQDTGysoagpCCo7RWgzjLREg2BGWd2UQpY4AW
+    nYAP4QNt82UMQbgIqsEMj64mzS9Q+o1P84J1naSP5sCI22LeFRp6iezZc+D8EH/5
+    RNONGSNWl3g6bsvN1VywYwjWn+waD3XAjXUu+peUgQKBgQDDu1QP28oSMKivHdfo
+    kQ1HrTNBRc9eWeAMZFuIbbPLN8rdEibpOm3DwTqithnahqS0NLOsBnXNtuLw1Qr/
+    zmOzn0yDO5XG8dlKr9vqWeBLdcRydLJBZwqEzWf4JwwwgfK3rItRaIbnAxnGUTS5
+    SrrhNfBAIGS9jx5X2kvLC7hFQQKBgQDDBIrpLTIjRDloWZcu03z9Bhb8jQCyGb5C
+    4MYs+duCnQIdNq/+maPspJzbVmF4b6S1zIPweI3fMvMeqRTbuf+drpElst1buFTO
+    P0UMMn4V+4qGIOOkIy5JIKwR8sJD9tNDUPtxuDEotTB9IyWx6pdmCFz5v/bggDCu
+    reoqflL+5wKBgQCDvb+L2QS+j4/KJk0flRoaJ2K7SVCVEesyjA3r2uLMImZhvAkC
+    rDgbLSDZSbZHFp8fR+WzILoD11gSf2Ki4PjMeqkWH3HlcP0vPwTHTO0h/UdXPmKI
+    kOFMl7CmHyoeMCj9JZ60EaXTMYwUpq3VFY6JbTOjBeqoh/8FZMHlDaNewQKBgCHg
+    ECEg8KyflTlDFrfTlMp+3E9STuShBCOp18LIRBEUJOHeNgQLvCXHElgnURcSjZHm
+    zKRgzIQQ3Zpd1Hm2fWhuglgCEeF0y4ZoBx5vRueaoh1aaTCBy/B39GvJt2UG4vu2
+    fXbrf96KWrnh+RJGpbXbjgr0BXZJzisJmrt25gPRAoGBAI3c+INpQXwrE+LBzCPu
+    LwIVvkm5NpeIlKQtDNrqG1QvUhqyZ2/Xitc4FyiccW7WHxkGKGZyj7GbmpqEOnyY
+    iVku0LSftZgycet2uMdp0HaVAgi5S6aVf5yN0U/8R5ToxcbuEfqwrBIyRgse8lx3
+    NNSvLxPAempmiFPSk9AtobYV
+    -----END PRIVATE KEY-----
+  tags:
+  - proxy.kong.lan
+  snis:
+  - name: proxy.kong.lan
+ca_certificates:
+- id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
+    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
+    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
+    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
+    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
+    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
+    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
+    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
+    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
+    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
+    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
+    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
+    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
+    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
+    -----END CERTIFICATE-----

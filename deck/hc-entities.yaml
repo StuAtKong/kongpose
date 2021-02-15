@@ -1,0 +1,163 @@
+_format_version: "1.1"
+_workspace: haproxy-hc
+services:
+- connect_timeout: 60000
+  host: status-upstream
+  name: healthcheck
+  path: /status
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  tags:
+  - ha-proxy_healthcheck
+  routes:
+  - name: healthcheck
+    paths:
+    - /health
+    path_handling: v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    tags:
+    - ha-proxy_healthcheck
+    https_redirect_status_code: 426
+  plugins:
+  - name: request-transformer
+    config:
+      add:
+        body: []
+        headers:
+        - kong-admin-token:password
+        querystring: []
+      append:
+        body: []
+        headers: []
+        querystring: []
+      http_method: null
+      remove:
+        body: []
+        headers: []
+        querystring: []
+      rename:
+        body: []
+        headers: []
+        querystring: []
+      replace:
+        body: []
+        headers: []
+        querystring: []
+        uri: null
+    enabled: true
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - ha-proxy_healthcheck
+upstreams:
+- name: status-upstream
+  algorithm: round-robin
+  slots: 10000
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      type: http
+      timeout: 1
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        tcp_failures: 0
+        timeouts: 0
+        interval: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 0
+  hash_on: none
+  hash_fallback: none
+  hash_on_cookie_path: /
+  tags:
+  - ha-proxy_healthcheck
+  targets:
+  - target: kongpose_kong-cp_1:48001
+    weight: 100
+    tags:
+    - ha-proxy_healthcheck
+ca_certificates:
+- id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
+    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
+    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
+    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
+    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
+    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
+    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
+    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
+    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
+    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
+    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
+    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
+    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
+    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
+    -----END CERTIFICATE-----
