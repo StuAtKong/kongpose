@@ -241,7 +241,7 @@ services:
   ha-proxy:
     networks:
       - kongpose-net
-    image: haproxy:2.2.4-alpine
+    image: haproxy:2.3.5-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
       - ./ssl-certs:/tmp/ssl/customcerts
