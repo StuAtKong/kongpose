@@ -4,3 +4,4 @@ locust/__pycache__/*
 zookeeper/*
 kafka/*
 ssl-certs/rootCA.srl
+ha-proxy/haproxy.cfg
