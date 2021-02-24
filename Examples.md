@@ -127,7 +127,7 @@ An endpoint of `/auth/oidc` exists with auth_code and bearer authentication meth
 Get an auth token by calling the Keycloak `/token` endpoint and assigning the token to an ENV var;
 
 ```
-TOKEN=`curl -s -X POST 'http://proxy.kong.lan:8080/auth/realms/kong/protocol/openid-connect/token' \
+TOKEN=`curl -s -X POST 'http://keycloak.kong.lan:8080/auth/realms/kong/protocol/openid-connect/token' \
        --header 'content-type: application/x-www-form-urlencoded'  \
       --data-urlencode 'client_id=kong' \
       --data-urlencode 'client_secret=ab523f45-e04a-43ec-bac7-2e268c2ff05c'  \
