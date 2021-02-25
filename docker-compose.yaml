@@ -7,8 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.9-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -23,8 +23,8 @@ services:
     restart: on-failure
 
   kong-node:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.9-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
     scale: 2
     networks:
       - kongpose-net
@@ -101,7 +101,6 @@ services:
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
-      KONG_HEADERS: off
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
