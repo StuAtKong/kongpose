@@ -1,0 +1,113 @@
+_format_version: "1.1"
+_workspace: mtls
+services:
+- connect_timeout: 60000
+  host: kongpose_httpbin_1
+  name: local-httpbin
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: local-httpbin
+    paths:
+    - /auth/mtls
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    snis:
+    - client.kong.lan
+    https_redirect_status_code: 426
+consumers:
+- custom_id: mtls_id
+  username: mtls-consumer
+certificates:
+- id: ee2867cf-8572-4f1a-a3ac-fbb07fc4e915
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIECzCCAvOgAwIBAgIUAusYGP9BwoLFFAJdB/jY6eUzUyIwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMTAxMjAxMzQyMjhaFw0yMjA2MDQxMzQyMjhaMIGSMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD2Ns
+    aWVudC5rb25nLmxhbjEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC4TgCS78i/gqALxlZp1ucR8pXm
+    uLEiPZTUPYeFX19ExYCpDhmp/QCeMiEYrLpTEhI5nEAxEUZhUoN3xGUdPEiEQFXn
+    eV70/k2naZ0r9TySVwSLIT8aHTgsU/i9sbGNsof5jBIMPlwEISLfZUvXDprE5qR1
+    cHqlqR0lPIf4M8tWTsIOl8yuz/GZAOSN7PWSSuG1jrVUbaU1P92rovBNVJvrnc57
+    0Ib/P5663tTSFXIUkho6vgNib0OoCKf7N8VZ/hvSDJqYPbszo1ZRbJa+wdSsFQwN
+    IXjJP1bNUvywgSVUjBFROQ5G7kQAJcI97C2u9U30spr6e5F9tEXSbV0DEERdAgMB
+    AAGjVzBVMB8GA1UdIwQYMBaAFHbJKX9MCUUMY7c0BWXIlplH5dm3MAkGA1UdEwQC
+    MAAwCwYDVR0PBAQDAgTwMBoGA1UdEQQTMBGCD2NsaWVudC5rb25nLmxhbjANBgkq
+    hkiG9w0BAQsFAAOCAQEAIX/MZ/M8ifd4vXPgNnvMuV8qp61CiHsHOIT3jpG+DOSt
+    e5AnaQ/uSJ5n2nmO1zMqJe4Wv9bv9FWffntQ+VX0DxmeKLVFHjhnthFYKHad1gUO
+    rm+fzmYr74CX5JtkVO35tbJ8WwcnCthjnwtHYb4kOxxQ47ACl16yU8nFKW68sO2m
+    VU7DYkFoE0E0/RoNByCfzzqdosu8DvvtjaV26rbvFcdZ+3DiPWhXpPcoiZtB3S8a
+    582gUxxITKq/ES5A5jbaHFZ6NVwwablG8FBw51wZU6PPoVtIxe4/v+FGeQF+/KUv
+    AcaJ1cRhKzYcW475WW9pWitCobCUNYIbEz/egv/kLg==
+    -----END CERTIFICATE-----
+  key: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC4TgCS78i/gqAL
+    xlZp1ucR8pXmuLEiPZTUPYeFX19ExYCpDhmp/QCeMiEYrLpTEhI5nEAxEUZhUoN3
+    xGUdPEiEQFXneV70/k2naZ0r9TySVwSLIT8aHTgsU/i9sbGNsof5jBIMPlwEISLf
+    ZUvXDprE5qR1cHqlqR0lPIf4M8tWTsIOl8yuz/GZAOSN7PWSSuG1jrVUbaU1P92r
+    ovBNVJvrnc570Ib/P5663tTSFXIUkho6vgNib0OoCKf7N8VZ/hvSDJqYPbszo1ZR
+    bJa+wdSsFQwNIXjJP1bNUvywgSVUjBFROQ5G7kQAJcI97C2u9U30spr6e5F9tEXS
+    bV0DEERdAgMBAAECggEACavWLd+1Sg9htJx4xl8HixKOuSex69kNaUG9TcteZW5z
+    vOtHf3sOQD7jK7dMo7VMDYfcenasmcjJq0w7/he+umnh2B6vU+3QR1usarUYs5kr
+    XN2mwQkNfI3/fHzJk2Tt67Nk8w2GqJTQjqZzH1rd1j1AHgWD+hNwuxZ9EBIvtlye
+    0J/qQ8+ezqY0Dvj6Srd2+RpLNtQVd2pRUcGvLTA7BEKT8Q438kzpPDXDhBqTlVNv
+    +ZMAVP66Op+xQ3tSe40lugw8tvRoca4ntZbpEWl3jBQ2YxoWNivW9P+Id5nxxqt0
+    tP7TK+JtRrV9cdgMRc/up4MQdQGfQ8wq3mlv8vQ6gQKBgQDkqlpIDiuGXw9Wwrwu
+    GcqK2T5BxIyxO79iKtAImbdXAQHkPdRekDaujTTMqN3B4ZbhtZCuWG1qaYHbjKf4
+    JHSo8mqtmHcibMJSULGamOvQh9AYDWktrjiCLy+BzdqgJxM1D8Z+c31YOyk5axcf
+    55+FXyNqUSceR6BRvAyxsfkeoQKBgQDOVh3jojbL+oUKsPwhV8QHUPE4AC/WdYkQ
+    FJZj4J7RMyTeuy56udujfvP4r/KOfCeQlQjdCqw5xGA/NK2UkcvBGIHvJMNwy79W
+    8sOSMgEewCpE0U7v5aYyksmFhTKDpKI4mjcSV2ENoTK3LMs4EjTrr9uRbbKFtzMY
+    JdahUAj4PQKBgQCkKnV0o8+1wcuWY2qMwnF6a+tZdk339Eg7pzcB5bIN4ahE/+rX
+    FTxc5v3QLTBAQMB9PUgpE01Ch4r2X6475ZhnrtrN1Nc7PM/qHwrTThSG+up4SjCH
+    3juto0i9LVhXgJY2kyPTpwCHdrnrAipw+m65ZwtbCfZGs++ynoqSjI6o4QKBgQCv
+    zz6+c7wfB4GOv4jFXEPiO/ycy8P3BsTXl8MgrQaFl/9lbLZIyc40u/pjPn/9GhqY
+    HfSkavCedA3SLS9ttOCY0in8OyXwGRsamdU73zGHIxOg+Xs5+0ImO15MT1bgRkoW
+    0of0L9G5TE2rOBab2x+OZpQ+kOqY9qUpgSwk3M4XvQKBgQCZZzHu8D5Pecw8S5ta
+    40STsoejGqrHH0i3F6Cepw81jh2NFbgMeP4MX6gC2kvyYqQ+XzWiJQETnzRmNBdB
+    jVQMNjXZIRRNur+Iaa0WUTsstArGkOv1vDp3hU22+5ayTsmR6N1fTySeU8h75g+k
+    ueul7WK5Ww/tHblMClI3reiXGw==
+    -----END PRIVATE KEY-----
+  snis:
+  - name: client.kong.lan
+ca_certificates:
+- id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
+    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
+    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
+    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
+    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
+    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
+    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
+    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
+    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
+    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
+    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
+    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
+    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
+    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
+    -----END CERTIFICATE-----

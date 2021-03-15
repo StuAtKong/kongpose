@@ -6,7 +6,7 @@ from locust import HttpUser, task, between
 
 class QuickstartUser(HttpUser):
     wait_time = between(0.5, 1)
-    host = "http://api.kong.lan"
+    host = "http://proxy.kong.lan"
 
     @task(32)
     def good_response(self):
