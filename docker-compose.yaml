@@ -34,6 +34,7 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
+      - ../kong-plugin-log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -128,7 +129,7 @@ services:
 
   kong-dp:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.2.0-alpine
-    scale: 3
+    scale: 1
     networks:
       - kongpose-net
     depends_on:
@@ -137,6 +138,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
+      - ../kong-plugin-log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
