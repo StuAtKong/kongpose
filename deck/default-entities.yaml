@@ -518,7 +518,7 @@ services:
         - TRACE
         - CONNECT
         origins:
-        - '*'
+        - 'https://portal.kong.lan'
         preflight_continue: false
       enabled: true
       protocols:
