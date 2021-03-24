@@ -111,7 +111,7 @@ services:
   db:
     networks:
       - kongpose-net
-    image: postgres:9.5
+    image: postgres:12
     environment:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
