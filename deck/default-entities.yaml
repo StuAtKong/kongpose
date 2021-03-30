@@ -2,17 +2,19 @@ _format_version: "1.1"
 _workspace: default
 services:
 - connect_timeout: 60000
-  host: echo-server
-  name: local-echo-server
-  port: 8080
+  host: dadjokes
+  id: 13c5594b-d39a-45e7-b699-0bb4eab4ff82
+  name: local_dadjokes
+  port: 80
   protocol: http
   read_timeout: 60000
   retries: 5
   write_timeout: 60000
   routes:
-  - name: auth-hmac
+  - id: 83fee33a-2ed2-4552-9465-272c4b3bbfd9
+    name: local-dadjokes
     paths:
-    - /auth/hmac
+    - /dadjokes
     path_handling: v0
     preserve_host: false
     protocols:
@@ -21,18 +23,240 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
     plugins:
-    - name: hmac-auth
+    - id: 63d991df-b44a-4ec7-9ecb-54a008a83e98
+      name: cors
       config:
-        algorithms:
-        - hmac-sha256
-        anonymous: null
-        clock_skew: 600
-        enforce_headers:
-        - date
-        - request-line
+        credentials: false
+        exposed_headers: null
+        headers: null
+        max_age: null
+        methods:
+        - GET
+        - HEAD
+        - PUT
+        - PATCH
+        - POST
+        - DELETE
+        - OPTIONS
+        - TRACE
+        - CONNECT
+        origins:
+        - https://portal.kong.lan
+        preflight_continue: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+  - id: 992f30f6-a225-42de-9e57-9ad2eb6eb84f
+    name: auth-dadjokes
+    paths:
+    - /auth/dadjokes
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+    plugins:
+    - id: 3ec93c47-0105-4296-8415-a47195978a4e
+      name: basic-auth
+      config:
+        anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
         hide_credentials: false
-        validate_request_body: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - id: d3564331-f0ff-4181-9f9e-98b1e8887a9d
+      name: acl
+      config:
+        allow:
+        - jokes
+        deny: null
+        hide_groups_header: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+- connect_timeout: 60000
+  host: kongpose_toxiproxy_1
+  id: 168f5d40-5c4b-484d-b78f-1e064462c4f7
+  name: slow-httpbin
+  port: 8000
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - id: 7f9b7bb7-89b0-40d8-8da3-eb8305648fb8
+    name: slow-httpbin
+    paths:
+    - /slow-httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+- connect_timeout: 60000
+  host: kongpose_grpc-server_1
+  id: 6049c566-ff0b-4b77-8412-336c43f72f60
+  name: local-grpc-server
+  port: 9000
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - id: 02f8b023-c8c9-40e2-905f-75e7cbecd066
+    name: local-grpc-sayHello
+    paths:
+    - /hello.HelloService/SayHello
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+  - id: 5e27b7c3-1454-4fde-94f2-56a62bf15d1b
+    name: local-grpc-reflection
+    paths:
+    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+  - id: 901d8af3-9628-475f-8964-d741b34c6462
+    name: local-grpc-lotsOfReplies
+    paths:
+    - /hello.HelloService/LotsOfReplies
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+- connect_timeout: 60000
+  host: local-httpbin
+  id: c2436422-8f03-47c0-887c-321bc2ad4fae
+  name: local-httpbin
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  tags:
+  - rl-test
+  routes:
+  - id: 4dd46178-e456-4a46-8da9-546e97658447
+    name: local-httpbin
+    paths:
+    - /httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+  - id: d86e9f0c-e2bc-470d-a5a9-8f523512f379
+    name: limit-httpbin
+    paths:
+    - /limit-httpbin
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    tags:
+    - rl-test
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+    plugins:
+    - id: c3abf3f2-195e-4ff8-86ee-bfe25acd09da
+      name: key-auth
+      config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - id: d4c87247-6b36-4e97-a6b9-c56bd94eaf79
+      name: rate-limiting-advanced
+      config:
+        dictionary_name: kong_rate_limiting_counters
+        header_name: null
+        hide_client_headers: false
+        identifier: consumer
+        limit:
+        - 5
+        namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
+        redis:
+          cluster_addresses: null
+          database: 0
+          host: kongpose_redis_1
+          password: null
+          port: 6379
+          sentinel_addresses: null
+          sentinel_master: null
+          sentinel_password: null
+          sentinel_role: null
+          server_name: null
+          ssl: false
+          ssl_verify: false
+          timeout: 2000
+        retry_after_jitter_max: 0
+        strategy: redis
+        sync_rate: 0
+        window_size:
+        - 30
+        window_type: sliding
       enabled: true
       protocols:
       - grpc
@@ -40,8 +264,34 @@ services:
       - http
       - https
       tags:
+      - rl-test
       - plugin-example
-  - name: auth-oidc
+  plugins:
+  - id: 4b0638fe-5700-4a6e-8bb5-3664663ebbc4
+    name: application-registration
+    config:
+      auto_approve: false
+      description: A simple API that echos the request
+      display_name: Echo Server
+      show_issuer: false
+    enabled: false
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+- connect_timeout: 60000
+  host: echo-server
+  id: e399a95c-5a02-4594-814e-8d364167903e
+  name: local-echo-server
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - id: 4625ebe0-8287-44a2-8cc0-27a182e5a06d
+    name: auth-oidc
     paths:
     - /auth/oidc
     path_handling: v0
@@ -52,8 +302,11 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
     plugins:
-    - name: openid-connect
+    - id: 829e1104-6f33-4364-b518-8d7a8533f579
+      name: openid-connect
       config:
         anonymous: null
         audience: null
@@ -110,6 +363,7 @@ services:
         consumer_optional: false
         credential_claim:
         - sub
+        disable_session: null
         discovery_headers_names: null
         discovery_headers_values: null
         display_errors: false
@@ -279,7 +533,43 @@ services:
       - grpcs
       - http
       - https
-  - name: echo
+  - id: c6c055fa-5723-4848-bdc5-8cb3fb360256
+    name: auth-hmac
+    paths:
+    - /auth/hmac
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+    plugins:
+    - id: d136a6d0-ae95-4aba-a51c-eb070e85d64e
+      name: hmac-auth
+      config:
+        algorithms:
+        - hmac-sha256
+        anonymous: null
+        clock_skew: 600
+        enforce_headers:
+        - date
+        - request-line
+        hide_credentials: false
+        validate_request_body: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - plugin-example
+  - id: f491db3f-7018-4197-ae6e-42f69202d6e1
+    name: echo
     paths:
     - /echo
     path_handling: v0
@@ -290,8 +580,11 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
     plugins:
-    - name: udp-log
+    - id: c4e70a0c-bbdc-4201-94e2-964b18a4269d
+      name: udp-log
       config:
         host: kongpose_graylog_1
         port: 5555
@@ -304,127 +597,21 @@ services:
       - https
       tags:
       - plugin-example
-- connect_timeout: 60000
-  host: kongpose_grpc-server_1
-  name: local-grpc-server
-  port: 9000
-  protocol: grpc
+- client_certificate: f3ae1bb2-ea6a-4caf-a7a7-2f078b7842db
+  connect_timeout: 60000
+  host: web-server.kong.lan
+  id: f398724d-6041-4f4d-ba02-7dca7702ac2f
+  name: local_mtls-webserver
+  port: 8181
+  protocol: https
   read_timeout: 60000
   retries: 5
   write_timeout: 60000
   routes:
-  - name: local-grpc-lotsOfReplies
+  - id: 8e232361-d6cd-4055-8e78-f3aa68a04f63
+    name: local_mtls-webserver
     paths:
-    - /hello.HelloService/LotsOfReplies
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
-  - name: local-grpc-reflection
-    paths:
-    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
-  - name: local-grpc-sayHello
-    paths:
-    - /hello.HelloService/SayHello
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
-- connect_timeout: 60000
-  host: local-httpbin
-  name: local-httpbin
-  port: 80
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  tags:
-  - rl-test
-  routes:
-  - name: limit-httpbin
-    paths:
-    - /limit-httpbin
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    tags:
-    - rl-test
-    https_redirect_status_code: 426
-    plugins:
-    - name: key-auth
-      config:
-        anonymous: null
-        hide_credentials: false
-        key_in_body: false
-        key_names:
-        - apikey
-        run_on_preflight: true
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-    - name: rate-limiting-advanced
-      config:
-        dictionary_name: kong_rate_limiting_counters
-        header_name: null
-        hide_client_headers: false
-        identifier: consumer
-        limit:
-        - 5
-        namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
-        redis:
-          cluster_addresses: null
-          database: 0
-          host: kongpose_redis_1
-          password: null
-          port: 6379
-          sentinel_addresses: null
-          sentinel_master: null
-          sentinel_password: null
-          sentinel_role: null
-          server_name: null
-          ssl: false
-          ssl_verify: false
-          timeout: 2000
-        strategy: redis
-        sync_rate: 0
-        window_size:
-        - 30
-        window_type: sliding
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-      tags:
-      - rl-test
-      - plugin-example
-  - name: local-httpbin
-    paths:
-    - /httpbin
+    - /webserver
     path_handling: v0
     preserve_host: false
     protocols:
@@ -433,142 +620,43 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
-  plugins:
-  - name: application-registration
-    config:
-      auto_approve: false
-      description: A simple API that echos the request
-      display_name: Echo Server
-      show_issuer: false
-    enabled: false
-    protocols:
-    - grpc
-    - grpcs
-    - http
-    - https
-- connect_timeout: 60000
-  host: dadjokes
-  name: local_dadjokes
-  port: 80
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  routes:
-  - name: auth-dadjokes
-    paths:
-    - /auth/dadjokes
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    https_redirect_status_code: 426
-    plugins:
-    - name: acl
-      config:
-        allow:
-        - jokes
-        deny: null
-        hide_groups_header: false
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-    - name: basic-auth
-      config:
-        anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
-        hide_credentials: false
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-  - name: local-dadjokes
-    paths:
-    - /dadjokes
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    https_redirect_status_code: 426
-    plugins:
-    - name: cors
-      config:
-        credentials: false
-        exposed_headers: null
-        headers: null
-        max_age: null
-        methods:
-        - GET
-        - HEAD
-        - PUT
-        - PATCH
-        - POST
-        - DELETE
-        - OPTIONS
-        - TRACE
-        - CONNECT
-        origins:
-        - 'https://portal.kong.lan'
-        preflight_continue: false
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-- connect_timeout: 60000
-  host: kongpose_toxiproxy_1
-  name: slow-httpbin
-  port: 8000
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  routes:
-  - name: slow-httpbin
-    paths:
-    - /slow-httpbin
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
 consumers:
-- username: anonymous
-- username: consA
-  keyauth_credentials:
-  - key: abc
-  basicauth_credentials:
-  - username: consA
-    password: c0afdf2593c6d4b25f898d07b1889e89e07e807b
-  acls:
-  - group: jokes
-- username: consB
-  keyauth_credentials:
-  - key: "123"
-  basicauth_credentials:
-  - username: consB
-    password: 254e069e9bf4e0a2c861e33c7e986baff7de42a4
-- username: hmac-consumer
+- id: 5bba33b9-bff0-4eb6-bc55-d48bddac99d6
+  username: hmac-consumer
   hmacauth_credentials:
-  - username: hmac-user
+  - id: 2497b722-1c5b-4f0e-be15-cbf2f97554c8
+    username: hmac-user
     secret: K1ngK0ng
-- username: oidc-consumer
+- id: accb0537-af5f-4d29-8948-e78eaf0e677f
+  username: oidc-consumer
+- id: b4d6a39a-5dc6-4ce8-b85a-fee580b5513b
+  username: anonymous
+- id: cc3e8260-80d8-4109-ad13-881eed5f1e71
+  username: consB
+  keyauth_credentials:
+  - id: 950dbfde-bfe6-4050-9639-07c461c4127a
+    key: "123"
+  basicauth_credentials:
+  - id: 0cb7723b-424a-43b6-b902-728ce7248668
+    username: consB
+    password: 2211624728f544f8aa7d4b7f4ea640831d5536cc
+- id: df473d53-0ab4-4fd7-8615-0dabf1c19866
+  username: consA
+  keyauth_credentials:
+  - id: 2e1dfe17-9e67-4ba8-b20e-efec3c24234b
+    key: abc
+  basicauth_credentials:
+  - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
+    username: consA
+    password: dcb2bf60adf48e2c14e007d153ef329577ffa303
+  acls:
+  - id: d18259f5-14ea-4164-8328-9aebb1cfc103
+    group: jokes
 upstreams:
-- name: local-httpbin
+- id: 5585601c-f97e-4a2c-91a6-bb2a16b2686f
+  name: local-httpbin
   algorithm: round-robin
   slots: 10000
   healthchecks:
@@ -635,9 +723,11 @@ upstreams:
   hash_fallback: none
   hash_on_cookie_path: /
   targets:
-  - target: kongpose_httpbin_1:80
+  - id: 05cdf296-70de-4d5c-86f8-f0cc5dac8b9d
+    target: kongpose_httpbin_2:80
     weight: 100
-  - target: kongpose_httpbin_2:80
+  - id: c5fb77d8-26ff-456c-a2c8-a29fb812e032
+    target: kongpose_httpbin_1:80
     weight: 100
 certificates:
 - id: 507cc555-5b92-496d-9e89-bfc78dfcddbe
@@ -698,7 +788,94 @@ certificates:
   tags:
   - proxy.kong.lan
   snis:
-  - name: proxy.kong.lan
+  - id: 26b81a17-f770-4f09-a6ce-dd51a391a482
+    name: proxy.kong.lan
+- id: f3ae1bb2-ea6a-4caf-a7a7-2f078b7842db
+  cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIFeDCCBGCgAwIBAgIUAusYGP9BwoLFFAJdB/jY6eUzUyQwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMTAxMjAxNTA0NDVaFw0yMjAxMjAxNTA0NDVaMIGQMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxFjAUBgNVBAMMDW10
+    bHMtY29uc3VtZXIxHTAbBgkqhkiG9w0BCQEWDnN0dUBrb25naHEuY29tMIICIjAN
+    BgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA1/+83/YNiEVKYvcuVwYGve6afsg1
+    BYCn1+E9Uwgh0uwAenT/DKB8NhqoVxc7cZ2HaTI146IGmFICmctlTWvLPLglHmTo
+    byOUV6tIJAjvzyEOpC458hLGgbv8mhGXJWPxBVu7Wy6Hapz2bk0cEscfL7PHKaRu
+    3D6r8/zbhhWAqe4EIt+NVYT6baaYBs7bPZQXs/sluKI+DNYuDeaAmoSuCc4ein6z
+    0xDqCSMmPebzjns03ttB29vWL3eYY9dvgoCd+CPhXT/C4CHtvKbH+hOQYDtVF6MO
+    1mmABAQTQWMR/00+QI0xtvuXtEPurla5dA0TN6ddCTOOcILKx62z5oc3Kqr+nHHa
+    71zNzARUVaZ2vy1pRVr0DZgB7KqcFXhy/oy8IpmxUR1ASBDZl6B6RKrdQwvgLgmn
+    3M/roNLAU+3nz4itpt/zf+X0suwdthrflic1R68z1SlYbyoGARWkZ/pOl6kLNVK2
+    OsqQuICaajnW7t1oDd7z1+3hm+uoryDwvG6f3T9ZvWjKXYcKg7b+BjbFdahbDywD
+    PgnhSz9AaoVWhR+GHIPrjRClMpEkra/yGJFvH3UpXhgg9d0DrLZE51Z75a9SvnAj
+    vdLuNhx4bJbwLBgNGsJMkupzBrw4iCfbKFcBbP8o0Xjtarj7T/mkWuQ1GjWqfyrD
+    55NecBPNw5C9BR0CAwEAAaOBxTCBwjAJBgNVHRMEAjAAMBEGCWCGSAGG+EIBAQQE
+    AwIFoDAzBglghkgBhvhCAQ0EJhYkT3BlblNTTCBHZW5lcmF0ZWQgQ2xpZW50IENl
+    cnRpZmljYXRlMB0GA1UdDgQWBBSV3F+eicU8SVT4LcDJ6eMzP0todzAfBgNVHSME
+    GDAWgBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0l
+    BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4IBAQB5L0OZ
+    WELG9Pw6Ol1BsZYgpLR4PGNBB9dKm/9dd+q+ohZVFCfXcjZ3YOU1vh/HHQrALRNY
+    I58JxcVCOx/qIW2uA0iSCqIT0sNb9cJLxfZf7X+BzPPPnu0ugUJp7GzLNnHitrLC
+    Xb1nmmefwgraNzp+a5IrR8RcQG1mYDuS+2HK/rybo22XcCxhob8OiDEn8+ytkKyQ
+    Ipmrf9D+/68/ih6az0w1aakASMmFe8z/p6VgVQkCySCWWFG525BRdGmSImqVZ4xa
+    aQFN3L+oN+JJcCFTthLOAYo32JH+xLMz7PokzSL84g3b68h59hXDoMSwB10GthL5
+    T8tqV6i5miKWwvfZ
+    -----END CERTIFICATE-----
+  key: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    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
+    -----END RSA PRIVATE KEY-----
 ca_certificates:
 - id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
   cert: |-
