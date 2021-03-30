@@ -128,7 +128,7 @@ services:
 
   kong-dp:
     image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    scale: 3
+    scale: 1
     networks:
       - kongpose-net
     depends_on:
@@ -322,6 +322,7 @@ services:
       - "8000-8004:8000-8004/tcp"
       - "8443-8447:8443-8447/tcp"
       - "8100:8100/tcp"
+      - "8181:8181/tcp"
       - "8404:8404/tcp"
       - "9999:9999/tcp"
 
