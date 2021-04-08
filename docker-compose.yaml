@@ -271,7 +271,8 @@ services:
         condition: service_healthy
     entrypoint: >
       sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;"
+             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
+             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
 
   locust:
     networks:
