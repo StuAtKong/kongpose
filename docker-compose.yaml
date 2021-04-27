@@ -7,7 +7,10 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    image: kong/kong-gateway:2.3.3.2-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -23,7 +26,10 @@ services:
     restart: on-failure
 
   kong-cp:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    image: kong/kong-gateway:2.3.3.2-alpine
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -68,19 +74,19 @@ services:
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ENFORCE_RBAC: "on"
+      KONG_ENFORCE_RBAC: "off"
       KONG_ADMIN_API_URI: "https://api.kong.lan"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      #KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       # Kong Manager auth via local LDAP(AD) server
       #KONG_ADMIN_GUI_AUTH: "basic-auth"
       # Kong Manager auth via local LDAP(AD) server
-      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
+      #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
+      #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
       # Kong Manager auth via OIDC & Auth0
       # KONG_ADMIN_GUI_AUTH: "openid-connect"
       # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
@@ -127,7 +133,10 @@ services:
     restart: on-failure
 
   kong-dp:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
+    image: kong/kong-gateway:2.3.3.2-alpine
     scale: 1
     networks:
       - kongpose-net
@@ -448,3 +457,4 @@ services:
       PGADMIN_LISTEN_PORT: 7071
     ports:
      - "7071:7071"
+
