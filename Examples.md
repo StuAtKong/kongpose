@@ -148,7 +148,7 @@ Open this link in a browser and login with the `keycloak_user` user;
 
 http://proxy.kong.lan/auth/oidc
 
-## Mutual-TLS Auth
+## Mutual-TLS Auth - Client to Kong
 
 The mutual-tls Route is configured to use the `client.kong.lan` hostname. The curl call passes the client certificate and key. The certificate exchange can be seen in the verbose headers from the curl call and the reponse has details of the mtls-consumer for consumer mapping in the plugin;
 
@@ -229,6 +229,201 @@ $ curl -v --cacert ./ssl-certs/rootCA.pem --key ./ssl-certs/client/client.key --
 }
 * Connection #0 to host client.kong.lan left intact
 ```
+
+## Mutual-TLS Auth - Kong to Upstream
+
+An ngix server is configured via the http_content/http_server.conf file which listens on port 8181 and requires a client certificate to be sent. This can be tested directly from the command line to the web server as the web server listener port (8181) is exposed outside the container.
+
+With a client certificate in the request;
+
+```
+$ curl -v --cacert ./ssl-certs/rootCA.pem --key ssl-certs/client/client.key --cert ssl-certs/client/client.pem https://web-server.kong.lan:8181
+*   Trying 192.168.1.196:8181...
+* Connected to web-server.kong.lan (192.168.1.196) port 8181 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* successfully set certificate verify locations:
+*  CAfile: ./ssl-certs/rootCA.pem
+*  CApath: /etc/ssl/certs
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Request CERT (13):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Certificate (11):
+* TLSv1.3 (OUT), TLS handshake, CERT verify (15):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+*  subject: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=*.kong.lan; emailAddress=stu@konghq.com
+*  start date: Feb 11 10:43:07 2021 GMT
+*  expire date: Jun 26 10:43:07 2022 GMT
+*  subjectAltName: host "web-server.kong.lan" matched cert's "*.kong.lan"
+*  issuer: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=Support Root CA; emailAddress=stu@konghq.com
+*  SSL certificate verify ok.
+> GET / HTTP/1.1
+> Host: web-server.kong.lan:8181
+> User-Agent: curl/7.74.0
+> Accept: */*
+>
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< Server: openresty
+< Date: Tue, 30 Mar 2021 13:06:25 GMT
+< Content-Type: text/html; charset=UTF-8
+< Content-Length: 297
+< Last-Modified: Thu, 25 Mar 2021 10:35:57 GMT
+< Connection: keep-alive
+< ETag: "605c678d-129"
+< Accept-Ranges: bytes
+<
+<html>
+	<title>
+		Test site for files
+	</title>
+	<body>
+		<p> This is a test site to allow downloading of content</p>
+		<p> To create a file use a command as below;</p>
+		<p> $ yes this is test file | head -c 10MB > test.txt </p>
+		<a href="./test.txt">A 10 MB file (test.txt)</a>
+	</body>
+<html>
+* Connection #0 to host web-server.kong.lan left intact 
+```
+
+*Without* a client certificate in the request;
+
+```
+$ curl -v --cacert ./ssl-certs/rootCA.pem  https://web-server.kong.lan:8181
+*   Trying 192.168.1.196:8181...
+* Connected to web-server.kong.lan (192.168.1.196) port 8181 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* successfully set certificate verify locations:
+*  CAfile: ./ssl-certs/rootCA.pem
+*  CApath: /etc/ssl/certs
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Request CERT (13):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Certificate (11):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server accepted to use http/1.1
+* Server certificate:
+*  subject: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=*.kong.lan; emailAddress=stu@konghq.com
+*  start date: Feb 11 10:43:07 2021 GMT
+*  expire date: Jun 26 10:43:07 2022 GMT
+*  subjectAltName: host "web-server.kong.lan" matched cert's "*.kong.lan"
+*  issuer: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=Support Root CA; emailAddress=stu@konghq.com
+*  SSL certificate verify ok.
+> GET / HTTP/1.1
+> Host: web-server.kong.lan:8181
+> User-Agent: curl/7.74.0
+> Accept: */*
+>
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 400 Bad Request
+< Server: openresty
+< Date: Tue, 30 Mar 2021 13:06:08 GMT
+< Content-Type: text/html; charset=UTF-8
+< Content-Length: 202
+< Connection: close
+<
+<html>
+<head><title>400 No required SSL certificate was sent</title></head>
+<body>
+<center><h1>400 Bad Request</h1></center>
+<center>No required SSL certificate was sent</center>
+</body>
+</html>
+* Closing connection 0
+* TLSv1.3 (OUT), TLS alert, close notify (256):
+```
+
+There is a Kong proxy for the web server than is configured to pass the client certificate to the upstream. This can be called without passing a client cert as there is no Client->Kong MTLS requirement, just from Kong->Upstream requires MTLS.
+
+```
+$ curl -v --cacert ./ssl-certs/rootCA.pem  https://proxy.kong.lan/webserver
+*   Trying 192.168.1.196:443...
+* Connected to proxy.kong.lan (192.168.1.196) port 443 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* successfully set certificate verify locations:
+*  CAfile: ./ssl-certs/rootCA.pem
+*  CApath: /etc/ssl/certs
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=*.kong.lan; emailAddress=stu@konghq.com
+*  start date: Feb 11 10:43:07 2021 GMT
+*  expire date: Jun 26 10:43:07 2022 GMT
+*  subjectAltName: host "proxy.kong.lan" matched cert's "*.kong.lan"
+*  issuer: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=Support Root CA; emailAddress=stu@konghq.com
+*  SSL certificate verify ok.
+* Using HTTP2, server supports multi-use
+* Connection state changed (HTTP/2 confirmed)
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+* Using Stream ID: 1 (easy handle 0x5616b34d7120)
+> GET /webserver HTTP/2
+> Host: proxy.kong.lan
+> user-agent: curl/7.74.0
+> accept: */*
+>
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+* Connection state changed (MAX_CONCURRENT_STREAMS == 100)!
+< HTTP/2 200
+< content-type: text/html; charset=UTF-8
+< content-length: 297
+< server: openresty
+< date: Tue, 30 Mar 2021 13:02:17 GMT
+< last-modified: Thu, 25 Mar 2021 10:35:57 GMT
+< etag: "605c678d-129"
+< accept-ranges: bytes
+< x-kong-upstream-latency: 1
+< x-kong-proxy-latency: 5
+< via: kong/2.3.3.0-enterprise-edition
+< x-server: kongpose_kong-dp_1
+<
+<html>
+	<title>
+		Test site for files
+	</title>
+	<body>
+		<p> This is a test site to allow downloading of content</p>
+		<p> To create a file use a command as below;</p>
+		<p> $ yes this is test file | head -c 10MB > test.txt </p>
+		<a href="./test.txt">A 10 MB file (test.txt)</a>
+	</body>
+<html>
+* Connection #0 to host proxy.kong.lan left intact
+```
+
+Removing the `config.client_certificate` from the `local_mtls-webserver` Kong Service will show the `No required SSL certificate was sent` error
 
 ## Websocket Example
 
