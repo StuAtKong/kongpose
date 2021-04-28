@@ -76,7 +76,7 @@ Need to see what is stored in redis? Try redis-commander at http://api.kong.lan:
 
 For Syslog/TCP/UDP log plugins, use Graylog. The default username/password to login is admin/admin
 
-http://api.kong.lan:9000/
+https://graylog.kong.lan/
 
 Two example inputs (System/Inputs) have been created via the "content packs" JSON file to listen on port 5555 for TCP and UDP.
 
