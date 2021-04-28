@@ -366,7 +366,7 @@ services:
     # - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py
+    command: -f /mnt/locust/kafka.py
 
   fake-smtp-server:
     networks:
@@ -496,7 +496,7 @@ services:
       - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
       - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9092,EXTERNAL://kafka-1:19093
       - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
-      - KAFKA_CFG_NUM_PARTITIONS=3
+      - KAFKA_CFG_NUM_PARTITIONS=1
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
       - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
       - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
@@ -510,14 +510,13 @@ services:
 
   kafka-ui:
     image: 'obsidiandynamics/kafdrop'
-    container_name: 'kafka-web-ui'
     environment:
       - KAFKA_BROKERCONNECT=kongpose_kafka_1:9092
       - SERVER_PORT=8080
     networks:
       - kongpose-net
-    ports:
-      - "8787:8080"
+#   ports:
+#     - "8787:8080"
     depends_on:
       - kafka
       - zookeeper

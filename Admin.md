@@ -96,4 +96,4 @@ http://api.kong.lan:7071
 
 Need to view the Kafka topics, messages, etc? Try kafdrop
 
-http://kafka-ui.kong.lan:8787
+https://kafka-ui.kong.lan/
