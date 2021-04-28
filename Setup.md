@@ -99,3 +99,12 @@ curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan/def
 --form 'path="specs/dadjokes.yaml"' \
 --form 'contents=@"./devportal/dadjokes.yaml"'
 ~~~
+
+## Adding Kong entities
+
+If you want to add Kong entities, use deck to dump the configuration making sure to export the entity id's too;
+
+~~~
+deck dump --with-id --workspace default --output-file deck/default-entities.yaml
+~~~
+
