@@ -91,3 +91,9 @@ http://api.kong.lan:9411/
 Need to view the postgres database? Try pgadmin
 
 http://api.kong.lan:7071
+
+## Kafka UI
+
+Need to view the Kafka topics, messages, etc? Try kafdrop
+
+http://kafka-ui.kong.lan:8787
