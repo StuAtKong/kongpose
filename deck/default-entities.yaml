@@ -3,6 +3,7 @@ _workspace: default
 services:
 - connect_timeout: 60000
   host: echo-server
+  id: 2786cef3-1c69-4b21-8562-b186d04aae3f
   name: local-echo-server
   port: 8080
   protocol: http
@@ -10,7 +11,8 @@ services:
   retries: 5
   write_timeout: 60000
   routes:
-  - name: auth-hmac
+  - id: 7b85bc07-fcfd-4e80-a723-faf94168a2aa
+    name: auth-hmac
     paths:
     - /auth/hmac
     path_handling: v0
@@ -22,7 +24,8 @@ services:
     strip_path: true
     https_redirect_status_code: 426
     plugins:
-    - name: hmac-auth
+    - id: 7762552e-4157-4c11-96e4-a1253e3f43d6
+      name: hmac-auth
       config:
         algorithms:
         - hmac-sha256
@@ -41,7 +44,35 @@ services:
       - https
       tags:
       - plugin-example
-  - name: auth-oidc
+  - id: a8d3f572-0448-4d75-b8c1-78580a281a07
+    name: echo
+    paths:
+    - /echo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - id: a5392cd1-662a-4ed9-8242-cae943a0653b
+      name: udp-log
+      config:
+        host: kongpose_graylog_1
+        port: 5555
+        timeout: 10000
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - plugin-example
+  - id: cf9a1b38-79bc-4fe3-9a10-4240042062c6
+    name: auth-oidc
     paths:
     - /auth/oidc
     path_handling: v0
@@ -53,7 +84,8 @@ services:
     strip_path: true
     https_redirect_status_code: 426
     plugins:
-    - name: openid-connect
+    - id: 0ffa1889-ab61-4d84-91af-feb6a9ac68eb
+      name: openid-connect
       config:
         anonymous: null
         audience: null
@@ -268,75 +300,9 @@ services:
       - grpcs
       - http
       - https
-  - name: echo
-    paths:
-    - /echo
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    https_redirect_status_code: 426
-    plugins:
-    - name: udp-log
-      config:
-        host: kongpose_graylog_1
-        port: 5555
-        timeout: 10000
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-      tags:
-      - plugin-example
-- connect_timeout: 60000
-  host: kongpose_grpc-server_1
-  name: local-grpc-server
-  port: 9000
-  protocol: grpc
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  routes:
-  - name: local-grpc-lotsOfReplies
-    paths:
-    - /hello.HelloService/LotsOfReplies
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
-  - name: local-grpc-reflection
-    paths:
-    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
-  - name: local-grpc-sayHello
-    paths:
-    - /hello.HelloService/SayHello
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - grpc
-    - grpcs
-    regex_priority: 0
-    strip_path: false
-    https_redirect_status_code: 426
 - connect_timeout: 60000
   host: local-httpbin
+  id: 4c4ad5c6-2265-4464-a6fb-8156354beed8
   name: local-httpbin
   port: 80
   protocol: http
@@ -346,7 +312,8 @@ services:
   tags:
   - rl-test
   routes:
-  - name: limit-httpbin
+  - id: 62d25591-7fa5-4425-88b9-53b5a141d700
+    name: limit-httpbin
     paths:
     - /limit-httpbin
     path_handling: v0
@@ -360,7 +327,8 @@ services:
     - rl-test
     https_redirect_status_code: 426
     plugins:
-    - name: key-auth
+    - id: 829b9d7a-99d2-4012-a17b-138676980c3b
+      name: key-auth
       config:
         anonymous: null
         hide_credentials: false
@@ -374,7 +342,8 @@ services:
       - grpcs
       - http
       - https
-    - name: rate-limiting-advanced
+    - id: 964ae6d6-6e8f-48c8-9903-a3eca11a4820
+      name: rate-limiting-advanced
       config:
         dictionary_name: kong_rate_limiting_counters
         header_name: null
@@ -408,7 +377,8 @@ services:
       tags:
       - rl-test
       - plugin-example
-  - name: local-httpbin
+  - id: c1bae649-67c3-4d69-9eab-d2639934d6fe
+    name: local-httpbin
     paths:
     - /httpbin
     path_handling: v0
@@ -420,15 +390,22 @@ services:
     strip_path: true
     https_redirect_status_code: 426
   plugins:
-  - name: application-registration
+  - id: 58df8840-22b5-4558-8907-4debea779607
+    name: application-registration
     config:
+      auth_header_name: authorization
       auto_approve: false
       description: A simple API that echos the request
       display_name: Echo Server
       enable_authorization_code: true
-      enable_implicit_grant: true
       enable_client_credentials: true
+      enable_implicit_grant: true
       enable_password_grant: true
+      mandatory_scope: false
+      provision_key: i2hNukpQBenWsMTPxUGWnDlEHmrVzruQ
+      refresh_token_ttl: 1.2096e+06
+      scopes: null
+      token_expiration: 7200
     enabled: false
     protocols:
     - grpc
@@ -436,7 +413,54 @@ services:
     - http
     - https
 - connect_timeout: 60000
+  host: kongpose_grpc-server_1
+  id: 784a2348-e717-453f-b7ba-bd953b06420f
+  name: local-grpc-server
+  port: 9000
+  protocol: grpc
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - id: a14fb5e2-cf7b-4cf0-97ef-141cd3bee1f6
+    name: local-grpc-sayHello
+    paths:
+    - /hello.HelloService/SayHello
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - id: c0d4c3e4-19a6-4770-89bb-09a6dd1057e5
+    name: local-grpc-reflection
+    paths:
+    - /grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+  - id: c5aa5261-1eb0-4132-b8cc-e0bcf894f39d
+    name: local-grpc-lotsOfReplies
+    paths:
+    - /hello.HelloService/LotsOfReplies
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - grpc
+    - grpcs
+    regex_priority: 0
+    strip_path: false
+    https_redirect_status_code: 426
+- connect_timeout: 60000
   host: dadjokes
+  id: ce4a0b64-9975-42ae-9d6c-782745be477f
   name: local_dadjokes
   port: 80
   protocol: http
@@ -444,40 +468,8 @@ services:
   retries: 5
   write_timeout: 60000
   routes:
-  - name: auth-dadjokes
-    paths:
-    - /auth/dadjokes
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    https_redirect_status_code: 426
-    plugins:
-    - name: acl
-      config:
-        whitelist:
-        - jokes
-        hide_groups_header: false
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-    - name: basic-auth
-      config:
-        anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
-        hide_credentials: false
-      enabled: true
-      protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
-  - name: local-dadjokes
+  - id: 0e09a097-ce6b-4e5f-80f0-9aece4b16427
+    name: local-dadjokes
     paths:
     - /dadjokes
     path_handling: v0
@@ -489,7 +481,8 @@ services:
     strip_path: true
     https_redirect_status_code: 426
     plugins:
-    - name: cors
+    - id: 470685cd-6d5d-4b3d-9bf3-d22d02c89bff
+      name: cors
       config:
         credentials: false
         exposed_headers: null
@@ -514,8 +507,46 @@ services:
       - grpcs
       - http
       - https
+  - id: ca23b8db-8103-40f4-8244-0cce961d7a85
+    name: auth-dadjokes
+    paths:
+    - /auth/dadjokes
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+    https_redirect_status_code: 426
+    plugins:
+    - id: 77012eec-d076-4104-8309-2579a9d0697e
+      name: acl
+      config:
+        blacklist: null
+        hide_groups_header: false
+        whitelist:
+        - jokes
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    - id: d1212ef0-e5e8-4666-81d3-8c820378db13
+      name: basic-auth
+      config:
+        anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
+        hide_credentials: false
+      enabled: true
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
 - connect_timeout: 60000
   host: kongpose_toxiproxy_1
+  id: f93fe4ac-6eea-435d-8316-c427989b813b
   name: slow-httpbin
   port: 8000
   protocol: http
@@ -523,7 +554,8 @@ services:
   retries: 5
   write_timeout: 60000
   routes:
-  - name: slow-httpbin
+  - id: e0bfac2c-4e2e-4319-82bc-09045b71ad91
+    name: slow-httpbin
     paths:
     - /slow-httpbin
     path_handling: v0
@@ -534,29 +566,83 @@ services:
     regex_priority: 0
     strip_path: true
     https_redirect_status_code: 426
+routes:
+- id: 08e78771-3d74-4891-a7d3-4ba8bccddcc5
+  name: local-kafka
+  paths:
+  - /kafka
+  path_handling: v1
+  preserve_host: false
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  strip_path: true
+  https_redirect_status_code: 426
+  plugins:
+  - id: 0720d5ca-b0c8-46ec-b658-b4ef7359522c
+    name: kafka-upstream
+    config:
+      bootstrap_servers:
+      - host: kongpose_kafka_1
+        port: 9092
+      forward_body: true
+      forward_headers: true
+      forward_method: true
+      forward_uri: true
+      keepalive: 60000
+      producer_async: false
+      producer_async_buffering_limits_messages_in_memory: 50000
+      producer_async_flush_timeout: 1000
+      producer_request_acks: 1
+      producer_request_limits_bytes_per_request: 1.048576e+06
+      producer_request_limits_messages_per_request: 200
+      producer_request_retries_backoff_timeout: 100
+      producer_request_retries_max_attempts: 10
+      producer_request_timeout: 2000
+      timeout: 10000
+      topic: kong-upstream-plugin
+    enabled: true
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
 consumers:
-- username: anonymous
-- username: consA
+- id: 3785b4fa-93a7-4350-9f19-4a10907b2dee
+  username: anonymous
+- id: 89565539-ef58-4f00-a546-8f10a4011e85
+  username: consB
   keyauth_credentials:
-  - key: abc
+  - id: 0b92a59b-1391-47a8-8b15-f20fad616737
+    key: "123"
   basicauth_credentials:
-  - username: consA
-    password: c0afdf2593c6d4b25f898d07b1889e89e07e807b
-  acls:
-  - group: jokes
-- username: consB
-  keyauth_credentials:
-  - key: "123"
-  basicauth_credentials:
-  - username: consB
-    password: 254e069e9bf4e0a2c861e33c7e986baff7de42a4
-- username: hmac-consumer
+  - id: 86740dab-f110-4253-9bdf-b8a170ce3cbc
+    username: consB
+    password: c46882cd7497202269be2544e4c5586d12c98896
+- id: b3bb3858-1ba8-4c05-9772-fe8dde7039e5
+  username: oidc-consumer
+- id: d8611dcf-4f6b-4571-8467-12b20e53792b
+  username: hmac-consumer
   hmacauth_credentials:
-  - username: hmac-user
+  - id: d391dfb6-94d4-4da2-84cf-7ca8fd138e0c
+    username: hmac-user
     secret: K1ngK0ng
-- username: oidc-consumer
+- id: e25c322d-7a19-4492-8f96-ac79800ce9db
+  username: consA
+  keyauth_credentials:
+  - id: 42928caa-f89a-4833-a1f7-a228e99fb7cc
+    key: abc
+  basicauth_credentials:
+  - id: 74297405-6711-45bf-8966-9ffc6c3cb5ae
+    username: consA
+    password: de284e4551ea6ed2b1988e54658c98c5b6dc8c44
+  acls:
+  - id: 8c57d6a7-d0db-4330-b06e-f955a951474d
+    group: jokes
 upstreams:
-- name: local-httpbin
+- id: 25139000-9e4e-4888-92a0-f237669bcb05
+  name: local-httpbin
   algorithm: round-robin
   slots: 10000
   healthchecks:
@@ -622,9 +708,11 @@ upstreams:
   hash_fallback: none
   hash_on_cookie_path: /
   targets:
-  - target: kongpose_httpbin_1:80
+  - id: c70485da-95d4-481a-9618-60b4fd8b0e09
+    target: kongpose_httpbin_2:80
     weight: 100
-  - target: kongpose_httpbin_2:80
+  - id: d0f53669-3222-46d1-b727-f8b0b8bd619d
+    target: kongpose_httpbin_1:80
     weight: 100
 certificates:
 - id: 507cc555-5b92-496d-9e89-bfc78dfcddbe
@@ -685,7 +773,8 @@ certificates:
   tags:
   - proxy.kong.lan
   snis:
-  - name: proxy.kong.lan
+  - id: 55b81ad5-a3f6-444d-a628-b6bab8b0978a
+    name: proxy.kong.lan
 ca_certificates:
 - id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
   cert: |-

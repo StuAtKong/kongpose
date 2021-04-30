@@ -7,8 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -23,8 +23,8 @@ services:
     restart: on-failure
 
   kong-node:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
     scale: 2
     networks:
       - kongpose-net
@@ -65,17 +65,17 @@ services:
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ENFORCE_RBAC: "on"
+      KONG_ENFORCE_RBAC: "off"
       KONG_ADMIN_API_URI: "https://api.kong.lan"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_ADMIN_GUI_AUTH: "basic-auth"
+      #KONG_ADMIN_GUI_AUTH: "basic-auth"
       #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
       #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
-      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      #KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
@@ -282,7 +282,7 @@ services:
      - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/locustfile.py
+    command: -f /mnt/locust/kafka.py
 
   fake-smtp-server:
     networks:
@@ -376,3 +376,63 @@ services:
     ports:
      - "7071:7071"
 
+  zookeeper:
+    image: 'bitnami/zookeeper:3.6.2'
+    networks:
+      - kongpose-net
+#   ports:
+#     - '12181:12181'
+#   volumes:
+#     - zk-1:/bitnami/zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_PORT_NUMBER=12181
+      - ZOO_SERVER_ID=1
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+      - ZOO_TICK_TIME=2000
+      - ZOO_INIT_LIMIT=10
+      - ZOO_SYNC_LIMIT=5
+      - ZOO_MAX_CLIENT_CNXNS=60
+      - ZOO_HEAP_SIZE=1024
+      - ZOO_AUTOPURGE_PURGEINTERVAL=72
+      - ZOO_AUTOPURGE_SNAPRETAINCOUNT=3
+
+  kafka:
+    #image: 'bitnami/kafka:2.7.0'
+    image: 'bitnami/kafka:2.2.1'
+    networks:
+      - kongpose-net
+#   ports:
+#     - '19093:19093'
+    environment:
+      - KAFKA_CFG_BROKER_ID=101
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=kongpose_zookeeper_1:12181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9092,EXTERNAL://kafka-1:19093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xmx1024m -Xms1024m
+
+#   volumes:
+#     - 'kafka_data:/bitnami'
+    depends_on:
+      - zookeeper
+
+  kafka-ui:
+    image: 'obsidiandynamics/kafdrop'
+    environment:
+      - KAFKA_BROKERCONNECT=kongpose_kafka_1:9092
+      - SERVER_PORT=8080
+    networks:
+      - kongpose-net
+#   ports:
+#     - "8787:8080"
+    depends_on:
+      - kafka
+      - zookeeper
