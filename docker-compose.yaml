@@ -70,6 +70,9 @@ services:
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
+      KONG_VITALS_STRATEGY: prometheus
+      KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
+      KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -160,6 +163,10 @@ services:
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ANONYMOUS_REPORTS: "off"
+      KONG_VITALS: "on"
+      KONG_VITALS_STRATEGY: prometheus
+      KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
+      KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -520,3 +527,72 @@ services:
     depends_on:
       - kafka
       - zookeeper
+
+  elasticsearch:
+#   container_name: elasticsearch
+#   hostname: elasticsearch
+    networks:
+      - kongpose-net
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
+    environment:
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - discovery.type=single-node
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.11.2
+    networks:
+      - kongpose-net
+#   hostname: kibana
+#   container_name: kibana
+    ports:
+      - 5601:5601
+
+# filebeat:
+#   image: docker.elastic.co/beats/filebeat:7.2.0
+#   hostname: filebeat
+#   networks:
+#     - kongpose-net
+#   container_name: filebeat
+#   user: root
+#   volumes:
+#     - ./data/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+#     - /var/lib/docker:/var/lib/docker:ro
+#     - /var/run/docker.sock:/var/run/docker.sock
+
+  statsd-exporter:
+    image: prom/statsd-exporter:v0.20.1
+#   hostname: statsd-exporter
+    networks:
+      - kongpose-net
+#   container_name: statsd-exporter
+    user: root
+    volumes:
+      - ./statsd-exporter/statsd-mapping.yml:/tmp/statsd-mapping.yml
+    command:
+      - "--statsd.mapping-config=/tmp/statsd-mapping.yml"
+      - "--statsd.listen-unixgram=''"
+
+  prometheus:
+    image: prom/prometheus:v2.25.2
+#   hostname: prometheus
+    networks:
+      - kongpose-net
+#   container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana:7.5.1
+    networks:
+      - kongpose-net
+#   container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SERVER_DOMAIN=grafana.kong.lan
+
