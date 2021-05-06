@@ -7,8 +7,10 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong/kong-gateway:1.5.0.11-alpine
+
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -23,8 +25,9 @@ services:
     restart: on-failure
 
   kong-node:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    image: kong/kong-gateway:1.5.0.11-alpine
     scale: 2
     networks:
       - kongpose-net
