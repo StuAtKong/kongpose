@@ -528,7 +528,7 @@ services:
       - kafka
       - zookeeper
 
-  elasticsearch:
+  elasticsearch-v:
 #   container_name: elasticsearch
 #   hostname: elasticsearch
     networks:
