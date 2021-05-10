@@ -10,7 +10,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    image: kong/kong-gateway:2.3.3.2-alpine
+    #image: kong/kong-gateway:2.3.3.2-alpine
+    image: kong/kong-gateway:2.3.0.0-beta1-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -29,7 +30,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    image: kong/kong-gateway:2.3.3.2-alpine
+    #image: kong/kong-gateway:2.3.3.2-alpine
+    image: kong/kong-gateway:2.3.0.0-beta1-alpine
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -141,7 +143,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    image: kong/kong-gateway:2.3.3.2-alpine
+    #image: kong/kong-gateway:2.3.3.2-alpine
+    image: kong/kong-gateway:2.3.0.0-beta1-alpine
     scale: 1
     networks:
       - kongpose-net
