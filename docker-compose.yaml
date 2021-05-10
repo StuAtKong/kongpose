@@ -57,6 +57,7 @@ services:
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
+      KONG_PG_MAX_CONCURRENT_QUERIES: 5
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
@@ -72,9 +73,9 @@ services:
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      KONG_VITALS_STRATEGY: prometheus
-      KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
+      #KONG_VITALS_STRATEGY: prometheus
+      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
+      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -167,9 +168,9 @@ services:
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      KONG_VITALS_STRATEGY: prometheus
-      KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
+      #KONG_VITALS_STRATEGY: prometheus
+      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
+      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -419,7 +420,7 @@ services:
   graylog:
     networks:
       - kongpose-net
-    image: graylog/graylog:4.0
+    image: graylog/graylog:4.0.7
     volumes:
       #- ./graylog/server.conf:/etc/graylog/server.conf
       - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
