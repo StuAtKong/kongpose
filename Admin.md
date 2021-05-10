@@ -52,6 +52,17 @@ echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 state ready" | socat s
 echo "set server kong_https_proxy_nodes/kongpose_kong-dp_3 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
 ~~~
 
+To add more Data Plane nodes, simply scale the service and then add the DP nodes into the haproxy rotation.
+
+~~~
+docker-compose up -d --scale kong-dp=5
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_2 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_4 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
+echo "set server kong_http_proxy_nodes/kongpose_kong-dp_5 state ready" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+
 To view some HAProxy stats, look here;
 
 http://api.kong.lan:8404/stats
