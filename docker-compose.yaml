@@ -7,9 +7,7 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.2.0-alpine
-    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
-    image: kong/kong-gateway:2.4.0.0-beta1-alpine
+    image: kong-with-zlib:latest
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -25,9 +23,7 @@ services:
     restart: on-failure
 
   kong-cp:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.2.0-alpine
-    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
-    image: kong/kong-gateway:2.4.0.0-beta1-alpine
+    image: kong-with-zlib:latest
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -39,8 +35,7 @@ services:
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
       - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-      - ../kong-plugin-jq/kong/plugins/jq-request-filter:/usr/local/share/lua/5.1/kong/plugins/jq-request-filter
-      - ../kong-plugin-jq/kong/plugins/jq-response-filter:/usr/local/share/lua/5.1/kong/plugins/jq-response-filter
+      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -126,7 +121,7 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
-      KONG_PLUGINS: "bundled,log-filter,jq-request-filter,jq-response-filter"
+      KONG_PLUGINS: "bundled,log-filter,udp-gelf-log"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -135,9 +130,7 @@ services:
     restart: on-failure
 
   kong-dp:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.2.0-alpine
-    #image: kong-docker-kong-enterprise-edition-internal-preview-docker.bintray.io/kong-enterprise-edition:2.4.0.0-internal-preview-alpine
-    image: kong/kong-gateway:2.4.0.0-beta1-alpine
+    image: kong-with-zlib:latest
     scale: 1
     networks:
       - kongpose-net
@@ -148,8 +141,7 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-      - ../kong-plugin-jq/kong/plugins/jq-request-filter:/usr/local/share/lua/5.1/kong/plugins/jq-request-filter
-      - ../kong-plugin-jq/kong/plugins/jq-response-filter:/usr/local/share/lua/5.1/kong/plugins/jq-response-filter
+      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
@@ -177,7 +169,7 @@ services:
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
-      KONG_PLUGINS: "bundled,log-filter,jq-request-filter,jq-response-filter"
+      KONG_PLUGINS: "bundled,log-filter,udp-gelf-log"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -409,7 +401,7 @@ services:
   graylog:
     networks:
       - kongpose-net
-    image: graylog/graylog:4.0
+    image: graylog/graylog:4.0.6
     volumes:
       #- ./graylog/server.conf:/etc/graylog/server.conf
       - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
@@ -423,17 +415,17 @@ services:
       GRAYLOG_PASSWORD_SECRET: somepasswordpepper
       # Password: admin
       GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      GRAYLOG_HTTP_EXTERNAL_URI: http://api.kong.lan:9000/
-      GRAYLOG_HTTP_PUBLISH_URI: http://api.kong.lan:9000/
+      GRAYLOG_HTTP_EXTERNAL_URI: https://graylog.kong.lan/
+      GRAYLOG_HTTP_PUBLISH_URI: https://graylog.kong.lan/
       GRAYLOG_CONTENT_PACKS_LOADER_ENABLED: "true"
       GRAYLOG_CONTENT_PACKS_DIR: /usr/share/graylog/data/contentpacks
       GRAYLOG_CONTENT_PACKS_AUTO_INSTALL: kong-log-endpoints.json
     links:
       - mongodb:mongo
       - elasticsearch
-    ports:
+#    ports:
       # Graylog web interface and REST API
-      - 9000:9000
+      #- 9000:9000
       # Syslog TCP
       #- 1514:1514
       # Syslog UDP
