@@ -158,6 +158,7 @@ services:
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
+      KONG_STREAM_LISTEN: "0.0.0.0:45555, 0.0.0.0:45556 ssl reuseport backlog=65536"
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
@@ -347,6 +348,7 @@ services:
       - "8181:8181/tcp"
       - "8404:8404/tcp"
       - "9999:9999/tcp"
+      - "5555-5556:5555-5556/tcp"
 
   deck:
     networks:

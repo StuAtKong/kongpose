@@ -116,6 +116,30 @@ services:
     request_buffering: true
     response_buffering: true
 - connect_timeout: 60000
+  host: tcpbin.com
+  id: 35d14851-9911-4563-9797-f05388f03193
+  name: tcp-echo
+  port: 4242
+  protocol: tcp
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - id: 8e962319-e12a-4f1d-902e-5e347e4ae0da
+    name: tcp-echo
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - tcp
+    - tls
+    regex_priority: 0
+    strip_path: true
+    snis:
+    - proxy.kong.lan
+    https_redirect_status_code: 426
+    request_buffering: true
+    response_buffering: true
+- connect_timeout: 60000
   host: kongpose_grpc-server_1
   id: 6049c566-ff0b-4b77-8412-336c43f72f60
   name: local-grpc-server
@@ -357,6 +381,7 @@ services:
     - id: c4e70a0c-bbdc-4201-94e2-964b18a4269d
       name: udp-log
       config:
+        custom_fields_by_lua: null
         host: kongpose_graylog_1
         port: 5555
         timeout: 10000
@@ -456,7 +481,7 @@ consumers:
   basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
     username: consB
-    password: 961b28a444e1f039d8077f446f0fd167f7130836
+    password: a02e45f781fda11ea91d2e6ccc2d0b4ec9850b81
 - id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   username: consA
   keyauth_credentials:
@@ -465,7 +490,7 @@ consumers:
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
     username: consA
-    password: 6be5825f9ca8f347f4adf6561b43a04d1c8437c5
+    password: e7dba38e26f38418f154c4c16a5d926c542f7d8b
   acls:
   - id: d18259f5-14ea-4164-8328-9aebb1cfc103
     group: jokes

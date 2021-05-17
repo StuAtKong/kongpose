@@ -457,6 +457,17 @@ X-Forwarded-Port: 48000
 X-Forwarded-Prefix: /echo
 ```
 
+## Stream Example
+
+Kong is configured with a stream_listen on ports 45555 (tcp) and 45556 (tcps). These ports are not exposed outside the docker network and you need to use ha-proxy on ports 5555 (tcp) and 5556 (tcps). 
+
+For example, to open a tls connection to an echo server, use the below command. Any input will be echo'd back to you;
+
+```
+openssl s_client -CAfile ssl-certs/rootCA.pem  -connect proxy.kong.lan:5556 -servername proxy.kong.lan -quiet
+```
+
+
 ## GRPC Example
 
 ### TLS
