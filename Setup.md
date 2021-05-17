@@ -15,6 +15,7 @@ portal.kong.lan | Kong Developer Portal |
 portal-api.kong.lan | Kong Developer Portal API |
 proxy.kong.lan | API Proxies |
 client.kong.lan | Mutual TLS Proxies |
+keycloak.kong.lan | Local Keycloak instance for Authentication |
 
 It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong. Using localhost will give issues when trying to access services as the requests will not be looking at the correct endpoints. If needed, you can add a 2nd IP address to the lo0 interface in OSX with this command;
 
