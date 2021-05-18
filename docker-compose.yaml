@@ -237,6 +237,14 @@ services:
 #    ports:
 #      - "80:80/tcp"
 
+# use ./tcpbin/Dockerfile to build a local image for the tcpbin echo repo
+# https://github.com/Kong/tcpbin
+#
+# tcpbin:
+#   networks:
+#     - kongpose-net
+#   image: "tcpbin:latest"
+
   echo-server:
     networks:
       - kongpose-net

@@ -1,0 +1,29 @@
+{
+  "name": "tcpbin",
+  "version": "2.0.0",
+  "description": "A simple TCP server that echoes whatever it receives",
+  "author": "Kong <support@konghq.com>",
+  "homepage":"http://www.tcpbin.org",
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "~5.2.0",
+    "should": "~13.2.3"
+  },
+  "private": false,
+  "engines": {
+      "node": ">=0.10.0"
+  },
+  "license": "MIT",
+  "repository": {
+      "type": "git",
+    "url": "https://github.com/Kong/tcpbin"
+  },
+  "bugs": {
+    "url": "https://github.com/Kong/tcpbin/issues",
+    "email": "support@konghq.com"
+  },
+  "scripts": {
+    "test": "mocha tests --exit"
+  },
+  "main": "lib/server.js"
+}
