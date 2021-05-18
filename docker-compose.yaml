@@ -1,5 +1,3 @@
-version: '2.2'
-
 networks:
   kongpose-net:
     name: kongpose-net
@@ -329,7 +327,7 @@ services:
     networks:
       - kongpose-net
     image: "shopify/toxiproxy"
-    entrypoint: > 
+    entrypoint: >
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream kongpose_httpbin_1:80;
@@ -415,7 +413,7 @@ services:
         test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
         interval: 30s
         timeout: 30s
-        retries: 3    
+        retries: 3
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
@@ -610,3 +608,18 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=password
       - GF_SERVER_DOMAIN=grafana.kong.lan
 
+  dns:
+    restart: always
+    image: strm/dnsmasq
+    networks:
+      - kongpose-net
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    ports:
+      - "53:53/udp"
+    cap_add:
+      - NET_ADMIN
+    deploy:
+      resources:
+        limits:
+          memory: 50M
