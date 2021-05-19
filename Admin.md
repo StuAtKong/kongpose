@@ -79,7 +79,7 @@ Add a fake-smtp-server service. View the UI at https://mail.kong.lan/
 
 ## Redis
 
-Need to see what is stored in redis? Try redis-commander at http://api.kong.lan:8081
+Need to see what is stored in redis? Try redis-commander at https://redis-commander.kong.lan/
 
 ## Graylog
 
