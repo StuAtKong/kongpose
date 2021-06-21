@@ -11,7 +11,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
-    image: kong-save-config:latest
+    image: kong/kong-gateway:2.4.1.0-alpine
+    #image: kong-save-config:latest
 
     networks:
       - kongpose-net
@@ -32,7 +33,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
-    image: kong-save-config:latest
+    image: kong/kong-gateway:2.4.1.0-alpine
+    #image: kong-save-config:latest
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -145,7 +147,8 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.3.0-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
-    image: kong-save-config:latest
+    image: kong/kong-gateway:2.4.1.0-alpine
+    #image: kong-save-config:latest
     scale: 1
     networks:
       - kongpose-net
