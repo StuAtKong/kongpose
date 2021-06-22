@@ -158,7 +158,9 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
+      - ./prometheus/prometheus-server.conf:/usr/local/kong/prometheus-server.conf
     environment:
+      KONG_NGINX_HTTP_INCLUDE: "/usr/local/kong/prometheus-server.conf"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
