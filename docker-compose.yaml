@@ -1,204 +1,18 @@
 version: '2.2'
 
 networks:
-  kongpose-net:
-    name: kongpose-net
+  training-kong-net:
+    name: training-kong-net
     driver: bridge
 
 services:
-  kong-migrations:
-    image: kong/kong-gateway:2.4.1.0-alpine
-    networks:
-      - kongpose-net
-    command: kong migrations bootstrap
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      #KONG_PG_DATABASE: kong
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PASSWORD: password
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-    restart: on-failure
-
-<<<<<<< HEAD
-  kong-cp:
-    image: kong/kong-gateway:2.4.1.0-alpine
-=======
-  kong-ee:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.2-alpine
-    container_name: case-kong-ee
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-    networks:
-      - kongpose-net
-    user: "${KONG_USER:-kong}"
-    depends_on:
-      db:
-        condition: service_healthy
-<<<<<<< HEAD
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-    environment:
-      KONG_PROXY_LISTEN: "off"
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
-      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:48002, 0.0.0.0:48445 http2 ssl"
-      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:48003, 0.0.0.0:48446 http2 ssl"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 http2 ssl"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100 ssl"
-      KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
-      KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
-=======
-    environment:
-      KONG_PROXY_LISTEN: "0.0.0.0:8000"
-      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
-      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:8002"
-      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:8003"
-      KONG_PORTAL_API_LISTEN: "0.0.0.0:8004"
-      KONG_STATUS_LISTEN: "0.0.0.0:8100"
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PG_MAX_CONCURRENT_QUERIES: 5
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-<<<<<<< HEAD
-      KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_GUI_ERROR_LOG: /dev/stderr
-      KONG_PORTAL_API_ACCESS_LOG: /dev/stdout
-      KONG_PORTAL_API_ERROR_LOG: /dev/stderr
-      KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
-      KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
-      KONG_STATUS_ACCESS_LOG: /dev/stdout
-      KONG_STATUS_ERROR_LOG: /dev/stderr
-      KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_AUDIT_LOG: "on"
-=======
-      KONG_AUDIT_LOG: "off"
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_VITALS: "on"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_LOG_LEVEL: "debug"
-      KONG_ENFORCE_RBAC: "on"
-<<<<<<< HEAD
-      KONG_ADMIN_API_URI: "https://api.kong.lan"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
-      KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
-      KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-=======
-      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
-      KONG_ADMIN_GUI_URL: "http://api.kong.lan:8002"
-      KONG_ADMIN_GUI_AUTH: "basic-auth"
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
-      KONG_ADMIN_GUI_AUTH: "basic-auth"
-      KONG_PORTAL: "on"
-<<<<<<< HEAD
-      KONG_PORTAL_GUI_PROTOCOL: "https"
-      KONG_PORTAL_GUI_HOST: "portal.kong.lan"
-      KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
-      KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_PORTAL_API_URL: "https://portal-api.kong.lan"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_PORTAL_AUTH: "openid-connect"
-      KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
-      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
-      KONG_PORTAL_EMAIL_VERIFICATION: "off"
-      KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
-      KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_FROM: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_SMTP_MOCK: "off"
-      KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "kongpose_fake-smtp-server_1"
-      KONG_SMTP_PORT: 1025
-      KONG_SMTP_DOMAIN: "api.kong.lan"
-      KONG_ROLE: control_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
-
-  kong-dp:
-    image: kong/kong-gateway:2.4.1.0-alpine
-    scale: 1
-    networks:
-      - kongpose-net
-    depends_on:
-      kong-cp:
-        condition: service_healthy
-    volumes:
-      - ./ssl-certs:/tmp/ssl/customcerts
-    environment:
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
-      KONG_STREAM_LISTEN: "0.0.0.0:45555, 0.0.0.0:45556 ssl reuseport backlog=65536"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_DATABASE: "off"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_LOG_LEVEL: "debug"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_VITALS: "on"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
-      KONG_ROLE: data_plane
-      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
-      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
-      KONG_CLUSTER_CONTROL_PLANE: kongpose_kong-cp_1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kongpose_kong-cp_1:48006
-      KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_TRUSTED_IPS: "0.0.0.0/0"
-      KONG_REAL_IP_HEADER: "X-Forwarded-For"
-      KONG_REAL_IP_RECURSIVE: "on"
-=======
-      KONG_PORTAL_GUI_PROTOCOL: "http"
-      KONG_PORTAL_GUI_HOST: "api.kong.lan:8003"
-      KONG_PORTAL_API_URL: "http://api.kong.lan:8004"
-      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true}"
-      KONG_SMTP_MOCK: "on"
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-    healthcheck:
-      test: ["CMD", "kong", "health"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    restart: on-failure
-    ports:
-      - "8000-8004:8000-8004/tcp"
-      - "8100:8100/tcp"
 
   db:
     networks:
-      - kongpose-net
+      - training-kong-net
     image: postgres:13.1
+    container_name: db
+    hostname: db
     environment:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
@@ -212,66 +26,166 @@ services:
     stdin_open: true
     tty: true
 
-<<<<<<< HEAD
-  httpbin:
+  kong-migrations:
     networks:
-      - kongpose-net
-=======
-  httpbin-1:
-    networks:
-      - case-kong-net
-    container_name: case-httpbin-1
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
-    image: "kennethreitz/httpbin"
-#    ports:
-#      - "80:80/tcp"
+      - training-kong-net
+    image: kong/kong-gateway:2.4.1.0-alpine
+    container_name: kong-migrations
+    hostname: kong-migrations
+    command: kong migrations bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PASSWORD: password
+      #KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+    restart: on-failure
 
-<<<<<<< HEAD
-  ha-proxy:
+  kong-cp:
     networks:
-      - kongpose-net
-    image: haproxy:2.3.5-alpine
+      - training-kong-net
+    image: kong/kong-gateway:2.4.1.0-alpine
+    container_name: kong-cp
+    hostname: kong-cp
+    user: "${KONG_USER:-kong}"
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
-      - ./ha-proxy:/usr/local/etc/haproxy:ro
       - ./ssl-certs:/tmp/ssl/customcerts
+    environment:
+      KONG_ROLE: control_plane
+      KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
+      KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
+      KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 http2 ssl"
+      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:8002, 0.0.0.0:8445 http2 ssl"
+      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:8003, 0.0.0.0:8446 http2 ssl"
+      KONG_PORTAL_API_LISTEN: "0.0.0.0:8004, 0.0.0.0:8447 http2 ssl"
+      KONG_STATUS_LISTEN: "0.0.0.0:8100 ssl"
+      KONG_CLUSTER_LISTEN: "0.0.0.0:8005"
+      KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:8006"
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: db
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PG_MAX_CONCURRENT_QUERIES: 5
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_GUI_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_API_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_API_ERROR_LOG: /dev/stderr
+      KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
+      KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
+      KONG_STATUS_ACCESS_LOG: /dev/stdout
+      KONG_STATUS_ERROR_LOG: /dev/stderr
+      KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
+      KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_VITALS: "on"
+      #KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+      #KONG_ENFORCE_RBAC: "on"
+      KONG_ADMIN_API_URI: "https://api.kong.lan:8444"
+      KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
+      KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
+      KONG_ADMIN_GUI_URL: "https://manager.kong.lan:8445"
+      KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
+      KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
+      #KONG_ADMIN_GUI_AUTH: "basic-auth"
+      #KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      KONG_PORTAL: "on"
+      KONG_PORTAL_GUI_PROTOCOL: "https"
+      KONG_PORTAL_GUI_HOST: "portal.kong.lan:8446"
+      KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
+      KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
+      KONG_PORTAL_API_URL: "https://portal-api.kong.lan:8447"
+      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
+      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
+      KONG_PORTAL_AUTH: "basic-auth"
+      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
+      KONG_PORTAL_EMAIL_VERIFICATION: "off"
+      KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
+      KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
+      KONG_ADMIN_EMAILS_FROM: "stu@konghq.com"
+      KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
+      KONG_SMTP_MOCK: "off"
+      KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
+      KONG_SMTP_HOST: "smtp-server"
+      KONG_SMTP_PORT: 1025
+      KONG_SMTP_DOMAIN: "api.kong.lan"
+      KONG_NGINX_WORKER_PROCESSES: 1
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure
+    ports:
+      - "8001-8006:8001-8006/tcp"
+      - "8100:8100/tcp"
+      - "8444-8447:8444-8447/tcp"
+
+  kong-dp:
+    networks:
+      - training-kong-net
+    image: kong/kong-gateway:2.4.1.0-alpine
+    container_name: kong-dp
+    hostname: kong-dp
     depends_on:
       kong-cp:
         condition: service_healthy
-      kong-dp:
-        condition: service_healthy
-    ports:
-      - "80:80/tcp"
-      - "443:443/tcp"
-      - "8000-8004:8000-8004/tcp"
-      - "8443-8447:8443-8447/tcp"
-      - "8100:8100/tcp"
-      - "8181:8181/tcp"
-      - "8404:8404/tcp"
-      - "9999:9999/tcp"
-      - "5555-5556:5555-5556/tcp"
-
-  fake-smtp-server:
-    networks:
-      - kongpose-net
-    image: reachfive/fake-smtp-server
-    #ports:
-      #- "25:1025/tcp"
-      #- "1080:1080/tcp"
-=======
-  deck:
-    networks:
-      - case-kong-net
-    container_name: case-deck
-    image: kong/deck:v1.2.3
     volumes:
-        - .:/tmp:ro
+      - ./ssl-certs:/tmp/ssl/customcerts
     environment:
-        DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://kong-ee:8001"
-        DECK_HEADERS: "kong-admin-token:password"
-    depends_on:
-      kong-ee:
-        condition: service_healthy
-    command: sync --state=/tmp/workspace-compose.yaml
->>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
+      KONG_ROLE: "data_plane"
+      KONG_CLUSTER_CERT: "/tmp/ssl/customcerts/hybrid/cluster.crt"
+      KONG_CLUSTER_CERT_KEY: "/tmp/ssl/customcerts/hybrid/cluster.key"
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "/tmp/ssl/customcerts/hybrid/cluster.crt,system"
+      KONG_CLUSTER_CONTROL_PLANE: "kong-cp:8005"
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: "kong-cp:8006"
+      KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+      KONG_STREAM_LISTEN: "0.0.0.0:5555, 0.0.0.0:5556 ssl reuseport backlog=65536"
+      KONG_STATUS_LISTEN: "0.0.0.0:8101"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_DATABASE: "off"
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_VITALS: "on"
+      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
+      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
+      KONG_NGINX_WORKER_PROCESSES: 1
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: on-failure
+    ports:
+      - "8000:8000/tcp"
+      - "8443:8443/tcp"
+      - "8101:8101/tcp"
 
+  httpbin:
+    networks:
+      - training-kong-net
+    image: "kennethreitz/httpbin"
+    container_name: httpbin
+    hostname: httpbin
+#    ports:
+#      - "80:80/tcp"
+
+  smtp-server:
+    networks:
+      - training-kong-net
+    image: reachfive/fake-smtp-server
+    container_name: smtp-server
+    hostname: smtp-server
+    ports:
+      #- "25:1025/tcp"
+      - "1080:1080/tcp"
