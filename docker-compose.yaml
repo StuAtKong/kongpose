@@ -7,8 +7,6 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     image: kong/kong-gateway:2.4.1.0-alpine
     networks:
       - kongpose-net
@@ -25,8 +23,6 @@ services:
     restart: on-failure
 
   kong-cp:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     image: kong/kong-gateway:2.4.1.0-alpine
     networks:
       - kongpose-net
@@ -36,8 +32,6 @@ services:
         condition: service_healthy
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
-      - ./http_content:/tmp/htdocs
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -69,9 +63,6 @@ services:
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      #KONG_VITALS_STRATEGY: prometheus
-      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -84,14 +75,7 @@ services:
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
-      # Kong Manager auth via local LDAP(AD) server
-      #KONG_ADMIN_GUI_AUTH: "basic-auth"
-      # Kong Manager auth via local LDAP(AD) server
-      KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false, \"log_search_results\":true }"
-      # Kong Manager auth via OIDC & Auth0
-      # KONG_ADMIN_GUI_AUTH: "openid-connect"
-      # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
+      KONG_ADMIN_GUI_AUTH: "basic-auth"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
@@ -102,8 +86,6 @@ services:
       KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_PORTAL_AUTH: "openid-connect"
       KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
-      # Kong DevPortal auth via OIDC & Okta
-      # KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"7zxU14d1b5NTNf31p5lhShVX1N1UfWp3BHayU8kw\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"0oa4q0et31F47l9Nq4x6\"],\"issuer\":\"https://dev-885513.okta.com/oauth2/default/.well-known/oauth-authorization-server\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
       KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
@@ -115,21 +97,15 @@ services:
       KONG_SMTP_HOST: "kongpose_fake-smtp-server_1"
       KONG_SMTP_PORT: 1025
       KONG_SMTP_DOMAIN: "api.kong.lan"
-      KONG_TRACING: "off"
-      KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
-      KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
-      KONG_GENERATE_TRACE_DETAILS: "on"
       KONG_ROLE: control_plane
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
       KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
-      KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -138,8 +114,6 @@ services:
     restart: on-failure
 
   kong-dp:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     image: kong/kong-gateway:2.4.1.0-alpine
     scale: 1
     networks:
@@ -149,7 +123,6 @@ services:
         condition: service_healthy
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
-      - ./tracing:/usr/local/kong/tracing
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
@@ -164,9 +137,6 @@ services:
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      #KONG_VITALS_STRATEGY: prometheus
-      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -180,7 +150,6 @@ services:
       KONG_CLUSTER_CONTROL_PLANE: kongpose_kong-cp_1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kongpose_kong-cp_1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
-      KONG_EVENT_HOOKS_ENABLED: "on"
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
@@ -208,127 +177,12 @@ services:
     stdin_open: true
     tty: true
 
-  ad-server:
-    networks:
-      - kongpose-net
-    image: alpine:3.12.1
-    volumes:
-            - ./ldap-server:/setup-ad/:ro
-    # run as privileged to workaround this issue
-    # set_nt_acl_no_snum: fset_nt_acl returned NT_STATUS_ACCESS_DENIED
-    privileged: true
-    command: >
-        sh -c "/setup-ad/setup.sh &&
-        bash /setup-ad/seed.sh &&
-        samba -i --debuglevel=1"
-    ports:
-      - "389:389/tcp"
-
   httpbin:
     networks:
       - kongpose-net
     image: "kennethreitz/httpbin"
-    scale: 2
 #    ports:
 #      - "80:80/tcp"
-
-# use ./tcpbin/Dockerfile to build a local image for the tcpbin echo repo
-# https://github.com/Kong/tcpbin
-#
-# tcpbin:
-#   networks:
-#     - kongpose-net
-#   image: "tcpbin:latest"
-
-  echo-server:
-    networks:
-      - kongpose-net
-    image: "jmalloc/echo-server"
-#    ports:
-#      - "8080:8080/tcp"
-
-  dadjokes:
-    networks:
-      - kongpose-net
-    image: yesinteractive/dadjokes
-#    ports:
-#      - "8081:80"
-
-  grpc-server:
-    networks:
-      - kongpose-net
-    image: "moul/grpcbin"
-    ports:
-      - "7000:9000/tcp"
-      - "7001:9001/tcp"
-
-  keycloak:
-    networks:
-      - kongpose-net
-    image: jboss/keycloak:9.0.0
-    volumes:
-      - ./keycloak/kong-realm.json:/tmp/kong-realm.json
-      - ./ssl-certs/wild.key:/etc/x509/https/tls.key
-      - ./ssl-certs/wild.crt:/etc/x509/https/tls.crt
-    environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
-      KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
-    ports:
-      - "8080:8080/tcp"
-      - "18443:8443/tcp"
-
-  redis:
-    networks:
-      - kongpose-net
-    image: redis:latest
-#    ports:
-#      - "6379:6379/tcp"
-
-  redis-commander:
-    networks:
-      - kongpose-net
-    hostname: redis-commander
-    image: rediscommander/redis-commander:latest
-    environment:
-      REDIS_HOSTS: kongpose_redis_1
-    ports:
-    - "8081:8081"
-
-  zipkin:
-    networks:
-      - kongpose-net
-    image: openzipkin/zipkin
-    ports:
-      - "9411:9411/tcp"
-
-  vault:
-    networks:
-      - kongpose-net
-    image: vault:latest
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: myroot
-      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
-#    ports:
-#      - "8200:8200/tcp"
-
-  toxiproxy:
-    networks:
-      - kongpose-net
-    image: "shopify/toxiproxy"
-    ports:
-       - "8474:8474"
-
-  # Create a toxiproxy configuration for postgres latency
-  toxiproxy-config:
-    networks:
-      - kongpose-net
-    image: "shopify/toxiproxy"
-    entrypoint: > 
-      sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream kongpose_httpbin_1:80;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency -t latency -a latency=250 -a jitter=150;"
 
   ha-proxy:
     networks:
@@ -353,37 +207,6 @@ services:
       - "9999:9999/tcp"
       - "5555-5556:5555-5556/tcp"
 
-  deck:
-    networks:
-      - kongpose-net
-    image: kong/deck:v1.5.1
-    volumes:
-        - ./deck:/tmp/deck:ro
-        - ./ssl-certs:/tmp/ssl-certs:ro
-    environment:
-        DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://kongpose_kong-cp_1:48001"
-        DECK_HEADERS: "kong-admin-token:password"
-    depends_on:
-      kong-cp:
-        condition: service_healthy
-      kong-dp:
-        condition: service_healthy
-    entrypoint: >
-      sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
-             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
-
-  locust:
-    networks:
-      - kongpose-net
-    image: locustio/locust
-    #ports:
-    # - "8089:8089"
-    volumes:
-      - ./locust:/mnt/locust
-    command: -f /mnt/locust/kafka.py
-
   fake-smtp-server:
     networks:
       - kongpose-net
@@ -391,217 +214,4 @@ services:
     #ports:
       #- "25:1025/tcp"
       #- "1080:1080/tcp"
-
-  mongodb:
-    networks:
-      - kongpose-net
-    image: mongo:4.2
-    healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin --quiet | grep 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
-
-  elasticsearch:
-    networks:
-      - kongpose-net
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
-    healthcheck:
-        test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-        interval: 30s
-        timeout: 30s
-        retries: 3    
-    environment:
-      - http.host=0.0.0.0
-      - transport.host=localhost
-      - network.host=0.0.0.0
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    mem_limit: 1g
-
-  graylog:
-    networks:
-      - kongpose-net
-    image: graylog/graylog:4.0.7
-    volumes:
-      #- ./graylog/server.conf:/etc/graylog/server.conf
-      - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-    environment:
-      # CHANGE ME (must be at least 16 characters)!
-      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
-      # Password: admin
-      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      GRAYLOG_HTTP_EXTERNAL_URI: https://graylog.kong.lan/
-      GRAYLOG_HTTP_PUBLISH_URI: https://graylog.kong.lan/
-      GRAYLOG_CONTENT_PACKS_LOADER_ENABLED: "true"
-      GRAYLOG_CONTENT_PACKS_DIR: /usr/share/graylog/data/contentpacks
-      GRAYLOG_CONTENT_PACKS_AUTO_INSTALL: kong-log-endpoints.json
-    links:
-      - mongodb:mongo
-      - elasticsearch
-    ports:
-      # Graylog web interface and REST API
-      - 9000:9000
-      # Syslog TCP
-      #- 1514:1514
-      # Syslog UDP
-      #- 1514:1514/udp
-      # GELF TCP
-      #- 12201:12201
-      # GELF UDP
-      #- 12201:12201/udp
-      #- "5555:5555"
-      #- "5555:5555/udp"
-
-  pgadmin:
-    networks:
-      - kongpose-net
-    image: dpage/pgadmin4
-    volumes:
-      - ./pgadmin/servers.json:/pgadmin4/servers.json
-      - ./pgadmin/config_local.py:/pgadmin4/config_local.py
-        #  - ./pgadmin_data/pgadmin:/var/lib/pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "stu@konghq.com"
-      PGADMIN_DEFAULT_PASSWORD: "password"
-      PGADMIN_LISTEN_PORT: 7071
-    ports:
-     - "7071:7071"
-
-  zookeeper:
-    image: 'bitnami/zookeeper:3.6.2'
-    networks:
-      - kongpose-net
-#   ports:
-#     - '12181:12181'
-#   volumes:
-#     - zk-1:/bitnami/zookeeper
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-      - ZOO_PORT_NUMBER=12181
-      - ZOO_SERVER_ID=1
-      - ZOO_SERVERS=0.0.0.0:2888:3888
-      - ZOO_TICK_TIME=2000
-      - ZOO_INIT_LIMIT=10
-      - ZOO_SYNC_LIMIT=5
-      - ZOO_MAX_CLIENT_CNXNS=60
-      - ZOO_HEAP_SIZE=1024
-      - ZOO_AUTOPURGE_PURGEINTERVAL=72
-      - ZOO_AUTOPURGE_SNAPRETAINCOUNT=3
-
-  kafka:
-    #image: 'bitnami/kafka:2.7.0'
-    image: 'bitnami/kafka:2.2.1'
-    networks:
-      - kongpose-net
-#   ports:
-#     - '19093:19093'
-    environment:
-      - KAFKA_CFG_BROKER_ID=101
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=kongpose_zookeeper_1:12181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9092,EXTERNAL://kafka-1:19093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
-      - KAFKA_CFG_NUM_PARTITIONS=1
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
-      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_HEAP_OPTS=-Xmx1024m -Xms1024m
-
-#   volumes:
-#     - 'kafka_data:/bitnami'
-    depends_on:
-      - zookeeper
-
-  kafka-ui:
-    image: 'obsidiandynamics/kafdrop'
-    environment:
-      - KAFKA_BROKERCONNECT=kongpose_kafka_1:9092
-      - SERVER_PORT=8080
-    networks:
-      - kongpose-net
-#   ports:
-#     - "8787:8080"
-    depends_on:
-      - kafka
-      - zookeeper
-
-# elasticsearch-v:
-#   container_name: elasticsearch
-#   hostname: elasticsearch
-#   networks:
-#     - kongpose-net
-#   image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
-#   environment:
-#     - ES_JAVA_OPTS=-Xms1g -Xmx1g
-#     - discovery.type=single-node
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.11.2
-    networks:
-      - kongpose-net
-#   hostname: kibana
-#   container_name: kibana
-    ports:
-      - 5601:5601
-
-# filebeat:
-#   image: docker.elastic.co/beats/filebeat:7.2.0
-#   hostname: filebeat
-#   networks:
-#     - kongpose-net
-#   container_name: filebeat
-#   user: root
-#   volumes:
-#     - ./data/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-#     - /var/lib/docker:/var/lib/docker:ro
-#     - /var/run/docker.sock:/var/run/docker.sock
-
-  statsd-exporter:
-    image: prom/statsd-exporter:v0.20.1
-#   hostname: statsd-exporter
-    networks:
-      - kongpose-net
-#   container_name: statsd-exporter
-    user: root
-    volumes:
-      - ./statsd-exporter/statsd-mapping.yml:/tmp/statsd-mapping.yml
-    command:
-      - "--statsd.mapping-config=/tmp/statsd-mapping.yml"
-      - "--statsd.listen-unixgram=''"
-
-  prometheus:
-    image: prom/prometheus:v2.25.2
-#   hostname: prometheus
-    networks:
-      - kongpose-net
-#   container_name: prometheus
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    ports:
-      - 9090:9090
-
-  grafana:
-    image: grafana/grafana:7.5.1
-    networks:
-      - kongpose-net
-#   container_name: grafana
-    ports:
-      - 3000:3000
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=password
-      - GF_SERVER_DOMAIN=grafana.kong.lan
 
