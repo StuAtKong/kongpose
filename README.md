@@ -67,7 +67,7 @@ openssl req -new -nodes -out ./ssl-certs/wildcard.csr -newkey rsa:2048 -keyout .
 3) Sign the public certificat with the private CA certificate
 
 ~~~shell
-openssl x509 -req -in ./ssl-certs/wildcard.csr -CA ./ssl-certs/rootCA.pem -CAkey ./ssl-certs/rootCA.key -CAcreateserial -out ./ssl-certs/wildcard.crt -days 500 -sha256 -extfile ./ssl-certs/v3.ext
+openssl x509 -req -in ./ssl-certs/wildcard.csr -CA ./ssl-certs/rootCA.pem -CAkey ./ssl-certs/rootCA.key -CAcreateserial -out ./ssl-certs/wildcard.pem -days 500 -sha256 -extfile ./ssl-certs/v3.ext
 ~~~
 
 The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs` and `./ssl-certs/hybrid` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. We will create our own private CA and use this to sign a wildcart certificate for `*.kong.lan` to ease the installation process.
