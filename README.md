@@ -81,7 +81,7 @@ docker run --rm -it --user root -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid kong/
 Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need `644` permissions for the keys/certificates;
 
 ```
-chmod -R 644 ssl-certs
+chmod -R 644 ./ssl-certs/*
 ```
 
 
