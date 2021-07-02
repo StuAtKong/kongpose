@@ -75,18 +75,15 @@ openssl x509 -req -in ./ssl-certs/wildcard.csr -CA ./ssl-certs/rootCA.pem -CAkey
 To create the certificates, you can start a temporary kong container using a command as below (this maps the repository directory to the container which allows the certificates to be saved to the docker host);
 
 ```
-docker run --rm -it --user root -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid kong/kong-gateway:2.4.1.0-alpine /bin/sh
+docker run --rm -it --user root -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid kong/kong-gateway:2.4.1.0-alpine /bin/sh -c "cd /tmp/ssl/hybrid; kong hybrid gen_cert; exit"
 ```
 
-Then run;
+Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need `644` permissions for the keys/certificates;
 
 ```
-cd /tmp/ssl/hybrid
-kong hybrid gen_cert
-exit
+chmod -R 644 ssl-certs
 ```
 
-Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need to run `sudo chmod 644 cluster.key` for the hybrid cluster ssl key.
 
 The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs` and `./ssl-certs/hybrid` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. We will create our own private CA and use this to sign a wildcart certificate for `*.kong.lan` to ease the installation process.
 
