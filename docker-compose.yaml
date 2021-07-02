@@ -22,14 +22,22 @@ services:
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
 
+<<<<<<< HEAD
   kong-cp:
     image: kong/kong-gateway:2.4.1.0-alpine
+=======
+  kong-ee:
+    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.2-alpine
+    container_name: case-kong-ee
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
     depends_on:
       db:
         condition: service_healthy
+<<<<<<< HEAD
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
     environment:
@@ -41,15 +49,24 @@ services:
       KONG_STATUS_LISTEN: "0.0.0.0:48100 ssl"
       KONG_CLUSTER_LISTEN: "0.0.0.0:48005"
       KONG_CLUSTER_TELEMETRY_LISTEN: "0.0.0.0:48006"
+=======
+    environment:
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_ADMIN_GUI_LISTEN: "0.0.0.0:8002"
+      KONG_PORTAL_GUI_LISTEN: "0.0.0.0:8003"
+      KONG_PORTAL_API_LISTEN: "0.0.0.0:8004"
+      KONG_STATUS_LISTEN: "0.0.0.0:8100"
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
-      #KONG_PG_HOST: toxiproxy
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_PG_MAX_CONCURRENT_QUERIES: 5
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
+<<<<<<< HEAD
       KONG_ADMIN_GUI_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_GUI_ERROR_LOG: /dev/stderr
       KONG_PORTAL_API_ACCESS_LOG: /dev/stdout
@@ -61,22 +78,30 @@ services:
       KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_AUDIT_LOG: "on"
+=======
+      KONG_AUDIT_LOG: "off"
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
-      KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
-      KONG_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ENFORCE_RBAC: "on"
+<<<<<<< HEAD
       KONG_ADMIN_API_URI: "https://api.kong.lan"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/server.crt"
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
+=======
+      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
+      KONG_ADMIN_GUI_URL: "http://api.kong.lan:8002"
+      KONG_ADMIN_GUI_AUTH: "basic-auth"
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
       KONG_ADMIN_GUI_AUTH: "basic-auth"
       KONG_PORTAL: "on"
+<<<<<<< HEAD
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
       KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
@@ -153,12 +178,22 @@ services:
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
+=======
+      KONG_PORTAL_GUI_PROTOCOL: "http"
+      KONG_PORTAL_GUI_HOST: "api.kong.lan:8003"
+      KONG_PORTAL_API_URL: "http://api.kong.lan:8004"
+      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true}"
+      KONG_SMTP_MOCK: "on"
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 10s
       retries: 10
     restart: on-failure
+    ports:
+      - "8000-8004:8000-8004/tcp"
+      - "8100:8100/tcp"
 
   db:
     networks:
@@ -177,13 +212,21 @@ services:
     stdin_open: true
     tty: true
 
+<<<<<<< HEAD
   httpbin:
     networks:
       - kongpose-net
+=======
+  httpbin-1:
+    networks:
+      - case-kong-net
+    container_name: case-httpbin-1
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
     image: "kennethreitz/httpbin"
 #    ports:
 #      - "80:80/tcp"
 
+<<<<<<< HEAD
   ha-proxy:
     networks:
       - kongpose-net
@@ -214,4 +257,21 @@ services:
     #ports:
       #- "25:1025/tcp"
       #- "1080:1080/tcp"
+=======
+  deck:
+    networks:
+      - case-kong-net
+    container_name: case-deck
+    image: kong/deck:v1.2.3
+    volumes:
+        - .:/tmp:ro
+    environment:
+        DECK_ANALYTICS: "off"
+        DECK_KONG_ADDR: "http://kong-ee:8001"
+        DECK_HEADERS: "kong-admin-token:password"
+    depends_on:
+      kong-ee:
+        condition: service_healthy
+    command: sync --state=/tmp/workspace-compose.yaml
+>>>>>>> 87a372fd8e210e41d96eb06b0a4dbb1fb9225a37
 
