@@ -25,14 +25,67 @@ Now you can configure the hostname resolution to use 10.0.10.1 for the IP addres
 
 ### SSL Certificates
 
+The below steps are not intended to be an exhaustive explnation of creating certificates. You can use any process you currently have to generate certificates and the below steps should be accepted as purely for use in a test/training environment and should not be considered a secure process for any live use.
+
+#### Generate the Root CA private key and certificate
+
+1) Generate the root CA private key.
+
+~~~shell
+openssl genrsa -des3 -passout pass:password -out ./ssl-certs/rootCA.key 2048
+~~~
+
+2) Generate the root CA public certificate
+
+~~~shell
+openssl req -x509 -new -nodes -key ./ssl-certs/rootCA.key -sha256 -days 1024  -out ./ssl-certs/rootCA.pem
+~~~
+
+#### Generate wildcard certificate and sign with the private CA key
+
+1) Create an openssl configuration file
+
+~~~shell
+cat > ./ssl-certs/v3.ext <<EOF
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = kong.lan
+DNS.2 = *.kong.lan
+
+EOF
+~~~
+
+2) Create a private key for our kong server and a certificate signing request.
+
+~~~shell
+openssl req -new -nodes -out ./ssl-certs/wildcard.csr -newkey rsa:2048 -keyout ./ssl-certs/wildcard.key
+~~~
+
+3) Sign the public certificat with the private CA certificate
+
+~~~shell
+openssl x509 -req -in ./ssl-certs/wildcard.csr -CA ./ssl-certs/rootCA.pem -CAkey ./ssl-certs/rootCA.key -CAcreateserial -out ./ssl-certs/wildcard.pem -days 500 -sha256 -extfile ./ssl-certs/v3.ext
+~~~
+
+#### Generate hybrid certificates
+
+To create the certificates, you can start a temporary kong container using a command as below (this maps the repository directory to the container which allows the certificates to be saved to the docker host);
+
+```
+docker run --rm -it --user root -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid kong/kong-gateway:2.4.1.0-alpine /bin/sh -c "cd /tmp/ssl/hybrid; kong hybrid gen_cert; exit"
+```
+
+Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need `644` permissions for the keys/certificates;
+
+```
+chmod -R 644 ./ssl-certs/*
+```
+
+
 The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs` and `./ssl-certs/hybrid` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. We will create our own private CA and use this to sign a wildcart certificate for `*.kong.lan` to ease the installation process.
-
-
-Some default certificates are included, but you can also create you own by following the steps below;
-
-1) Create the SSL certificates for the api.kong.lan hostname [here](ssl-certs/README.md)
-
-2) Create the hybrid CP/DP certs [here](ssl-certs/hybrid/README.md)
 
 Make sure to install the private CA certificate to the OS truststore or you will have issues connecting to Kong Manager via the browser. Details can be found [here](ssl-certs/README.md#add-the-private-ca-to-the-os-trustore)
 
