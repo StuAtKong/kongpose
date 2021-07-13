@@ -122,7 +122,7 @@ services:
       KONG_ROLE: control_plane
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-      KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 600
+      KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 60
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
       KONG_TRUSTED_IPS: "0.0.0.0/0"
