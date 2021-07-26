@@ -7,3 +7,4 @@ kafka/*
 ssl-certs/rootCA.srl
 http_content/test.txt
 ha-proxy/haproxy.cfg
+tmp/*
