@@ -118,6 +118,65 @@ $ curl http://proxy.kong.lan/limit-httpbin/anything?apikey=123
 
 Send a few requests, get a 429 response and take a look in [redis](Admin.md#redis) ;-)
 
+## LDAP Auth
+
+An endpoint of `/auth/ldap` exists which uses the ldap-auth-advanced plugin. This can be tested using the super user that is in the Samba AD server. The plugin has been configured with config.ldap=basic so the standard basic authentication header can be sent;
+
+```
+$ curl -v -u super:K1ngK0ng  http://proxy.kong.lan/auth/ldap/anything
+```
+
+The plugin also hads config.log_search_results set which logs some good debugging information for the authentication attempt.
+
+```
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [lua] init.lua:493: calling patched method 'ldap-auth-advanced:access'
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [lua] init.lua:493: calling patched method 'ldap-auth-advanced:access'
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:93 [ldap-auth-advanced] binding with cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com and conf.ldap_password
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:102 [ldap-auth-advanced] ldap bind successful, performing search request with base_dn:cn=Users,dc=ldap,dc=kong,dc=com, scope='sub', and filter=sAMAccountName=super
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 [kong] access.lua:ldap_authenticate:112 "ldap search results:", client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 +------------------------------------------------------------------------------------------------------------------------+, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |[kong] access.lua:ldap_authenticate:113 {                                                                               |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |  ["CN=super,CN=Users,DC=ldap,DC=kong,DC=com"] = {                                                                      |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    accountExpires = "9223372036854775807",                                                                             |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    badPasswordTime = "0",                                                                                              |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    badPwdCount = "0",                                                                                                  |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    cn = "super",                                                                                                       |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    codePage = "0",                                                                                                     |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    countryCode = "0",                                                                                                  |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    distinguishedName = "CN=super,CN=Users,DC=ldap,DC=kong,DC=com",                                                     |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    instanceType = "4",                                                                                                 |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    lastLogoff = "0",                                                                                                   |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    lastLogon = "0",                                                                                                    |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    lastLogonTimestamp = "132720253967685800",                                                                          |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    logonCount = "0",                                                                                                   |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    memberOf = "CN=oligarchs,CN=Users,DC=ldap,DC=kong,DC=com",                                                          |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    name = "super",                                                                                                     |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    objectCategory = "CN=Person,CN=Schema,CN=Configuration,DC=ldap,DC=kong,DC=com",                                     |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    objectClass = { "top", "person", "organizationalPerson", "user" },                                                  |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    objectGUID = "#�\r9�EcH�/�\0280�Q0",                                                                                |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    objectSid = "\1\5\0\0\0\0\0\5\21\0\0\0��o[�l�\0263�\23&X\4\0\0",                                                    |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    primaryGroupID = "513",                                                                                             |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    pwdLastSet = "132714179217673400",                                                                                  |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    sAMAccountName = "super",                                                                                           |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    sAMAccountType = "805306368",                                                                                       |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    uSNChanged = "4128",                                                                                                |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    uSNCreated = "4091",                                                                                                |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    userAccountControl = "512",                                                                                         |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    userPrincipalName = "super@ldap.kong.com",                                                                          |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    whenChanged = "20210729094316.0Z",                                                                                  |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |    whenCreated = "20210722085841.0Z"                                                                                   |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |  }                                                                                                                     |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 |}                                                                                                                       |, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [notice] 28#0: *1563250 +------------------------------------------------------------------------------------------------------------------------+, client: 172.24.0.1, server: kong, request: "GET /auth/ldap/anything HTTP/1.1", host: "proxy.kong.lan"
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:123 [ldap-auth-advanced] finding groups with member attribute: memberOf
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:137 [ldap-auth-advanced] found groups
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] groups.lua:49 [ldap-auth-advanced] validating group: CN=oligarchs,CN=Users,DC=ldap,DC=kong,DC=com
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] groups.lua:66 [ldap-auth-advanced] "CN=oligarchs,CN=Users,DC=ldap,DC=kong,DC=com" is not a valid group
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:146 [ldap-auth-advanced] user has groups, but they are invalid. group must include group_base_dn with group_name_attribute
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:384 [ldap-auth-advanced] consumer mapping is not optional, looking for consumer.
+kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:388 [ldap-auth-advanced] consumer not found, checking anonymous
+```
+
 ## OIDC Auth
 
 An endpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A user exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set during the default Keycloak configuration.
