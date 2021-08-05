@@ -132,6 +132,10 @@ services:
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
       KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
+      KONG_KEYRING_ENABLED: "on"
+      KONG_KEYRING_STRATEGY: "cluster"
+      KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
+      KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
