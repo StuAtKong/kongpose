@@ -5,3 +5,4 @@ zookeeper/*
 kafka/*
 ssl-certs/rootCA.srl
 ha-proxy/haproxy.cfg
+/tmp
