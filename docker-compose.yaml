@@ -7,9 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
-    image: kong/kong-gateway:1.5.0.11-alpine
+    #image: kong/kong-gateway:1.5.0.11-alpine
+    image: kong/kong-gateway:2.5.0.0-alpine
 
     networks:
       - kongpose-net
@@ -25,9 +24,8 @@ services:
     restart: on-failure
 
   kong-node:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.3-alpine
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.2.0.0-alpine
-    image: kong/kong-gateway:1.5.0.11-alpine
+    #image: kong/kong-gateway:1.5.0.11-alpine
+    image: kong/kong-gateway:2.5.0.0-alpine
     scale: 2
     networks:
       - kongpose-net
@@ -104,6 +102,10 @@ services:
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
+      KONG_KEYRING_ENABLED: "on"
+      KONG_KEYRING_STRATEGY: "cluster"
+      KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
+      KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
