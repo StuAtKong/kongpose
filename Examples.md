@@ -212,7 +212,7 @@ http://proxy.kong.lan/auth/oidc
 The mutual-tls Route is configured to use the `client.kong.lan` hostname. The curl call passes the client certificate and key. The certificate exchange can be seen in the verbose headers from the curl call and the reponse has details of the mtls-consumer for consumer mapping in the plugin;
 
 ```
-$ curl -v --cacert ./ssl-certs/rootCA.pem --key ./ssl-certs/client/client.key --cert ./ssl-certs/client/client.pem https://client.kong.lan/auth/mtls/anything
+$ curl -v --cacert ./ssl-certs/rootCA.pem --key ./ssl-certs/client/client.key --cert ./ssl-certs/client/client.pem https://client.kong.lan:8443/auth/mtls/anything
 *   Trying 192.168.1.196:443...
 * Connected to client.kong.lan (192.168.1.196) port 443 (#0)
 * ALPN, offering h2
