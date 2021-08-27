@@ -1,34 +1,34 @@
 _format_version: "1.1"
 _workspace: mtls
-services:
-- connect_timeout: 60000
-  host: kongpose_httpbin_1
-  name: local-httpbin
-  port: 80
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  routes:
-  - name: local-httpbin
-    paths:
-    - /auth/mtls
-    path_handling: v0
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    snis:
-    - client.kong.lan
-    https_redirect_status_code: 426
-consumers:
-- custom_id: mtls_id
-  username: mtls-consumer
+ca_certificates:
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
+    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
+    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
+    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
+    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
+    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
+    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
+    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
+    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
+    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
+    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
+    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
+    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
+    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
+    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
+    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
+    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
+    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
+    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
+    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
+    -----END CERTIFICATE-----
+  id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
 certificates:
-- id: ee2867cf-8572-4f1a-a3ac-fbb07fc4e915
-  cert: |-
+- cert: |-
     -----BEGIN CERTIFICATE-----
     MIIECzCCAvOgAwIBAgIUAusYGP9BwoLFFAJdB/jY6eUzUyIwDQYJKoZIhvcNAQEL
     BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
@@ -53,6 +53,7 @@ certificates:
     582gUxxITKq/ES5A5jbaHFZ6NVwwablG8FBw51wZU6PPoVtIxe4/v+FGeQF+/KUv
     AcaJ1cRhKzYcW475WW9pWitCobCUNYIbEz/egv/kLg==
     -----END CERTIFICATE-----
+  id: ee2867cf-8572-4f1a-a3ac-fbb07fc4e915
   key: |-
     -----BEGIN PRIVATE KEY-----
     MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC4TgCS78i/gqAL
@@ -83,31 +84,58 @@ certificates:
     ueul7WK5Ww/tHblMClI3reiXGw==
     -----END PRIVATE KEY-----
   snis:
-  - name: client.kong.lan
-ca_certificates:
-- id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
-  cert: |-
-    -----BEGIN CERTIFICATE-----
-    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
-    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
-    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
-    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
-    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
-    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
-    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
-    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
-    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
-    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
-    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
-    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
-    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
-    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
-    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
-    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
-    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
-    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
-    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
-    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
-    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
-    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
-    -----END CERTIFICATE-----
+  - id: 34e4c478-5c24-4f2a-9b4e-951232ba225b
+    name: client.kong.lan
+consumers:
+- custom_id: mtls_id
+  id: 020c10c0-858f-4507-840b-d28692545fb0
+  username: mtls-consumer
+services:
+- connect_timeout: 60000
+  host: kongpose_httpbin_1
+  id: 17ae005b-3465-4e15-a649-59d64b9a5c24
+  name: local-httpbin
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: b42e4ba5-f3c0-448b-8e73-efe38f50f95e
+    name: local-httpbin
+    path_handling: v0
+    paths:
+    - /auth/mtls
+    plugins:
+    - config:
+        anonymous: null
+        authenticated_group_by: CN
+        ca_certificates:
+        - fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
+        cache_ttl: 60
+        cert_cache_ttl: 60000
+        consumer_by:
+        - username
+        - custom_id
+        http_timeout: 30000
+        revocation_check_mode: IGNORE_CA_ERROR
+        skip_consumer_lookup: false
+      enabled: true
+      id: 0af92263-9f50-48df-a013-d29955cf260d
+      name: mtls-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    snis:
+    - client.kong.lan
+    strip_path: true
+  write_timeout: 60000
