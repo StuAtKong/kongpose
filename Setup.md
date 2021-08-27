@@ -25,6 +25,12 @@ It is *NOT* recommended that you use localhost/127.0.0.1 as the address for Kong
 sudo ifconfig lo0 alias 10.0.10.1
 ~~~
 
+For newer versions of Linux with ifconfig deprecated/removed, use the following command;
+
+~~~shell
+sudo ip addr add 10.0.10.1 dev lo
+~~~
+
 Now you can configure the hostname resolution to use 10.0.10.1 for the IP address. Note, this setting will not survive a reboot but you can setup an alias automatically on a boot like [this](https://medium.com/@david.limkys/permanently-create-an-ifconfig-loopback-alias-macos-b7c93a8b0db)
 
 ### SSL Certificates
