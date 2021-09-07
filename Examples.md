@@ -177,6 +177,82 @@ kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.l
 kong-dp_1           | 2021/07/29 09:47:18 [debug] 28#0: *1563250 [kong] access.lua:388 [ldap-auth-advanced] consumer not found, checking anonymous
 ```
 
+## OPA  Auth
+
+Send a request with the required header value;
+
+```
+$ curl -v -H "my-secret-header: open-sesame" http://proxy.kong.lan/auth/opa/anything
+*   Trying 192.168.1.196:80...
+* Connected to proxy.kong.lan (192.168.1.196) port 80 (#0)
+> GET /auth/opa/anything HTTP/1.1
+> Host: proxy.kong.lan
+> User-Agent: curl/7.74.0
+> Accept: */*
+> my-secret-header: open-sesame
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< content-type: application/json
+< content-length: 500
+< server: gunicorn/19.9.0
+< date: Tue, 07 Sep 2021 10:35:42 GMT
+< access-control-allow-origin: *
+< access-control-allow-credentials: true
+< x-kong-upstream-latency: 6
+< x-kong-proxy-latency: 63
+< via: kong/2.5.0.1-enterprise-edition
+< x-server: kongpose_kong-dp_1
+<
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {},
+  "headers": {
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Host": "kongpose_httpbin_1",
+    "My-Secret-Header": "open-sesame",
+    "User-Agent": "curl/7.74.0",
+    "X-Forwarded-Host": "proxy.kong.lan",
+    "X-Forwarded-Path": "/auth/opa/anything",
+    "X-Forwarded-Prefix": "/auth/opa"
+  },
+  "json": null,
+  "method": "GET",
+  "origin": "192.168.1.196, 172.19.0.28",
+  "url": "http://proxy.kong.lan/anything"
+}
+* Connection #0 to host proxy.kong.lan left intact
+```
+
+Send a request without the required header value;
+
+```
+$ curl -v -H "my-secret-header: closed-door" http://proxy.kong.lan/auth/opa/anything
+*   Trying 192.168.1.196:80...
+* Connected to proxy.kong.lan (192.168.1.196) port 80 (#0)
+> GET /auth/opa/anything HTTP/1.1
+> Host: proxy.kong.lan
+> User-Agent: curl/7.74.0
+> Accept: */*
+> my-secret-header: closed-door
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 403 Forbidden
+< date: Tue, 07 Sep 2021 10:35:54 GMT
+< content-type: application/json; charset=utf-8
+< content-length: 26
+< x-kong-response-latency: 4
+< server: kong/2.5.0.1-enterprise-edition
+< x-server: kongpose_kong-dp_1
+<
+* Connection #0 to host proxy.kong.lan left intact
+{"message":"unauthorized"}
+```
+
+
 ## OIDC Auth
 
 An endpoint of `/auth/oidc` exists with auth_code and bearer authentication methods. A user exists in keycloak with username `keycloak_user` and password `password`. The client_id and secret are pre-set during the default Keycloak configuration.

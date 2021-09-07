@@ -10,7 +10,7 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
-    image: kong/kong-gateway:2.5.0.1-alpine
+    image: kong/kong-gateway:2.5.0.2-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -29,7 +29,7 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
-    image: kong/kong-gateway:2.5.0.1-alpine
+    image: kong/kong-gateway:2.5.0.2-alpine
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -147,7 +147,7 @@ services:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
-    image: kong/kong-gateway:2.5.0.1-alpine
+    image: kong/kong-gateway:2.5.0.2-alpine
     scale: 1
     networks:
       - kongpose-net
@@ -612,3 +612,13 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=password
       - GF_SERVER_DOMAIN=grafana.kong.lan
 
+  opa:
+    image: openpolicyagent/opa:latest
+    networks:
+      - kongpose-net
+#   container_name: opa
+#   ports:
+#     - "8181:8181"
+    volumes:
+      - ./opa/policies/:/records
+    command: "run --server --addr :8181 /records"

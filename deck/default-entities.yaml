@@ -343,7 +343,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: a47abff985b7ec074df15ab8051abaf7359dba7c
+    password: 8ff063a449e2dbb2952a6e1f83f5c2e4a05a650e
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -352,7 +352,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: bc6786b6ac490c909ba91f9ae0e09c55913cf0dc
+    password: 425ebbd57409456988e95bf7bf39be5928f3cdf1
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -911,6 +911,37 @@ services:
     response_buffering: true
     strip_path: true
   - https_redirect_status_code: 426
+    id: f4fece4f-f908-4346-97eb-c884f7826665
+    name: auth-opa
+    path_handling: v0
+    paths:
+    - /auth/opa
+    plugins:
+    - config:
+        include_consumer_in_opa_input: false
+        include_route_in_opa_input: false
+        include_service_in_opa_input: false
+        opa_host: kongpose_opa_1
+        opa_path: /v1/data/example/allowBoolean
+        opa_port: 8181
+        opa_protocol: http
+      enabled: true
+      id: 75f81f3a-50f5-4012-881a-b6bb2b1d4f56
+      name: opa
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  - https_redirect_status_code: 426
     id: d86e9f0c-e2bc-470d-a5a9-8f523512f379
     name: limit-httpbin
     path_handling: v0
@@ -944,10 +975,15 @@ services:
         namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
         redis:
           cluster_addresses: null
+          connect_timeout: null
           database: 0
           host: kongpose_redis_1
+          keepalive_backlog: null
+          keepalive_pool_size: 30
           password: null
           port: 6379
+          read_timeout: null
+          send_timeout: null
           sentinel_addresses: null
           sentinel_master: null
           sentinel_password: null
@@ -1001,10 +1037,15 @@ services:
           dictionary_name: kong_db_cache
         redis:
           cluster_addresses: null
+          connect_timeout: null
           database: 0
           host: redis
+          keepalive_backlog: null
+          keepalive_pool_size: 30
           password: null
           port: 6379
+          read_timeout: null
+          send_timeout: null
           sentinel_addresses: null
           sentinel_master: null
           sentinel_password: null
