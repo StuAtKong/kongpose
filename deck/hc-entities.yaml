@@ -123,7 +123,6 @@ upstreams:
         - 503
         tcp_failures: 0
         timeouts: 0
-    threshold: 0
   hash_on: none
   hash_fallback: none
   hash_on_cookie_path: /

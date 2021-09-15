@@ -7,7 +7,8 @@ networks:
 
 services:
   kong-migrations:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    image: vestas:latest
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     networks:
       - case-kong-net
@@ -25,7 +26,8 @@ services:
     restart: on-failure
 
   kong-node:
-    image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.2-alpine
+    image: vestas:latest
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:1.5.0.1-alpine
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.1.4.3-alpine
     scale: 2
     networks:
@@ -37,6 +39,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
+      - ./prometheus:/usr/local/kong/prometheus
     environment:
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 ssl"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 ssl"
@@ -53,6 +56,10 @@ services:
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
+      KONG_VITALS_STRATEGY: "prometheus"
+      KONG_VITALS_STATSD_ADDRESS: "kongpose_kong-node_1:9125"
+      KONG_VITALS_TSDB_ADDRESS: "kongpose_prometheus_1:9090"
+      KONG_VITALS_PROMETHEUS_SCRAPE_INTERVAL: 5
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
@@ -101,6 +108,7 @@ services:
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-cassandra.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
+      KONG_NGINX_HTTP_INCLUDE: "/usr/local/kong/prometheus/prometheus-server.conf"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -130,14 +138,8 @@ services:
     ports:
       - "389:389/tcp"
 
-  httpbin-1:
-    networks:
-      - case-kong-net
-    image: "kennethreitz/httpbin"
-#    ports:
-#      - "80:80/tcp"
-
-  httpbin-2:
+  httpbin:
+    scale: 2
     networks:
       - case-kong-net
     image: "kennethreitz/httpbin"
@@ -256,3 +258,13 @@ services:
       #- "25:1025/tcp"
       - "1080:1080/tcp"
 
+  prometheus:
+    image: prom/prometheus:v2.25.2
+    networks:
+      - case-kong-net
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - 9090:9090

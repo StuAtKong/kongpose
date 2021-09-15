@@ -630,7 +630,6 @@ upstreams:
         - 503
         tcp_failures: 1
         timeouts: 1
-    threshold: 0
   hash_on: none
   hash_fallback: none
   hash_on_cookie_path: /

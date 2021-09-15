@@ -1,0 +1,12 @@
+# my global config
+global:
+  external_labels:
+    monitor: 'kong-project'
+
+rule_files:
+
+scrape_configs:
+  - job_name: 'kong_exporter'
+    scrape_interval: "5s"
+    static_configs:
+      - targets: ['kongpose_kong-node_1:9542']
