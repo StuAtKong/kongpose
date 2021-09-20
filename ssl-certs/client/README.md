@@ -59,3 +59,9 @@ EOF
 $ openssl x509 -req -in client.csr -CA ../rootCA.pem -CAkey ../rootCA.key -out client.pem -CAcreateserial -days 365 -sha256 -extfile client_cert_ext.conf
 ```
 
+## Create a cfx file from the pem/key file
+
+```
+openssl pkcs12 -export -out client.pfx -inkey client.key -in client.pem -certfile ../rootCA.pem
+```
+
