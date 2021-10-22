@@ -7,15 +7,17 @@ networks:
 
 services:
   kong-migrations:
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:0.36-5-alpine
     #image: kong/kong-gateway-private:1.5.0.2-alpine
     #image: kong/kong-gateway:1.5.0.11-alpine
     #image: kong/kong-gateway-private:2.1.4.4-alpine
     #image: kong/kong-gateway-private:2.2.1.0-alpine
-    image: kong/kong-gateway:2.5.0.2-alpine
+    image: kong/kong-gateway:2.4.1.3-alpine
+    #image: kong/kong-gateway:2.5.0.2-alpine
 
     networks:
       - kongpose-net
-    command: kong migrations up
+    command: kong migrations bootstrap
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: db
@@ -27,11 +29,13 @@ services:
     restart: on-failure
 
   kong-node:
+    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:0.36-5-alpine
     #image: kong/kong-gateway-private:1.5.0.2-alpine
     #image: kong/kong-gateway:1.5.0.11-alpine
     #image: kong/kong-gateway-private:2.1.4.4-alpine
     #image: kong/kong-gateway-private:2.2.1.0-alpine
-    image: kong/kong-gateway:2.5.0.2-alpine
+    image: kong/kong-gateway:2.4.1.3-alpine
+    #image: kong/kong-gateway:2.5.0.2-alpine
     scale: 2
     networks:
       - kongpose-net
