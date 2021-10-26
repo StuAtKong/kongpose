@@ -11,7 +11,7 @@ services:
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
-    #image: kong/kong-gateway:2.5.1.0-alpine
+    #image: kong/kong-gateway:2.5.1.1-alpine
     image: kong/kong-gateway:2.6.0.0-alpine
     networks:
       - kongpose-net
@@ -32,7 +32,7 @@ services:
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
-    #image: kong/kong-gateway:2.5.1.0-alpine
+    #image: kong/kong-gateway:2.5.1.1-alpine
     image: kong/kong-gateway:2.6.0.0-alpine
     networks:
       - kongpose-net
@@ -110,9 +110,12 @@ services:
       KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_PORTAL_AUTH: "openid-connect"
+      # Kong DevPortal auth via OIDC & KeyCloak
       KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
       # Kong DevPortal auth via OIDC & Okta
       # KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"7zxU14d1b5NTNf31p5lhShVX1N1UfWp3BHayU8kw\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"0oa4q0et31F47l9Nq4x6\"],\"issuer\":\"https://dev-885513.okta.com/oauth2/default/.well-known/oauth-authorization-server\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
+      # Kong DevPortal auth via OIDC & Azure AD
+      # KONG_PORTAL_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"authorization_cookie_domain\":\".kong.lan\",\"authorization_cookie_samesite\":\"None\",\"authorization_cookie_secure\":true,\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"leeway\":100,\"login_action\":\"redirect\",\"login_redirect_mode\":\"query\",\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"logout_methods\":[\"GET\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_domain\":\".kong.lan\",\"session_cookie_samesite\":\"None\",\"session_cookie_secure\":true,\"session_storage\":\"cookie\",\"ssl_verify\":false,\"verify_parameters\":false}"
       KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
@@ -155,7 +158,8 @@ services:
     #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
-    image: kong/kong-gateway:2.5.1.0-alpine
+    #image: kong/kong-gateway:2.5.1.1-alpine
+    image: kong/kong-gateway:2.6.0.0-alpine
     scale: 1
     networks:
       - kongpose-net
