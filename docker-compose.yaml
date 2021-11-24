@@ -160,7 +160,8 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     image: kong/kong-gateway:2.6.0.1-alpine
-    scale: 1
+    deploy:
+      replicas: 1
     networks:
       - kongpose-net
     depends_on:
@@ -247,7 +248,8 @@ services:
     networks:
       - kongpose-net
     image: "kennethreitz/httpbin"
-    scale: 2
+    deploy:
+      replicas: 2
 #    ports:
 #      - "80:80/tcp"
 
