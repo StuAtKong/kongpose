@@ -8,11 +8,11 @@ networks:
 services:
   kong-migrations:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.6.0.1-alpine
+    image: kong/kong-gateway:2.7.0.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -29,11 +29,11 @@ services:
 
   kong-cp:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.6.0.1-alpine
+    image: kong/kong-gateway:2.7.0.0-alpine
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -90,7 +90,7 @@ services:
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
       KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
-      # Kong Manager auth via local LDAP(AD) server
+      # Kong Manager auth via BasicAuth
       #KONG_ADMIN_GUI_AUTH: "basic-auth"
       # Kong Manager auth via local LDAP(AD) server
       KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
@@ -100,7 +100,8 @@ services:
       # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       # Kong Manager auth via OIDC & Azure AD
-      #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
+      #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"password\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"admin_claim\":\"name\",\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false, \"authenticated_groups_claim\":[\"groups\"]}"
+      #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"admin_claim\":\"name\",\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false, \"authenticated_groups_claim\":[\"groups\"],\"ignore_signature\": [\"authorization_code\",\"password\"], \"issuers_allowed\": [ \"https://sts.windows.net/e4bf00f3-2010-40d6-b82f-58df9f957e49/\"]}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
@@ -142,10 +143,10 @@ services:
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
       KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
-      KONG_KEYRING_ENABLED: "on"
-      KONG_KEYRING_STRATEGY: "cluster"
-      KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
-      KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
+      #KONG_KEYRING_ENABLED: "on"
+      #KONG_KEYRING_STRATEGY: "cluster"
+      #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
+      #KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -155,11 +156,11 @@ services:
 
   kong-dp:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-    #image: kong/kong-gateway:2.3.3.2-alpine
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.6.0.1-alpine
+    image: kong/kong-gateway:2.7.0.0-alpine
     scale: 1
     networks:
       - kongpose-net
