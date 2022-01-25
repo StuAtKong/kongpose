@@ -393,19 +393,9 @@ services:
   - id: 58df8840-22b5-4558-8907-4debea779607
     name: application-registration
     config:
-      auth_header_name: authorization
       auto_approve: false
       description: A simple API that echos the request
       display_name: Echo Server
-      enable_authorization_code: true
-      enable_client_credentials: true
-      enable_implicit_grant: true
-      enable_password_grant: true
-      mandatory_scope: false
-      provision_key: i2hNukpQBenWsMTPxUGWnDlEHmrVzruQ
-      refresh_token_ttl: 1.2096e+06
-      scopes: null
-      token_expiration: 7200
     enabled: false
     protocols:
     - grpc

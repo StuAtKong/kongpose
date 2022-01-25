@@ -6,46 +6,23 @@ networks:
     driver: bridge
 
 services:
-  kong-migrations:
-    #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:0.36-5-alpine
-    #image: kong/kong-gateway-private:1.5.0.2-alpine
-    image: kong/kong-gateway:1.5.0.11-alpine
-    #image: kong/kong-gateway:1.5.0.11-alpine
-    #image: kong/kong-gateway-private:2.1.4.4-alpine
-    #image: kong/kong-gateway-private:2.2.1.0-alpine
-    #image: kong/kong-gateway:2.4.1.3-alpine
-    #image: kong/kong-gateway:2.5.0.2-alpine
-
-    networks:
-      - kongpose-net
-    command: kong migrations bootstrap
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
-      KONG_PASSWORD: password
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-    restart: on-failure
 
   kong-node:
     #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:0.36-5-alpine
     #image: kong/kong-gateway-private:1.5.0.2-alpine
-    image: kong/kong-gateway:1.5.0.11-alpine
+    #image: kong/kong-gateway:1.5.0.11-alpine
     #image: kong/kong-gateway:1.5.0.11-alpine
     #image: kong/kong-gateway-private:2.1.4.4-alpine
     #image: kong/kong-gateway-private:2.2.1.0-alpine
     #image: kong/kong-gateway:2.4.1.3-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
+    image: kong/kong-gateway:2.6.0.0-alpine
     scale: 2
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
-    depends_on:
-      db:
-        condition: service_healthy
     volumes:
+      - ./config/declarative-config.yaml:/tmp/declarative-config.yaml
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
     environment:
@@ -55,12 +32,8 @@ services:
       KONG_PORTAL_GUI_LISTEN: "0.0.0.0:48003, 0.0.0.0:48446 ssl"
       KONG_PORTAL_API_LISTEN: "0.0.0.0:48004, 0.0.0.0:48447 ssl"
       KONG_STATUS_LISTEN: "0.0.0.0:48100"
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: db
-      #KONG_PG_HOST: toxiproxy
-      KONG_PG_DATABASE: kong
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: kong
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: "/tmp/declarative-config.yaml"
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_PROXY_ACCESS_LOG: /dev/stdout
@@ -71,9 +44,9 @@ services:
       KONG_PORTAL_API_ERROR_LOG: /dev/stderr
       KONG_PORTAL_GUI_ACCESS_LOG: /dev/stdout
       KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
-      KONG_AUDIT_LOG: "on"
+      KONG_AUDIT_LOG: "off"
       KONG_ANONYMOUS_REPORTS: "off"
-      KONG_VITALS: "on"
+      KONG_VITALS: "off"
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/server.key"
@@ -85,62 +58,17 @@ services:
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      #KONG_ADMIN_GUI_AUTH: "basic-auth"
-      #KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      #KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false }"
-      #KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
-      KONG_PORTAL: "on"
-      KONG_PORTAL_GUI_PROTOCOL: "https"
-      KONG_PORTAL_GUI_HOST: "portal.kong.lan"
-      KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
-      KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_PORTAL_API_URL: "https://portal-api.kong.lan"
-      KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wild.key"
-      KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wild.crt"
-      KONG_PORTAL_AUTH: "openid-connect"
-      KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
-      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
-      KONG_PORTAL_EMAIL_VERIFICATION: "on"
-      KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
-      KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_FROM: "stu@konghq.com"
-      KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
-      KONG_SMTP_MOCK: "off"
-      KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "kongpose_fake-smtp-server_1"
-      KONG_SMTP_PORT: 1025
-      KONG_SMTP_DOMAIN: "api.konglan"
+      KONG_PORTAL: "off"
       KONG_TRACING: "off"
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
-      KONG_KEYRING_ENABLED: "on"
-      KONG_KEYRING_STRATEGY: "cluster"
-      KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
-      KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 10s
       retries: 10
     restart: on-failure
-
-  db:
-    networks:
-      - kongpose-net
-    image: postgres:12
-    environment:
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
-      POSTGRES_USER: kong
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    restart: on-failure
-    stdin_open: true
-    tty: true
 
   ad-server:
     networks:
@@ -273,24 +201,6 @@ services:
       - "8404:8404/tcp"
       - "9999:9999/tcp"
 
-  deck:
-    networks:
-      - kongpose-net
-    image: kong/deck:v1.3.0
-    volumes:
-        - .:/tmp:ro
-    environment:
-        DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://kongpose_kong-node_1:48001"
-        DECK_HEADERS: "kong-admin-token:password"
-    depends_on:
-      kong-node:
-        condition: service_healthy
-    entrypoint: >
-      sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
-             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
-
   locust:
     networks:
       - kongpose-net
@@ -377,21 +287,6 @@ services:
       #- 12201:12201/udp
       #- "5555:5555"
       #- "5555:5555/udp"
-
-  pgadmin:
-    networks:
-      - kongpose-net
-    image: dpage/pgadmin4
-    volumes:
-      - ./pgadmin/servers.json:/pgadmin4/servers.json
-      - ./pgadmin/config_local.py:/pgadmin4/config_local.py
-        #  - ./pgadmin_data/pgadmin:/var/lib/pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "stu@konghq.com"
-      PGADMIN_DEFAULT_PASSWORD: "password"
-      PGADMIN_LISTEN_PORT: 7071
-    ports:
-     - "7071:7071"
 
   zookeeper:
     image: 'bitnami/zookeeper:3.6.2'
