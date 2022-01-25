@@ -209,7 +209,7 @@ services:
      - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/kafka.py
+    command: -f /mnt/locust/db-less.py
 
   fake-smtp-server:
     networks:

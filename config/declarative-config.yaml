@@ -346,9 +346,9 @@ services:
       name: rate-limiting-advanced
       config:
         dictionary_name: kong_rate_limiting_counters
-        header_name: null
+        header_name: limit_header
         hide_client_headers: false
-        identifier: consumer
+        identifier: header
         limit:
         - 5
         namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
