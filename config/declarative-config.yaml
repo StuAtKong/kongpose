@@ -366,8 +366,8 @@ services:
         strategy: redis
         sync_rate: 0
         window_size:
-        - 30
-        window_type: sliding
+        - 60
+        window_type: fixed
       enabled: true
       protocols:
       - grpc
