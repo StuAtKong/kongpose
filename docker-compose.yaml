@@ -11,8 +11,8 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.0.0-alpine
+    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.7.0.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -32,8 +32,8 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.0.0-alpine
+    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.7.0.0-alpine
     networks:
       - kongpose-net
     user: "${KONG_USER:-kong}"
@@ -159,8 +159,8 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.0.0-alpine
+    image: kong/kong-gateway:2.6.0.1-alpine
+    #image: kong/kong-gateway:2.7.0.0-alpine
     scale: 1
     networks:
       - kongpose-net
@@ -645,3 +645,10 @@ services:
 #     - "9047:9047"
 #     - "31010:31010"
 #     - "45678:45678"
+
+  statsd:
+    image: statsd/statsd
+    networks:
+      - kongpose-net
+#   ports:
+#     - "8125:8125"
