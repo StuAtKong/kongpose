@@ -280,9 +280,9 @@ services:
     networks:
       - kongpose-net
     image: "moul/grpcbin"
-    ports:
-      - "7000:9000/tcp"
-      - "7001:9001/tcp"
+#   ports:
+#     - "7000:9000/tcp"
+#     - "7001:9001/tcp"
 
   keycloak:
     networks:
