@@ -12,7 +12,7 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.0-alpine
+    image: kong/kong-gateway:2.7.1.1-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -33,7 +33,7 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.0-alpine
+    image: kong/kong-gateway:2.7.1.1-alpine
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -161,7 +161,7 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.0-alpine
+    image: kong/kong-gateway:2.7.1.1-alpine
     #mem_limit: 8g
     scale: 1
     networks:
