@@ -11,8 +11,8 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.1-alpine
+    image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.1-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -32,8 +32,8 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.1-alpine
+    image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.1-alpine
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -160,7 +160,8 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.7.1.1-alpine
+    image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.1-alpine
     #mem_limit: 8g
     scale: 1
     networks:
@@ -215,11 +216,13 @@ services:
   db:
     networks:
       - kongpose-net
-    image: postgres:13.1
+    image: postgres:14-alpine
     environment:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
       POSTGRES_USER: kong
+      # Uncomment if kong version <2.3.2.0 i.e. does not support scram-sha256
+      #POSTGRES_HOST_AUTH_METHOD: md5
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "kong"]
       interval: 30s
