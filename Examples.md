@@ -5,7 +5,7 @@
 It is necessary to pass the CA certificate with the request to allow curl to verify the certs (or use -k which is not recommended);
 
 ~~~
-curl --cacert ./ssl-certs/rootCA.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
+curl --cacert ./ssl-certs/smallstep/intermediate_ca2.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
 ~~~
 
 ## Simple echo proxy
@@ -33,7 +33,7 @@ $ curl http://proxy.kong.lan/httpbin/anything
   "url": "http://proxy.kong.lan/anything"
 }
 
-$ curl -s --cacert ./ssl-certs/rootCA.pem --http2 https://proxy.kong.lan/httpbin/anything
+$ curl -s --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --http2 https://proxy.kong.lan/httpbin/anything
 {
   "args": {},
   "data": "",
@@ -288,7 +288,7 @@ http://proxy.kong.lan/auth/oidc
 The mutual-tls Route is configured to use the `client.kong.lan` hostname. The curl call passes the client certificate and key. The certificate exchange can be seen in the verbose headers from the curl call and the reponse has details of the mtls-consumer for consumer mapping in the plugin;
 
 ```
-$ curl -v --cacert ./ssl-certs/rootCA.pem --key ./ssl-certs/client/client.key --cert ./ssl-certs/client/client.pem https://client.kong.lan:8443/auth/mtls/anything
+$ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/smallstep/client/mtls-consumer.kong.lan.key --cert ./ssl-certs/smallstep/client/mtls-consumer.kong.lan.pem https://client.kong.lan:8443/auth/mtls/anything
 *   Trying 192.168.1.196:443...
 * Connected to client.kong.lan (192.168.1.196) port 443 (#0)
 * ALPN, offering h2

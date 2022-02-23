@@ -2,66 +2,22 @@
 
 Create a client cert for mutual-tls auth here
 
-## Create the client key
-
 ```
-$ openssl genrsa -out client.key 4096
-Generating RSA private key, 4096 bit long modulus (2 primes)
-........................................................++++
-.........................................................................................++++
-e is 65537 (0x010001)
-```
-
-## Create the client signing request
-
-Note, the CN value is set to `mtls-consumer` which will match the consumer defined in Kong.
-
-```
-$ openssl req -new -key client.key -out client.csr
-You are about to be asked to enter information that will be incorporated
-into your certificate request.
-What you are about to enter is what is called a Distinguished Name or a DN.
-There are quite a few fields but you can leave some blank
-For some fields there will be a default value,
-If you enter '.', the field will be left blank.
------
-Country Name (2 letter code) [AU]:UK
-State or Province Name (full name) [Some-State]:Hampshire
-Locality Name (eg, city) []:Aldershot
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:Kong UK
-Organizational Unit Name (eg, section) []:Support
-Common Name (e.g. server FQDN or YOUR name) []:mtls-consumer
-Email Address []:stu@konghq.com
-
-Please enter the following 'extra' attributes
-to be sent with your certificate request
-A challenge password []:
-An optional company name []:
+docker run --rm \
+-v $(pwd)/ssl-certs/smallstep:/tmp \
+smallstep/step-cli step certificate create 'mtls-consumer' /tmp/client/mtls-consumer.kong.lan.pem /tmp/client/mtls-consumer.kong.lan.key \
+--profile leaf \
+--not-after=8760h \
+--no-password \
+--insecure \
+--ca /tmp/intermediate_ca2.pem \
+--ca-key /tmp/intermediate_ca2.key \
+--bundle
 ```
 
-## Create the openssl configuration file
+## Create a pfx file from the pem/key file
 
 ```
-cat > client_cert_ext.conf <<EOF
-basicConstraints = CA:FALSE
-nsCertType = client, email
-nsComment = "OpenSSL Generated Client Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, emailProtection
-EOF
-```
-
-## Create the client certificate
-
-```
-$ openssl x509 -req -in client.csr -CA ../rootCA.pem -CAkey ../rootCA.key -out client.pem -CAcreateserial -days 365 -sha256 -extfile client_cert_ext.conf
-```
-
-## Create a cfx file from the pem/key file
-
-```
-openssl pkcs12 -export -out client.pfx -inkey client.key -in client.pem -certfile ../rootCA.pem
+openssl pkcs12 -export -out ssl-certs/smallstep/client.pfx -inkey ssl-certs/smallstep/client/mtls-consumer.kong.lan.key -in ssl-certs/smallstep/client/mtls-consumer.kong.lan.pem -certfile ssl-certs/smallstep/intermediate_ca2.pem
 ```
 
