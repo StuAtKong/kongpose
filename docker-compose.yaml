@@ -142,6 +142,7 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+      KONG_LUA_SSL_VERIFY_DEPTH: 5
       KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
       #KONG_KEYRING_ENABLED: "on"
       #KONG_KEYRING_STRATEGY: "cluster"
@@ -199,6 +200,7 @@ services:
       KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
+      KONG_LUA_SSL_VERIFY_DEPTH: 5
       KONG_CLUSTER_CONTROL_PLANE: kongpose_kong-cp_1:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kongpose_kong-cp_1:48006
       KONG_NGINX_WORKER_PROCESSES: 1
@@ -381,7 +383,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.5.1
+    image: kong/deck:v1.11.0
     volumes:
         - ./deck:/tmp/deck:ro
         - ./ssl-certs:/tmp/ssl-certs:ro

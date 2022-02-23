@@ -3,30 +3,52 @@ _workspace: default
 ca_certificates:
 - cert: |-
     -----BEGIN CERTIFICATE-----
-    MIIEBzCCAu+gAwIBAgIUG9T7bTwrVOdH+BNk7KWZgq/nVEcwDQYJKoZIhvcNAQEL
-    BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
-    CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
-    MBYGA1UEAwwPU3VwcG9ydCBSb290IENBMR0wGwYJKoZIhvcNAQkBFg5zdHVAa29u
-    Z2hxLmNvbTAeFw0yMDEwMzAxMjA1NDJaFw0yMzA4MjAxMjA1NDJaMIGSMQswCQYD
-    VQQGEwJVSzESMBAGA1UECAwJSGFtcHNoaXJlMRIwEAYDVQQHDAlBbGRlcnNob3Qx
-    EDAOBgNVBAoMB0tvbmcgVUsxEDAOBgNVBAsMB1N1cHBvcnQxGDAWBgNVBAMMD1N1
-    cHBvcnQgUm9vdCBDQTEdMBsGCSqGSIb3DQEJARYOc3R1QGtvbmdocS5jb20wggEi
-    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzR46YaAECb+K1YmAXhb6XICku
-    y1+xeVKqCnUJutDTvBlN2S4NnKxZn4BXgv83ormjN8XdP6U7abRz0nyuaLPJrfPT
-    chMA2Dcvk+jrLRamKDa0LyxAiX/ViB6ENwktbJRm81zP/zIx4HEwHActxQYEkQuW
-    +aFNpR0S9zgWEUyExnvarWexG8Y7M7WTohPFzWPsQyTvS9gnNTjN7obY6YTXPlfT
-    rhQPNQcySLUbzRaxNjIl8sxCGMk7TU80QHCFV99KQEKia4PJh+9pi62eEFYC6LlC
-    Vn9Wun5KqPCOvBs8nrSQu14kTsq4dSwD0sbwPoOzlXE/5v5vPadjapntEC2RAgMB
-    AAGjUzBRMB0GA1UdDgQWBBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAfBgNVHSMEGDAW
-    gBR2ySl/TAlFDGO3NAVlyJaZR+XZtzAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
-    DQEBCwUAA4IBAQCq2G68TQetpZsJcRVX/r+GxdgH/EtA2GfsVeuLvrLdO70u85y7
-    tonGTvPSltnZ+tS+7IUgNbjuJ+KZPWQK2ScSmq//8i6rIGJqNl9z8Z9K3h+efMT8
-    JAXzKgNaw+tGnWKiBE3d6ksmhD+tIfxzDYFwmRxuyTfJZHLrBa+DKlvAEu3z1vX5
-    A5qpckbGfEQ5PJRg/PjfuxfSSIRLjDaq+jGd3hvSsHagYDmDpXfwyJUNoTpg+jY+
-    BHtaDJAJ+W83/LP7VviHNjZ7+qKYuDTTvT5+o55AG1OR1jsFpvbSzi+Ucs2ExOXb
-    78Pm3Sm2u9c6L6TpXYUaq9S1VQ+8Iqxyk4ZF
+    MIIBfDCCASKgAwIBAgIRAOoqRcN/FbvBJL8jUqPzbtEwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwMjIzMTUzMTI3WhcNMjIw
+    MjI0MTUzMTI3WjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABG0DYYIwZl5A8zsRtAruFxWmWfRq4FRAXFuE/F1K
+    Wg/kZiy66fa1bxKI86Hh+ufcQxuRCmdN1OP9dfDKLBq/hpqjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBRTMic2a3WF2ltg
+    8dQTM2xWTtatPDAKBggqhkjOPQQDAgNIADBFAiBbA1GosuVYZ84GWSkRwWzAArnt
+    9ZrPWvIsri2NoeqkYwIhAMAcU9Lc3YDWsulTZcmeWBZfgCkRGlKHN8ontk3+3OtQ
     -----END CERTIFICATE-----
-  id: fa6e9989-86cb-4b26-bedd-b5f2f1af7f76
+  cert_digest: 8dc1a3699a96dc6d008cbbfa07c3cf9cdffb6f088bb170e87270a77d08462b41
+  id: f1c55c85-9871-420c-9444-50b690779a61
+  tags:
+  - root-ca
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBqzCCAVGgAwIBAgIRAJSO1oMU/lVbKsd4xKvHnUkwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwMjIzMTUzMTM0WhcNMjIw
+    MjI0MTUzMTM0WjAqMSgwJgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlh
+    dGUxIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbcePfnJydtlNtCSOO50F
+    C3WtO+sB9qFI6HboBSMHX3lf2v9PEYzE1Y6NYCDCoJLiqFyVmYsoLuRYXRTA5VdS
+    H6NmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0O
+    BBYEFDcCm1LMty5KcHtYdpUTAJ0y81IEMB8GA1UdIwQYMBaAFFMyJzZrdYXaW2Dx
+    1BMzbFZO1q08MAoGCCqGSM49BAMCA0gAMEUCIHYbkr33etz2YDWNqxNGE7o/O+QT
+    te5Mb8FIbyg3LxBkAiEAjugufrUh/gvumUNplsP5QCbjz2TaXFSWYn2j/+SlESg=
+    -----END CERTIFICATE-----
+  cert_digest: b6cef721ae138780fc6dbcf2485de894bf1c7ef4a1d6c64c7b25920f26d66108
+  id: d8ac4c57-edf1-4d15-8741-c9e8795ce6e5
+  tags:
+  - intermediate_ca1
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBuDCCAV+gAwIBAgIRAIAFE2awF2br6XAMJHSwUz4wCgYIKoZIzj0EAwIwKjEo
+    MCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjAy
+    MjMxNTMxNDJaFw0zMjAyMjExNTMxNDJaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS
+    b290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARe
+    76h4GWFA7kbMnyn9e7yUMDFa0rmr8IxXZesfX3H5P8APSVX9glQQ+FFFrVnYhepv
+    W3AYcpz4vdgpUOYRbmjAo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw
+    BgEB/wIBADAdBgNVHQ4EFgQUP2fiqx1AfBRN/m+b+k9gcSoR2cIwHwYDVR0jBBgw
+    FoAUNwKbUsy3Lkpwe1h2lRMAnTLzUgQwCgYIKoZIzj0EAwIDRwAwRAIgb37PGFsr
+    4Xw3Hh1vfD3x65riEcQ9p/mpuP3YFcuEirgCIDKNk2EyYTvTzyUgbrkHuLPc7kgk
+    OxhBuiyTmfSrXUCq
+    -----END CERTIFICATE-----
+  cert_digest: 931bc02ab61dd772e785dcf25bb4e63b26f7e2fc925092b1cf91fa0eb3bdc27d
+  id: cf3a7a80-b488-4529-8700-439d5d2baa72
+  tags:
+  - intermediate_ca2
 certificates:
 - cert: |-
     -----BEGIN CERTIFICATE-----
@@ -343,7 +365,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: 8ff063a449e2dbb2952a6e1f83f5c2e4a05a650e
+    password: e26bd748139776e215e2e530cbc8966f51edda4b
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -352,7 +374,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 425ebbd57409456988e95bf7bf39be5928f3cdf1
+    password: 42aad0bffd064aea75fb6cefbf27240725cba355
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -378,6 +400,7 @@ plugins:
     eab_hmac_key: null
     eab_kid: null
     fail_backoff_minutes: 1
+    preferred_chain: null
     renew_threshold_days: 14
     storage: redis
     storage_config:
@@ -397,8 +420,12 @@ plugins:
       shm:
         shm_name: kong
       vault:
+        auth_method: null
+        auth_path: null
+        auth_role: null
         host: null
         https: false
+        jwt_path: null
         kv_path: null
         port: null
         timeout: null
@@ -436,6 +463,12 @@ routes:
   - /kafka
   plugins:
   - config:
+      authentication:
+        mechanism: null
+        password: null
+        strategy: null
+        tokenauth: null
+        user: null
       bootstrap_servers:
       - host: kongpose_kafka_1
         port: 9092
@@ -444,6 +477,7 @@ routes:
       forward_method: false
       forward_uri: false
       keepalive: 60000
+      keepalive_enabled: false
       producer_async: true
       producer_async_buffering_limits_messages_in_memory: 50000
       producer_async_flush_timeout: 1000
@@ -453,6 +487,9 @@ routes:
       producer_request_retries_backoff_timeout: 100
       producer_request_retries_max_attempts: 10
       producer_request_timeout: 2000
+      security:
+        certificate_id: null
+        ssl: null
       timeout: 10000
       topic: kong-upstream
     enabled: true
@@ -548,6 +585,7 @@ services:
         - header
         - query
         - body
+        by_username_ignore_case: false
         cache_introspection: true
         cache_token_exchange: true
         cache_tokens: true
@@ -576,6 +614,7 @@ services:
         consumer_optional: false
         credential_claim:
         - sub
+        disable_session: null
         discovery_headers_names: null
         discovery_headers_values: null
         display_errors: false
@@ -587,9 +626,11 @@ services:
         downstream_id_token_header: null
         downstream_id_token_jwk_header: null
         downstream_introspection_header: null
+        downstream_introspection_jwt_header: null
         downstream_refresh_token_header: null
         downstream_session_id_header: null
         downstream_user_info_header: null
+        downstream_user_info_jwt_header: null
         enable_hs_signatures: false
         end_session_endpoint: null
         extra_jwks_uris: null
@@ -612,6 +653,8 @@ services:
         - body
         ignore_signature: []
         introspect_jwt_tokens: false
+        introspection_accept: application/json
+        introspection_check_active: true
         introspection_endpoint: null
         introspection_endpoint_auth_method: null
         introspection_headers_client: null
@@ -733,10 +776,19 @@ services:
         upstream_id_token_header: null
         upstream_id_token_jwk_header: null
         upstream_introspection_header: null
+        upstream_introspection_jwt_header: null
         upstream_refresh_token_header: null
         upstream_session_id_header: null
         upstream_user_info_header: null
+        upstream_user_info_jwt_header: null
+        userinfo_accept: application/json
         userinfo_endpoint: null
+        userinfo_headers_client: null
+        userinfo_headers_names: null
+        userinfo_headers_values: null
+        userinfo_query_args_client: null
+        userinfo_query_args_names: null
+        userinfo_query_args_values: null
         verify_claims: true
         verify_nonce: true
         verify_parameters: false
@@ -973,6 +1025,7 @@ services:
         limit:
         - 5
         namespace: 906AYYBNP8tw136B6KyKuTvDhXE6iIRv
+        path: null
         redis:
           cluster_addresses: null
           connect_timeout: null
