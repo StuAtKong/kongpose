@@ -15,7 +15,7 @@ smallstep/step-cli step certificate create 'mtls-consumer' /tmp/client/mtls-cons
 --bundle
 ```
 
-## Create a cfx file from the pem/key file
+## Create a pfx file from the pem/key file
 
 ```
 openssl pkcs12 -export -out ssl-certs/smallstep/client.pfx -inkey ssl-certs/smallstep/client/mtls-consumer.kong.lan.key -in ssl-certs/smallstep/client/mtls-consumer.kong.lan.pem -certfile ssl-certs/smallstep/intermediate_ca2.pem
