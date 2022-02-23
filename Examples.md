@@ -5,7 +5,7 @@
 It is necessary to pass the CA certificate with the request to allow curl to verify the certs (or use -k which is not recommended);
 
 ~~~
-curl --cacert ./ssl-certs/rootCA.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
+curl --cacert ./ssl-certs/smallstep/intermediate_ca2.pem -H "kong-admin-token: password" https://api.kong.lan:8444/default/kong
 ~~~
 
 ## Simple echo proxy
@@ -33,7 +33,7 @@ $ curl http://proxy.kong.lan/httpbin/anything
   "url": "http://proxy.kong.lan/anything"
 }
 
-$ curl -s --cacert ./ssl-certs/rootCA.pem --http2 https://proxy.kong.lan/httpbin/anything
+$ curl -s --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --http2 https://proxy.kong.lan/httpbin/anything
 {
   "args": {},
   "data": "",
