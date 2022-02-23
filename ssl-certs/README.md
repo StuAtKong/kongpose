@@ -7,34 +7,57 @@ https://smallstep.com/docs/step-cli/basic-crypto-operations
 
 ## Generate Private CA key and certificate
 
+### Create a template file for the Root CA generation (root.tpl);
+
+```
+{
+    "subject": {{ toJson .Subject }},
+    "issuer": {{ toJson .Subject }},
+    "keyUsage": ["certSign", "crlSign"],
+    "basicConstraints": {
+        "isCA": true,
+        "maxPathLen": 2
+    }
+}
+```
+
+### Create the Root CA using the template
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create --profile root-ca --no-password --insecure "Kong Root CA" /tmp/root_ca.pem /tmp/root_ca.key
+smallstep/step-cli step certificate create --template /tmp/root.tpl --no-password --insecure "Demo Kong Root CA" /tmp/root_ca.pem /tmp/root_ca.key
 ```
 
 ## Generate Intermediate CA SSL/TLS Certificates
 
+### Create a template file for the 1st Intermedia CA generation (root.tpl);
+
 ```
-docker run --rm \
--v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create "Kong Intermediate CA 1" /tmp/intermediate_ca1.pem /tmp/intermediate_ca1.key \
---profile intermediate-ca \
---no-password \
---insecure \
---ca /tmp/root_ca.pem \
---ca-key /tmp/root_ca.key
+{
+    "subject": {{ toJson .Subject }},
+    "keyUsage": ["certSign", "crlSign"],
+    "basicConstraints": {
+        "isCA": true,
+        "maxPathLen": 1
+    }
+}
 ```
+
+### Create the 1st Intermediate CA using the template
 
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create "Kong Intermediate CA 2" /tmp/intermediate_ca2.pem /tmp/intermediate_ca2.key \
---profile intermediate-ca \
---no-password \
---insecure \
---ca /tmp/intermediate_ca1.pem \
---ca-key /tmp/intermediate_ca1.key
+smallstep/step-cli step certificate create --template /tmp/intermediate1.tpl --ca /tmp/root_ca.pem --ca-key /tmp/root_ca.key --no-password --insecure "Demo Kong Root Intermediate1 CA" /tmp/intermediate_ca1.pem /tmp/intermediate_ca1.key
+```
+
+### Create the 2nd Intermediate CA signed by the first Internediate CA
+
+```
+docker run --rm \
+-v $(pwd)/ssl-certs/smallstep:/tmp \
+smallstep/step-cli step certificate create --profile intermediate-ca --ca /tmp/intermediate_ca1.pem --ca-key /tmp/intermediate_ca1.key --no-password --insecure "Demo Kong Root Intermediate2 CA" /tmp/intermediate_ca2.pem /tmp/intermediate_ca2.key
 ```
 
 ## Generate the server SSL certificate for api.kong.lan using rootCA.key, rootCA.pem and server.csr
