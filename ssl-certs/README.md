@@ -31,7 +31,7 @@ smallstep/step-cli step certificate create --template /tmp/root.tpl --no-passwor
 
 ## Generate Intermediate CA SSL/TLS Certificates
 
-### Create a template file for the 1st Intermedia CA generation (root.tpl);
+### Create a template file for the 1st Intermedia CA generation (intermediate1.tpl);
 
 ```
 {
