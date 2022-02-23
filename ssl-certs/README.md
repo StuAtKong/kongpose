@@ -31,7 +31,7 @@ smallstep/step-cli step certificate create --template /tmp/root.tpl --no-passwor
 
 ## Generate Intermediate CA SSL/TLS Certificates
 
-### Create a template file for the 1st Intermedia CA generation (intermediate1.tpl);
+### Create a template file for the 1st Intermediate CA generation (intermediate1.tpl);
 
 ```
 {
@@ -52,7 +52,7 @@ docker run --rm \
 smallstep/step-cli step certificate create --template /tmp/intermediate1.tpl --ca /tmp/root_ca.pem --ca-key /tmp/root_ca.key --no-password --insecure "Demo Kong Root Intermediate1 CA" /tmp/intermediate_ca1.pem /tmp/intermediate_ca1.key
 ```
 
-### Create the 2nd Intermediate CA signed by the first Internediate CA
+### Create the 2nd Intermediate CA signed by the first Intermediate CA
 
 ```
 docker run --rm \
