@@ -60,7 +60,7 @@ docker run --rm \
 smallstep/step-cli step certificate create --profile intermediate-ca --ca /tmp/intermediate_ca1.pem --ca-key /tmp/intermediate_ca1.key --no-password --insecure "Demo Kong Root Intermediate2 CA" /tmp/intermediate_ca2.pem /tmp/intermediate_ca2.key
 ```
 
-## Generate the server SSL certificate for api.kong.lan using rootCA.key, rootCA.pem and server.csr
+## Generate the server SSL certificates
 
 ### Generate a certificate for Kong named endpoints (Manager, Admin API, Portal, Portal API and Proxy)
 
@@ -81,7 +81,7 @@ smallstep/step-cli step certificate create manager.kong.lan /tmp/kong.lan.pem /t
 --bundle
 ```
 
-### Generate a certificate for client MTLS connections
+### Generate a certificate for client MTLS connections (hostname: client.kong.lan)
 
 ```
 docker run --rm \
@@ -102,6 +102,21 @@ smallstep/step-cli step certificate create client.kong.lan /tmp/client.kong.lan.
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
 smallstep/step-cli step certificate create '*.kong.lan' /tmp/wild.kong.lan.pem /tmp/wild.kong.lan.key \
+--profile leaf \
+--not-after=8760h \
+--no-password \
+--insecure \
+--ca /tmp/intermediate_ca2.pem \
+--ca-key /tmp/intermediate_ca2.key \
+--bundle
+```
+
+### Create certificate for Mutual TLS consumer signed by Intermediate2
+
+```
+docker run --rm \
+-v $(pwd)/ssl-certs/smallstep:/tmp \
+smallstep/step-cli step certificate create 'mtls-consumer' /tmp/client/mtls-consumer.kong.lan.pem /tmp/client/mtls-consumer.kong.lan.key \
 --profile leaf \
 --not-after=8760h \
 --no-password \
