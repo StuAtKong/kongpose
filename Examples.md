@@ -289,12 +289,12 @@ The mutual-tls Route is configured to use the `client.kong.lan` hostname. The cu
 
 ```
 $ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/smallstep/client/mtls-consumer.kong.lan.key --cert ./ssl-certs/smallstep/client/mtls-consumer.kong.lan.pem https://client.kong.lan:8443/auth/mtls/anything
-*   Trying 192.168.1.196:443...
-* Connected to client.kong.lan (192.168.1.196) port 443 (#0)
+*   Trying 192.168.1.196:8443...
+* Connected to client.kong.lan (192.168.1.196) port 8443 (#0)
 * ALPN, offering h2
 * ALPN, offering http/1.1
 * successfully set certificate verify locations:
-*  CAfile: ./ssl-certs/rootCA.pem
+*  CAfile: ./ssl-certs/smallstep/intermediate_ca2.pem
 *  CApath: /etc/ssl/certs
 * TLSv1.3 (OUT), TLS handshake, Client hello (1):
 * TLSv1.3 (IN), TLS handshake, Server hello (2):
@@ -310,19 +310,19 @@ $ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/
 * SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
 * ALPN, server accepted to use h2
 * Server certificate:
-*  subject: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=client.kong.lan; emailAddress=stu@konghq.com
-*  start date: Jan 20 13:42:28 2021 GMT
-*  expire date: Jun  4 13:42:28 2022 GMT
+*  subject: CN=client.kong.lan
+*  start date: Feb 23 16:41:43 2022 GMT
+*  expire date: Feb 23 16:41:43 2023 GMT
 *  subjectAltName: host "client.kong.lan" matched cert's "client.kong.lan"
-*  issuer: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=Support Root CA; emailAddress=stu@konghq.com
+*  issuer: CN=Demo Kong Root Intermediate2 CA
 *  SSL certificate verify ok.
-* Using HTTP2, server supports multi-use
+* Using HTTP2, server supports multiplexing
 * Connection state changed (HTTP/2 confirmed)
 * Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
-* Using Stream ID: 1 (easy handle 0x55e6a5dcb100)
+* Using Stream ID: 1 (easy handle 0x5646b59dae20)
 > GET /auth/mtls/anything HTTP/2
-> Host: client.kong.lan
-> user-agent: curl/7.74.0
+> Host: client.kong.lan:8443
+> user-agent: curl/7.79.1
 > accept: */*
 >
 * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
@@ -333,12 +333,12 @@ $ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/
 < content-type: application/json
 < content-length: 600
 < server: gunicorn/19.9.0
-< date: Wed, 20 Jan 2021 13:52:18 GMT
+< date: Thu, 24 Feb 2022 10:26:24 GMT
 < access-control-allow-origin: *
 < access-control-allow-credentials: true
-< x-kong-upstream-latency: 3
-< x-kong-proxy-latency: 4
-< via: kong/2.2.1.0-enterprise-edition
+< x-kong-upstream-latency: 9
+< x-kong-proxy-latency: 13
+< via: kong/2.6.0.2-enterprise-edition
 <
 {
   "args": {},
@@ -349,9 +349,9 @@ $ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/
     "Accept": "*/*",
     "Connection": "keep-alive",
     "Host": "kongpose_httpbin_1",
-    "User-Agent": "curl/7.74.0",
+    "User-Agent": "curl/7.79.1",
     "X-Consumer-Custom-Id": "mtls_id",
-    "X-Consumer-Id": "c4d20dc1-d486-4c79-bf93-2a6ad4af4781",
+    "X-Consumer-Id": "020c10c0-858f-4507-840b-d28692545fb0",
     "X-Consumer-Username": "mtls-consumer",
     "X-Forwarded-Host": "client.kong.lan",
     "X-Forwarded-Path": "/auth/mtls/anything",
@@ -359,7 +359,7 @@ $ curl -v --cacert ./ssl-certs/smallstep/intermediate_ca2.pem --key ./ssl-certs/
   },
   "json": null,
   "method": "GET",
-  "origin": "192.168.224.25",
+  "origin": "192.168.208.30",
   "url": "https://client.kong.lan/anything"
 }
 * Connection #0 to host client.kong.lan left intact
