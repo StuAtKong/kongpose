@@ -112,6 +112,8 @@ services:
         anonymous: null
         authenticated_group_by: CN
         ca_certificates:
+        - f1c55c85-9871-420c-9444-50b690779a61
+        - d8ac4c57-edf1-4d15-8741-c9e8795ce6e5
         - cf3a7a80-b488-4529-8700-439d5d2baa72
         cache_ttl: 60
         cert_cache_ttl: 60000
