@@ -11,8 +11,9 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.1-alpine
+    #image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.1.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -32,8 +33,9 @@ services:
     #image: kong/kong-gateway:2.4.1.1-alpine
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
-    image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.1-alpine
+    #image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.1.0-alpine
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -45,6 +47,7 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
+      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -96,12 +99,12 @@ services:
       # Kong Manager auth via local LDAP(AD) server
       KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
       KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false, \"log_search_results\":true }"
-      # KONG_ADMIN_GUI_AUTH: "openid-connect"
+      #KONG_ADMIN_GUI_AUTH: "openid-connect"
       # Kong Manager auth via OIDC & Auth0
       # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       # Kong Manager auth via OIDC & Azure AD
-      # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"password\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"admin_claim\":\"name\",\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false, \"authenticated_groups_claim\":[\"groups\"]}"
+      #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"password\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"admin_claim\":\"name\",\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false, \"authenticated_groups_claim\":[\"groups\"]}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
@@ -112,11 +115,11 @@ services:
       KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
       KONG_PORTAL_AUTH: "openid-connect"
       # Kong DevPortal auth via OIDC & KeyCloak
-      KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\",\"by_username_ignore_case\":true}"
+      #KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\",\"by_username_ignore_case\":true}"
       # Kong DevPortal auth via OIDC & Okta
       # KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"7zxU14d1b5NTNf31p5lhShVX1N1UfWp3BHayU8kw\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"0oa4q0et31F47l9Nq4x6\"],\"issuer\":\"https://dev-885513.okta.com/oauth2/default/.well-known/oauth-authorization-server\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
       # Kong DevPortal auth via OIDC & Azure AD
-      # KONG_PORTAL_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"authorization_cookie_domain\":\".kong.lan\",\"authorization_cookie_samesite\":\"None\",\"authorization_cookie_secure\":true,\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"leeway\":100,\"login_action\":\"redirect\",\"login_redirect_mode\":\"query\",\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"logout_methods\":[\"GET\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_domain\":\".kong.lan\",\"session_cookie_samesite\":\"None\",\"session_cookie_secure\":true,\"session_storage\":\"cookie\",\"ssl_verify\":false,\"verify_parameters\":false,\"by_username_ignore_case\":true}"
+      KONG_PORTAL_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"authorization_cookie_domain\":\".kong.lan\",\"authorization_cookie_samesite\":\"None\",\"authorization_cookie_secure\":true,\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"leeway\":100,\"login_action\":\"redirect\",\"login_redirect_mode\":\"query\",\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"logout_methods\":[\"GET\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_domain\":\".kong.lan\",\"session_cookie_samesite\":\"None\",\"session_cookie_secure\":true,\"session_storage\":\"cookie\",\"ssl_verify\":false,\"verify_parameters\":false,\"by_username_ignore_case\":true}"
       KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
@@ -148,6 +151,7 @@ services:
       #KONG_KEYRING_STRATEGY: "cluster"
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
       #KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
+      KONG_PLUGINS: "bundled,udp-gelf-log"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -161,8 +165,9 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
-    image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.1-alpine
+    #image: kong/kong-gateway:2.6.0.2-alpine
+    #image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.1.0-alpine
     #mem_limit: 8g
     scale: 1
     networks:
@@ -173,6 +178,7 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
+      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
@@ -208,6 +214,7 @@ services:
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
+      KONG_PLUGINS: "bundled,udp-gelf-log"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -658,3 +665,10 @@ services:
       - kongpose-net
 #   ports:
 #     - "8125:8125"
+
+  flask-server:
+    image: flask-app:latest
+    networks:
+      - kongpose-net
+    ports:
+      - "8432:80"
