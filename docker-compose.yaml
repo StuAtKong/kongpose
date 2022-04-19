@@ -16,6 +16,8 @@ services:
     image: kong/kong-gateway:2.8.1.0-alpine
     networks:
       - kongpose-net
+    volumes:
+      - ./ssl-certs:/tmp/ssl/customcerts
     command: kong migrations bootstrap
     environment:
       KONG_DATABASE: postgres
@@ -24,6 +26,12 @@ services:
       KONG_PG_DATABASE: kong
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
+      KONG_PG_SSL: "on"
+      KONG_PG_SSL_REQUIRED: "on"
+      KONG_PG_SSL_VERSION: "tlsv1_3"
+      #KONG_PG_SSL_CERT: "/usr/local/kong/certs/pg-client.crt"
+      #KONG_PG_SSL_CERT_KEY: "/usr/local/kong/certs/pg-client.key"
+      #LUA_SSL_TRUSTED_CERTIFICATE: "/usr/local/kong/certs/pg-server-ca.crt"
       KONG_PASSWORD: password
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
@@ -226,6 +234,10 @@ services:
     networks:
       - kongpose-net
     image: postgres:14-alpine
+    volumes:
+      - ./ssl-certs:/tmp/ssl/customcerts
+      - ./postgres/postgresql.conf:/tmp/postgresql.conf
+    command: "postgres -c config_file=/tmp/postgresql.conf"
     environment:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kong
