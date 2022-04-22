@@ -182,10 +182,10 @@ services:
       - ./tracing:/usr/local/kong/tracing
       - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
-      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl"
+      KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl reuseport backlog=65536"
+      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536"
       KONG_STREAM_LISTEN: "0.0.0.0:45555, 0.0.0.0:45556 ssl reuseport backlog=65536"
-      KONG_STATUS_LISTEN: "0.0.0.0:48100"
+      KONG_STATUS_LISTEN: "0.0.0.0:48100 ssl"
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_DATABASE: "off"
@@ -418,8 +418,7 @@ services:
     # - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
-    command: -f /mnt/locust/kafka.py
-
+    command: -f /mnt/locust/locustfile.py
   fake-smtp-server:
     networks:
       - kongpose-net
@@ -624,6 +623,7 @@ services:
       - ./prometheus/:/etc/prometheus/
     command:
       - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--log.level=debug"
     ports:
       - 9090:9090
 

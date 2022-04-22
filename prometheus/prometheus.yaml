@@ -28,8 +28,17 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # Kong metrics
+  # Kong Vitals metrics
   - job_name: 'vitals_statsd_exporter'
     scrape_interval: "5s"
     static_configs:
       - targets: ['statsd-exporter:9102']
+
+  # Kong Prometheus plugin metrics
+  - job_name: 'prometheus_plugin'
+    scrape_interval: "5s"
+    scheme: "https"
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+            - targets: ['kong-dp:48100']
