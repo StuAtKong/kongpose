@@ -12,8 +12,8 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.0-alpine
+    image: kong/kong-gateway:2.7.1.0-alpine
+    #image: kong/kong-gateway:2.8.1.0-alpine
     networks:
       - kongpose-net
     command: kong migrations bootstrap
@@ -34,8 +34,9 @@ services:
     #image: kong/kong-gateway:2.5.0.2-alpine
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.0-alpine
+    #image: kong/kong-gateway:2.7.1.0-alpine
+    image: siemens-rla:latest
+    #image: kong/kong-gateway:2.8.1.0-alpine
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -79,9 +80,9 @@ services:
       KONG_AUDIT_LOG: "on"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      #KONG_VITALS_STRATEGY: prometheus
-      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
+      KONG_VITALS_STRATEGY: prometheus
+      KONG_VITALS_STATSD_ADDRESS: statsd-exporter:9125
+      KONG_VITALS_TSDB_ADDRESS: prometheus:9090
       KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_LOG_LEVEL: "debug"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
@@ -166,8 +167,9 @@ services:
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
-    #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.0-alpine
+    #image: kong/kong-gateway:2.7.1.0-alpine
+    image: siemens-rla:latest
+    #image: kong/kong-gateway:2.8.1.0-alpine
     #mem_limit: 8g
     scale: 1
     networks:
@@ -193,9 +195,9 @@ services:
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      #KONG_VITALS_STRATEGY: prometheus
-      #KONG_VITALS_STATSD_ADDRESS: kongpose_statsd-exporter_1:9125
-      #KONG_VITALS_TSDB_ADDRESS: kongpose_prometheus_1:9090
+      KONG_VITALS_STRATEGY: prometheus
+      KONG_VITALS_STATSD_ADDRESS: statsd-exporter:9125
+      KONG_VITALS_TSDB_ADDRESS: prometheus:9090
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
@@ -603,28 +605,25 @@ services:
 #     - /var/run/docker.sock:/var/run/docker.sock
 
   statsd-exporter:
-    image: prom/statsd-exporter:v0.20.1
-#   hostname: statsd-exporter
+    #image: prom/statsd-exporter:v0.20.1
+    image: kong/statsd-exporter-advanced:0.3.1
     networks:
       - kongpose-net
-#   container_name: statsd-exporter
     user: root
     volumes:
-      - ./statsd-exporter/statsd-mapping.yml:/tmp/statsd-mapping.yml
+      - ./statsd-exporter/statsd.rules.yaml:/tmp/statsd.rules.yaml
     command:
-      - "--statsd.mapping-config=/tmp/statsd-mapping.yml"
+      - "--statsd.mapping-config=/tmp/statsd.rules.yaml"
       - "--statsd.listen-unixgram=''"
 
   prometheus:
-    image: prom/prometheus:v2.25.2
-#   hostname: prometheus
+    image: prom/prometheus:v2.35.0
     networks:
       - kongpose-net
-#   container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     ports:
       - 9090:9090
 
