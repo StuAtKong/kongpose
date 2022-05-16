@@ -663,9 +663,9 @@ services:
 #   ports:
 #     - "8125:8125"
 
-  flask-server:
-    image: flask-app:latest
-    networks:
-      - kongpose-net
-    ports:
-      - "8432:80"
+#  flask-server:
+#    image: flask-app:latest
+#    networks:
+#      - kongpose-net
+#    ports:
+#      - "8432:80"
