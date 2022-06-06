@@ -10,11 +10,11 @@ class QuickstartUser(HttpUser):
 
     @task(80)
     def good_response(self):
-        self.client.get("/httpbin/status/200")
+        self.client.get("/httpbin/status/200", headers={'apikey': 'keyA'})
 
     @task(20)
     def bad_response(self):
-        self.client.get("/httpbin/status/503")
+        self.client.get("/httpbin/status/503", headers={'apikey': 'keyA'})
 
     # @task(32)
     # def slow_response(self):
