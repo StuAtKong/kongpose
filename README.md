@@ -6,10 +6,3 @@ A comprehensive docker-compose file to get Kong EE up and running with minimal e
 
 The initial setup is detailed in [Setup](Setup.md)
 
-## Examples
-
-Some Kong examples are described in [Examples](Examples.md)
-
-## Administration
-
-There are some administration tools/utilities in [Admin](Admin.md)
