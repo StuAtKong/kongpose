@@ -23,10 +23,13 @@ https://smallstep.com/docs/step-cli/basic-crypto-operations
 
 ### Create the Root CA using the template
 
+Make certificate expiry 5 years (43830 hours)
+
+)
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create --template /tmp/root.tpl --no-password --insecure "Demo Kong Root CA" /tmp/root_ca.pem /tmp/root_ca.key
+smallstep/step-cli step certificate create --template /tmp/root.tpl --not-after=43830h --no-password --insecure "Demo Kong Root CA" /tmp/root_ca.pem /tmp/root_ca.key
 ```
 
 ## Generate Intermediate CA SSL/TLS Certificates
@@ -46,23 +49,29 @@ smallstep/step-cli step certificate create --template /tmp/root.tpl --no-passwor
 
 ### Create the 1st Intermediate CA using the template
 
+Make certificate expiry 1 year (8766 hours)
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create --template /tmp/intermediate1.tpl --ca /tmp/root_ca.pem --ca-key /tmp/root_ca.key --no-password --insecure "Demo Kong Root Intermediate1 CA" /tmp/intermediate_ca1.pem /tmp/intermediate_ca1.key
+smallstep/step-cli step certificate create --template /tmp/intermediate1.tpl --not-after=8766h --ca /tmp/root_ca.pem --ca-key /tmp/root_ca.key --no-password --insecure "Demo Kong Root Intermediate1 CA" /tmp/intermediate_ca1.pem /tmp/intermediate_ca1.key
 ```
 
 ### Create the 2nd Intermediate CA signed by the first Intermediate CA
 
+Make certificate expiry 6 months (4383 hours)
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
-smallstep/step-cli step certificate create --profile intermediate-ca --ca /tmp/intermediate_ca1.pem --ca-key /tmp/intermediate_ca1.key --no-password --insecure "Demo Kong Root Intermediate2 CA" /tmp/intermediate_ca2.pem /tmp/intermediate_ca2.key
+smallstep/step-cli step certificate create --profile intermediate-ca --ca /tmp/intermediate_ca1.pem --ca-key /tmp/intermediate_ca1.key --not-after=4383h --no-password --insecure "Demo Kong Root Intermediate2 CA" /tmp/intermediate_ca2.pem /tmp/intermediate_ca2.key
 ```
 
 ## Generate the server SSL certificates
 
 ### Generate a certificate for Kong named endpoints (Manager, Admin API, Portal, Portal API and Proxy)
+
+Make certificate expiry 6 months (4383 hours)
 
 ```
 docker run --rm \
@@ -73,7 +82,7 @@ smallstep/step-cli step certificate create manager.kong.lan /tmp/kong.lan.pem /t
 --san portal-api.kong.lan \
 --san proxy.kong.lan \
 --profile leaf \
---not-after=8760h \
+--not-after=4383h \
 --no-password \
 --insecure \
 --ca /tmp/intermediate_ca2.pem \
@@ -83,12 +92,14 @@ smallstep/step-cli step certificate create manager.kong.lan /tmp/kong.lan.pem /t
 
 ### Generate a certificate for client MTLS connections (hostname: client.kong.lan)
 
+Make certificate expiry 6 months (4383 hours)
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
 smallstep/step-cli step certificate create client.kong.lan /tmp/client.kong.lan.pem /tmp/client.kong.lan.key \
 --profile leaf \
---not-after=8760h \
+--not-after=4383h \
 --no-password \
 --insecure \
 --ca /tmp/intermediate_ca2.pem \
@@ -98,12 +109,14 @@ smallstep/step-cli step certificate create client.kong.lan /tmp/client.kong.lan.
 
 ### Generate a wildcard certificate for *.kong.lan for general use
 
+Make certificate expiry 6 months (4383 hours)
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
 smallstep/step-cli step certificate create '*.kong.lan' /tmp/wild.kong.lan.pem /tmp/wild.kong.lan.key \
 --profile leaf \
---not-after=8760h \
+--not-after=4383h \
 --no-password \
 --insecure \
 --ca /tmp/intermediate_ca2.pem \
@@ -113,12 +126,14 @@ smallstep/step-cli step certificate create '*.kong.lan' /tmp/wild.kong.lan.pem /
 
 ### Create certificate for Mutual TLS consumer signed by Intermediate2
 
+Make certificate expiry 6 months (4383 hours)
+
 ```
 docker run --rm \
 -v $(pwd)/ssl-certs/smallstep:/tmp \
 smallstep/step-cli step certificate create 'mtls-consumer' /tmp/client/mtls-consumer.kong.lan.pem /tmp/client/mtls-consumer.kong.lan.key \
 --profile leaf \
---not-after=8760h \
+--not-after=4383h \
 --no-password \
 --insecure \
 --ca /tmp/intermediate_ca2.pem \

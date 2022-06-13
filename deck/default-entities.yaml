@@ -1,52 +1,52 @@
 _format_version: "1.1"
 _workspace: default
 ca_certificates:
-- cert: |-
+- cert: |
     -----BEGIN CERTIFICATE-----
-    MIIBfDCCASKgAwIBAgIRAOoqRcN/FbvBJL8jUqPzbtEwCgYIKoZIzj0EAwIwHDEa
-    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwMjIzMTUzMTI3WhcNMjIw
-    MjI0MTUzMTI3WjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
-    SM49AgEGCCqGSM49AwEHA0IABG0DYYIwZl5A8zsRtAruFxWmWfRq4FRAXFuE/F1K
-    Wg/kZiy66fa1bxKI86Hh+ufcQxuRCmdN1OP9dfDKLBq/hpqjRTBDMA4GA1UdDwEB
-    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBRTMic2a3WF2ltg
-    8dQTM2xWTtatPDAKBggqhkjOPQQDAgNIADBFAiBbA1GosuVYZ84GWSkRwWzAArnt
-    9ZrPWvIsri2NoeqkYwIhAMAcU9Lc3YDWsulTZcmeWBZfgCkRGlKHN8ontk3+3OtQ
+    MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+    NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+    7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+    ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+    PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
     -----END CERTIFICATE-----
-  cert_digest: 8dc1a3699a96dc6d008cbbfa07c3cf9cdffb6f088bb170e87270a77d08462b41
-  id: f1c55c85-9871-420c-9444-50b690779a61
+  cert_digest: f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5
+  id: 8ccca140-aff4-411d-8e1c-fcfb3f932a8e
   tags:
   - root-ca
-- cert: |-
+- cert: |
     -----BEGIN CERTIFICATE-----
-    MIIBqzCCAVGgAwIBAgIRAJSO1oMU/lVbKsd4xKvHnUkwCgYIKoZIzj0EAwIwHDEa
-    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwMjIzMTUzMTM0WhcNMjIw
-    MjI0MTUzMTM0WjAqMSgwJgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlh
-    dGUxIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEbcePfnJydtlNtCSOO50F
-    C3WtO+sB9qFI6HboBSMHX3lf2v9PEYzE1Y6NYCDCoJLiqFyVmYsoLuRYXRTA5VdS
-    H6NmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0O
-    BBYEFDcCm1LMty5KcHtYdpUTAJ0y81IEMB8GA1UdIwQYMBaAFFMyJzZrdYXaW2Dx
-    1BMzbFZO1q08MAoGCCqGSM49BAMCA0gAMEUCIHYbkr33etz2YDWNqxNGE7o/O+QT
-    te5Mb8FIbyg3LxBkAiEAjugufrUh/gvumUNplsP5QCbjz2TaXFSWYn2j/+SlESg=
+    MIIBqTCCAVCgAwIBAgIQb5LqGa9gS3+Mc2ntWfSoJjAKBggqhkjOPQQDAjAcMRow
+    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMjA2MTMxMzM5MTVaFw0yMzA2
+    MTMxOTM5MTVaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
+    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQImvnSuvXkGy88lvx8a7of
+    e0MEMRI2siVvybvWXNpeXXlixgaq7weJ7pewf3HywfO68Va6kn8ehWh7s0D7SLHM
+    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
+    FgQUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
+    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDRwAwRAIgNZ+JPA1OqF5DsPapAZ2YsUOgIpn3
+    ZbQuYKCAV0SD4EcCIFnfA5rWrc1AgtUw5inJQqJQRNgoPuC14vACqI48BiRl
     -----END CERTIFICATE-----
-  cert_digest: b6cef721ae138780fc6dbcf2485de894bf1c7ef4a1d6c64c7b25920f26d66108
-  id: d8ac4c57-edf1-4d15-8741-c9e8795ce6e5
+  cert_digest: dbef7ed285fb292e24f84ffba93c48d92fa322387d85469c460c655abedd5308
+  id: 2e5f8ad1-21ca-47f5-8af7-899486e82731
   tags:
   - intermediate_ca1
-- cert: |-
+- cert: |
     -----BEGIN CERTIFICATE-----
-    MIIBuDCCAV+gAwIBAgIRAIAFE2awF2br6XAMJHSwUz4wCgYIKoZIzj0EAwIwKjEo
-    MCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjAy
-    MjMxNTMxNDJaFw0zMjAyMjExNTMxNDJaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS
-    b290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARe
-    76h4GWFA7kbMnyn9e7yUMDFa0rmr8IxXZesfX3H5P8APSVX9glQQ+FFFrVnYhepv
-    W3AYcpz4vdgpUOYRbmjAo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw
-    BgEB/wIBADAdBgNVHQ4EFgQUP2fiqx1AfBRN/m+b+k9gcSoR2cIwHwYDVR0jBBgw
-    FoAUNwKbUsy3Lkpwe1h2lRMAnTLzUgQwCgYIKoZIzj0EAwIDRwAwRAIgb37PGFsr
-    4Xw3Hh1vfD3x65riEcQ9p/mpuP3YFcuEirgCIDKNk2EyYTvTzyUgbrkHuLPc7kgk
-    OxhBuiyTmfSrXUCq
+    MIIBujCCAV+gAwIBAgIRAMkGpj7WZf+2RFE/q7ZhejEwCgYIKoZIzj0EAwIwKjEo
+    MCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjA2
+    MTMxMzQwNTFaFw0yMjEyMTMwNDQwNTFaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS
+    b290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQB
+    my/zhZ3F2HvHFqtQzuD3lXX8SeYakxiBQvaGkGSLKD67N3vh7iC2rTSdj/vAs8ws
+    Y9X+mXzS6GDKC8PbSX6xo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw
+    BgEB/wIBADAdBgNVHQ4EFgQURwCm53YPStZoAMfnVyknH4IgZa4wHwYDVR0jBBgw
+    FoAUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwCgYIKoZIzj0EAwIDSQAwRgIhAN1pkUKc
+    azM4PiXOnkILB2KBDIF4XpHf+4ThDMODzXP8AiEA45KXA3qMrRPQV1oBfWZ3hLgX
+    gxUhveuHBXMWnzUbn6U=
     -----END CERTIFICATE-----
-  cert_digest: 931bc02ab61dd772e785dcf25bb4e63b26f7e2fc925092b1cf91fa0eb3bdc27d
-  id: cf3a7a80-b488-4529-8700-439d5d2baa72
+  cert_digest: 45b2b6dd9d4102955b1b1e4b540e677f140521462ed4f22fa5a713863ca84600
+  id: cab2565d-fed6-4a07-b25c-bab76fdfe071
   tags:
   - intermediate_ca2
 certificates:
@@ -365,7 +365,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: e26bd748139776e215e2e530cbc8966f51edda4b
+    password: 07ca732dfe8ad804a833c365f11b89422333cc0c
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -374,7 +374,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 42aad0bffd064aea75fb6cefbf27240725cba355
+    password: 85dfba1bcc5e244a3ee3c53d041b6fda69217266
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -402,6 +402,7 @@ plugins:
     fail_backoff_minutes: 1
     preferred_chain: null
     renew_threshold_days: 14
+    rsa_key_size: 4096
     storage: redis
     storage_config:
       consul:
@@ -470,8 +471,9 @@ routes:
         tokenauth: null
         user: null
       bootstrap_servers:
-      - host: kongpose_kafka_1
+      - host: kafka
         port: 9092
+      cluster_name: null
       forward_body: true
       forward_headers: false
       forward_method: false
@@ -510,6 +512,7 @@ routes:
   strip_path: true
 services:
 - connect_timeout: 60000
+  enabled: true
   host: echo-server
   id: e399a95c-5a02-4594-814e-8d364167903e
   name: local-echo-server
@@ -702,6 +705,7 @@ services:
         - query
         - body
         refresh_tokens: true
+        resolve_distributed_claims: false
         response_mode: query
         response_type:
         - code
@@ -736,11 +740,11 @@ services:
         session_memcache_port: 11211
         session_memcache_prefix: sessions
         session_memcache_socket: null
-        session_redis_auth: null
         session_redis_cluster_maxredirections: null
         session_redis_cluster_nodes: null
         session_redis_connect_timeout: null
         session_redis_host: 127.0.0.1
+        session_redis_password: null
         session_redis_port: 6379
         session_redis_prefix: sessions
         session_redis_read_timeout: null
@@ -749,6 +753,7 @@ services:
         session_redis_socket: null
         session_redis_ssl: false
         session_redis_ssl_verify: false
+        session_redis_username: null
         session_secret: null
         session_storage: cookie
         session_strategy: default
@@ -818,7 +823,7 @@ services:
     plugins:
     - config:
         custom_fields_by_lua: null
-        host: kongpose_graylog_1
+        host: graylog
         port: 5555
         timeout: 10000
       enabled: true
@@ -841,7 +846,8 @@ services:
     strip_path: true
   write_timeout: 60000
 - connect_timeout: 60000
-  host: kongpose_grpc-server_1
+  enabled: true
+  host: grpc-server
   id: 6049c566-ff0b-4b77-8412-336c43f72f60
   name: local-grpc-server
   port: 9000
@@ -893,6 +899,7 @@ services:
     strip_path: false
   write_timeout: 60000
 - connect_timeout: 60000
+  enabled: true
   host: local-httpbin
   id: c2436422-8f03-47c0-887c-321bc2ad4fae
   name: local-httpbin
@@ -973,7 +980,7 @@ services:
         include_consumer_in_opa_input: false
         include_route_in_opa_input: false
         include_service_in_opa_input: false
-        opa_host: kongpose_opa_1
+        opa_host: opa
         opa_path: /v1/data/example/allowBoolean
         opa_port: 8181
         opa_protocol: http
@@ -1018,7 +1025,9 @@ services:
       - http
       - https
     - config:
+        consumer_groups: null
         dictionary_name: kong_rate_limiting_counters
+        enforce_consumer_groups: false
         header_name: null
         hide_client_headers: false
         identifier: consumer
@@ -1030,7 +1039,7 @@ services:
           cluster_addresses: null
           connect_timeout: null
           database: 0
-          host: kongpose_redis_1
+          host: redis
           keepalive_backlog: null
           keepalive_pool_size: 30
           password: null
@@ -1041,10 +1050,12 @@ services:
           sentinel_master: null
           sentinel_password: null
           sentinel_role: null
+          sentinel_username: null
           server_name: null
           ssl: false
           ssl_verify: false
           timeout: 2000
+          username: null
         retry_after_jitter_max: 0
         strategy: redis
         sync_rate: 0
@@ -1103,10 +1114,12 @@ services:
           sentinel_master: null
           sentinel_password: null
           sentinel_role: null
+          sentinel_username: null
           server_name: null
           ssl: false
           ssl_verify: false
           timeout: 2000
+          username: null
         request_method:
         - GET
         - HEAD
@@ -1140,6 +1153,7 @@ services:
   - rl-test
   write_timeout: 60000
 - connect_timeout: 60000
+  enabled: true
   host: dadjokes
   id: 13c5594b-d39a-45e7-b699-0bb4eab4ff82
   name: local_dadjokes
@@ -1231,6 +1245,7 @@ services:
   write_timeout: 60000
 - client_certificate: f3ae1bb2-ea6a-4caf-a7a7-2f078b7842db
   connect_timeout: 60000
+  enabled: true
   host: web-server.kong.lan
   id: f398724d-6041-4f4d-ba02-7dca7702ac2f
   name: local_mtls-webserver
@@ -1255,7 +1270,8 @@ services:
     strip_path: true
   write_timeout: 60000
 - connect_timeout: 60000
-  host: kongpose_toxiproxy_1
+  enabled: true
+  host: toxiproxy
   id: 168f5d40-5c4b-484d-b78f-1e064462c4f7
   name: slow-httpbin
   port: 8000
@@ -1279,6 +1295,7 @@ services:
     strip_path: true
   write_timeout: 60000
 - connect_timeout: 60000
+  enabled: true
   host: tcpbin.com
   id: 35d14851-9911-4563-9797-f05388f03193
   name: tcp-echo
