@@ -130,7 +130,7 @@ services:
       KONG_PORTAL_APPLICATION_STATUS_EMAIL: "on"
       KONG_SMTP_MOCK: "off"
       KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
-      KONG_SMTP_HOST: "kongpose_fake-smtp-server_1"
+      KONG_SMTP_HOST: "fake-smtp-server"
       KONG_SMTP_PORT: 1025
       KONG_SMTP_DOMAIN: "api.kong.lan"
       KONG_TRACING: "off"
@@ -209,8 +209,8 @@ services:
       KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
       KONG_LUA_SSL_VERIFY_DEPTH: 5
-      KONG_CLUSTER_CONTROL_PLANE: kongpose_kong-cp_1:48005
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: kongpose_kong-cp_1:48006
+      KONG_CLUSTER_CONTROL_PLANE: kong-cp:48005
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp:48006
       KONG_NGINX_WORKER_PROCESSES: 1
       KONG_EVENT_HOOKS_ENABLED: "on"
       KONG_TRUSTED_IPS: "0.0.0.0/0"
@@ -327,7 +327,7 @@ services:
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     environment:
-      REDIS_HOSTS: kongpose_redis_1
+      REDIS_HOSTS: redis
     ports:
     - "8081:8081"
 
@@ -363,7 +363,7 @@ services:
     entrypoint: > 
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream kongpose_httpbin_1:80;
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream httpbin:80;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency -t latency -a latency=250 -a jitter=150;"
 
   ha-proxy:
@@ -398,7 +398,7 @@ services:
         - ./ssl-certs:/tmp/ssl-certs:ro
     environment:
         DECK_ANALYTICS: "off"
-        DECK_KONG_ADDR: "http://kongpose_kong-cp_1:48001"
+        DECK_KONG_ADDR: "http://kong-cp:48001"
         DECK_HEADERS: "kong-admin-token:password"
     depends_on:
       kong-cp:
@@ -541,7 +541,7 @@ services:
 #     - '19093:19093'
     environment:
       - KAFKA_CFG_BROKER_ID=101
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=kongpose_zookeeper_1:12181
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:12181
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
@@ -562,7 +562,7 @@ services:
   kafka-ui:
     image: 'obsidiandynamics/kafdrop'
     environment:
-      - KAFKA_BROKERCONNECT=kongpose_kafka_1:9092
+      - KAFKA_BROKERCONNECT=kafka:9092
       - SERVER_PORT=8080
     networks:
       - kongpose-net
