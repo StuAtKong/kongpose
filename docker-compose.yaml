@@ -181,6 +181,7 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
+      - ./config:/tmp/kong_config
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl reuseport backlog=65536"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536"
@@ -217,6 +218,7 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_PLUGINS: "bundled,udp-gelf-log"
+      KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
