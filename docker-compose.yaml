@@ -128,6 +128,7 @@ services:
       KONG_ADMIN_EMAILS_REPLY_TO: "stu@konghq.com"
       KONG_PORTAL_APPLICATION_REQUEST_EMAIL: "on"
       KONG_PORTAL_APPLICATION_STATUS_EMAIL: "on"
+      KONG_PORTAL_GUI_USE_SUBDOMAINS: "on"
       KONG_SMTP_MOCK: "off"
       KONG_SMTP_ADMIN_EMAILS: "stu@konghq.com"
       KONG_SMTP_HOST: "fake-smtp-server"
