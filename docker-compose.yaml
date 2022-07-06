@@ -29,7 +29,7 @@ services:
   kong-migrations:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.4.1.1-alpine
+    image: kong/kong-gateway:2.7.1.2-alpine
     container_name: kong-migrations
     hostname: kong-migrations
     command: kong migrations bootstrap
@@ -40,13 +40,13 @@ services:
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kong
       KONG_PASSWORD: password
-      #KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
     restart: on-failure
 
   kong-cp:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.4.1.1-alpine
+    image: kong/kong-gateway:2.7.1.2-alpine
     container_name: kong-cp
     hostname: kong-cp
     user: "${KONG_USER:-kong}"
@@ -87,26 +87,26 @@ services:
       KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      #KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      #KONG_ENFORCE_RBAC: "on"
-      KONG_ADMIN_API_URI: "https://api.kong.lan:8444"
+      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+      KONG_ENFORCE_RBAC: "on"
+      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
-      KONG_ADMIN_GUI_URL: "https://manager.kong.lan:8445"
+      KONG_ADMIN_GUI_URL: "http://manager.kong.lan:8002"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
-      #KONG_ADMIN_GUI_AUTH: "basic-auth"
-      #KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":true, \"cookie_lifetime\":36000}"
+      KONG_ADMIN_GUI_AUTH: "basic-auth"
+      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":false, \"cookie_lifetime\":36000, \"cookie_domain\": \".kong.lan\"}"
       KONG_PORTAL: "on"
-      KONG_PORTAL_GUI_PROTOCOL: "https"
-      KONG_PORTAL_GUI_HOST: "portal.kong.lan:8446"
+      KONG_PORTAL_GUI_PROTOCOL: "http"
+      KONG_PORTAL_GUI_HOST: "portal.kong.lan:8003"
       KONG_PORTAL_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_PORTAL_GUI_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
-      KONG_PORTAL_API_URL: "https://portal-api.kong.lan:8447"
+      KONG_PORTAL_API_URL: "http://portal-api.kong.lan:8004"
       KONG_PORTAL_API_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_PORTAL_API_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
       KONG_PORTAL_AUTH: "basic-auth"
-      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
+      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":false, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
       KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
@@ -133,7 +133,7 @@ services:
   kong-dp:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.4.1.1-alpine
+    image: kong/kong-gateway:2.7.1.2-alpine
     container_name: kong-dp
     hostname: kong-dp
     depends_on:
