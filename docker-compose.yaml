@@ -47,7 +47,6 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
-      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -154,7 +153,6 @@ services:
       #KONG_KEYRING_STRATEGY: "cluster"
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
       #KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
-      KONG_PLUGINS: "bundled,udp-gelf-log"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -181,7 +179,6 @@ services:
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
-      - ../kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/share/lua/5.1/kong/plugins/udp-gelf-log
       - ./config:/tmp/kong_config
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl reuseport backlog=65536"
@@ -218,7 +215,6 @@ services:
       KONG_TRUSTED_IPS: "0.0.0.0/0"
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
-      KONG_PLUGINS: "bundled,udp-gelf-log"
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
     healthcheck:
       test: ["CMD", "kong", "health"]
@@ -282,6 +278,7 @@ services:
     networks:
       - kongpose-net
     image: "jmalloc/echo-server"
+    profiles: ["upstream"]
 #    ports:
 #      - "8080:8080/tcp"
 
@@ -289,6 +286,7 @@ services:
     networks:
       - kongpose-net
     image: yesinteractive/dadjokes
+    profiles: ["upstream"]
 #    ports:
 #      - "8081:80"
 
@@ -296,6 +294,7 @@ services:
     networks:
       - kongpose-net
     image: "moul/grpcbin"
+    profiles: ["upstream"]
 #   ports:
 #     - "7000:9000/tcp"
 #     - "7001:9001/tcp"
@@ -305,6 +304,7 @@ services:
       - kongpose-net
     #image: jboss/keycloak:9.0.0
     image: jboss/keycloak:15.0.2
+    profiles: ["auth"]
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
       - ./ssl-certs/smallstep/wild.kong.lan.key:/etc/x509/https/tls.key
@@ -329,6 +329,7 @@ services:
       - kongpose-net
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
+    profiles: ["utility"]
     environment:
       REDIS_HOSTS: redis
     ports:
@@ -338,6 +339,7 @@ services:
     networks:
       - kongpose-net
     image: openzipkin/zipkin
+    profiles: ["utility"]
     ports:
       - "9411:9411/tcp"
 
@@ -345,6 +347,7 @@ services:
     networks:
       - kongpose-net
     image: vault:latest
+    profiles: ["utility"]
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: myroot
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
@@ -355,6 +358,7 @@ services:
     networks:
       - kongpose-net
     image: "shopify/toxiproxy"
+    profiles: ["utility"]
     ports:
        - "8474:8474"
 
@@ -363,7 +367,8 @@ services:
     networks:
       - kongpose-net
     image: "shopify/toxiproxy"
-    entrypoint: > 
+    profiles: ["utility"]
+    entrypoint: >
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream httpbin:80;
@@ -417,11 +422,13 @@ services:
     networks:
       - kongpose-net
     image: locustio/locust
+    profiles: ["utility"]
     #ports:
     # - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
     command: -f /mnt/locust/locustfile.py
+
   fake-smtp-server:
     networks:
       - kongpose-net
@@ -434,6 +441,7 @@ services:
     networks:
       - kongpose-net
     image: mongo:4.2
+    profiles: ["graylog"]
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin --quiet | grep 1
       interval: 10s
@@ -444,11 +452,12 @@ services:
     networks:
       - kongpose-net
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
+    profiles: ["graylog"]
     healthcheck:
         test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
         interval: 30s
         timeout: 30s
-        retries: 3    
+        retries: 3
     environment:
       - http.host=0.0.0.0
       - transport.host=localhost
@@ -464,6 +473,7 @@ services:
     networks:
       - kongpose-net
     image: graylog/graylog:4.0.7
+    profiles: ["graylog"]
     volumes:
       #- ./graylog/server.conf:/etc/graylog/server.conf
       - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
@@ -503,6 +513,7 @@ services:
     networks:
       - kongpose-net
     image: dpage/pgadmin4
+    profiles: ["utility"]
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
       - ./pgadmin/config_local.py:/pgadmin4/config_local.py
@@ -516,6 +527,7 @@ services:
 
   zookeeper:
     image: 'bitnami/zookeeper:3.6.2'
+    profiles: ["kafka"]
     networks:
       - kongpose-net
 #   ports:
@@ -538,6 +550,7 @@ services:
   kafka:
     #image: 'bitnami/kafka:2.7.0'
     image: 'bitnami/kafka:2.2.1'
+    profiles: ["kafka"]
     networks:
       - kongpose-net
 #   ports:
@@ -564,6 +577,7 @@ services:
 
   kafka-ui:
     image: 'obsidiandynamics/kafdrop'
+    profiles: ["kafka"]
     environment:
       - KAFKA_BROKERCONNECT=kafka:9092
       - SERVER_PORT=8080
@@ -587,6 +601,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.11.2
+    profiles: ["utility"]
     networks:
       - kongpose-net
 #   hostname: kibana
@@ -608,6 +623,7 @@ services:
 
   statsd-exporter:
     image: prom/statsd-exporter:latest
+    profiles: ["prometheus"]
     #image: kong/statsd-exporter-advanced:0.3.1
     networks:
       - kongpose-net
@@ -620,6 +636,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.35.0
+    profiles: ["prometheus"]
     networks:
       - kongpose-net
     volumes:
@@ -632,6 +649,7 @@ services:
 
   grafana:
     image: grafana/grafana:7.5.1
+    profiles: ["prometheus"]
     networks:
       - kongpose-net
 #   container_name: grafana
@@ -643,6 +661,7 @@ services:
 
   opa:
     image: openpolicyagent/opa:latest
+    profiles: ["auth"]
     networks:
       - kongpose-net
 #   container_name: opa
@@ -652,24 +671,17 @@ services:
       - ./opa/policies/:/records
     command: "run --server --addr :8181 /records"
 
-# dremio:
-#   image: dremio/dremio-oss
-#   networks:
-#     - kongpose-net
-#   ports:
-#     - "9047:9047"
-#     - "31010:31010"
-#     - "45678:45678"
-
-  statsd:
-    image: statsd/statsd
-    networks:
-      - kongpose-net
+#  statsd:
+#    image: statsd/statsd
+#    profiles: ["utility"]
+#    networks:
+#      - kongpose-net
 #   ports:
 #     - "8125:8125"
 
 #  flask-server:
 #    image: flask-app:latest
+#    profiles: ["utility"]
 #    networks:
 #      - kongpose-net
 #    ports:
