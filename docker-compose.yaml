@@ -153,6 +153,10 @@ services:
       #KONG_KEYRING_STRATEGY: "cluster"
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
       #KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
+      KONG_AUDIT_LOG: "on"
+      KONG_AUDIT_LOG_IGNORE_METHODS: "OPTIONS"
+      KONG_AUDIT_LOG_PAYLOAD_EXCLUDE: "token, secret, password"
+      KONG_AUDIT_LOG_RECORD_TTL: 2592000
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
