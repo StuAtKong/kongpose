@@ -157,6 +157,11 @@ services:
       KONG_AUDIT_LOG_IGNORE_METHODS: "OPTIONS"
       KONG_AUDIT_LOG_PAYLOAD_EXCLUDE: "token, secret, password"
       KONG_AUDIT_LOG_RECORD_TTL: 2592000
+      KONG_ADMIN_GUI_LOGIN_BANNER_TITLE: "Limited Access"
+      KONG_ADMIN_GUI_LOGIN_BANNER_BODY: "Access by unauthorised personnel is prohibited"
+      KONG_ADMIN_GUI_HEADER_TXT: "*** Support environment ***"
+      KONG_ADMIN_GUI_HEADER_BG_COLOR: "green"
+      KONG_ADMIN_GUI_HEADER_TXT_COLOR: "white"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
