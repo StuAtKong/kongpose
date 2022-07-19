@@ -2,19 +2,30 @@ import random
 from datetime import datetime
 import hmac, hashlib, base64
 
-from locust import HttpUser, task, between
+from locust import HttpUser, FastHttpUser, task, between
 
-class QuickstartUser(HttpUser):
-    wait_time = between(0.5, 1)
-    host = "http://proxy.kong.lan"
 
-    @task(80)
-    def good_response(self):
-        self.client.get("/httpbin/status/200", headers={'apikey': 'keyA'})
 
-    @task(20)
-    def bad_response(self):
-        self.client.get("/httpbin/status/503", headers={'apikey': 'keyA'})
+class MyUser(FastHttpUser):
+    host = "https://stuatkong.duckdns.org:8443"
+
+    @task
+    def index(self):
+        response = self.client.get("/anything", headers={'appkey': 'app_key_1'})
+
+
+#class QuickstartUser(HttpUser):
+#    wait_time = between(0.5, 1)
+#    host = "https://stuatkong.duckdns.org:8443"
+
+
+#    @task(100)
+#    def good_response(self):
+#        self.client.get("/anything", headers={'appkey': 'app_key_1'})
+
+    # @task(20)
+    # def bad_response(self):
+    #     self.client.get("/httpbin/status/503", headers={'apikey': 'keyA'})
 
     # @task(32)
     # def slow_response(self):
