@@ -13,7 +13,8 @@ services:
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.4-alpine
+    #image: kong/kong-gateway:2.8.1.4-alpine
+    image: kong/kong-gateway:3.0.0.0-alpine
     networks:
       - kongpose-net
     command: "kong migrations bootstrap"
@@ -35,7 +36,8 @@ services:
     #image: kong/kong-gateway:2.5.1.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.4-alpine
+    #image: kong/kong-gateway:2.8.1.4-alpine
+    image: kong/kong-gateway:3.0.0.0-alpine
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -179,7 +181,8 @@ services:
     #image: kong/kong-gateway:2.6.0.1-alpine
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
-    image: kong/kong-gateway:2.8.1.4-alpine
+    #image: kong/kong-gateway:2.8.1.4-alpine
+    image: kong/kong-gateway:3.0.0.0-alpine
     #mem_limit: 8g
     scale: 1
     networks:
@@ -229,11 +232,7 @@ services:
       KONG_REAL_IP_HEADER: "X-Forwarded-For"
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
-      KONG_PLUGINS: "bundled, go-hello"
-      KONG_PLUGINSERVER_NAMES: "gohello"
-      KONG_PLUGINSERVER_GOHELLO_SOCKET: "/usr/local/kong/go-hello.socket"
-      KONG_PLUGINSERVER_GOHELLO_START_CMD: "/tmp/go-plugins/go-hello -kong-prefix /usr/local/kong"
-      KONG_PLUGINSERVER_GOHELLO_QUERY_CMD: "/tmp/go-plugins/go-hello -dump -kong-prefix /usr/local/kong"
+#      KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
