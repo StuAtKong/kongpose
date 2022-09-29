@@ -149,6 +149,8 @@ HA proxy also references a bundled certificate located at: ssl-certs/smallstep/c
 cat ssl-certs/smallstep/wild.kong.lan.pem ssl-certs/smallstep/intermediate_ca2.pem ssl-certs/smallstep/intermediate_ca1.pem ssl-certs/smallstep/root_ca.pem ssl-certs/smallstep/wild.kong.lan.key > ssl-certs/smallstep/combined-wild.pem
 ```
 
+### Validating certificates and trusting them
+
 You can check the generated certificate like this;
 
 ```
