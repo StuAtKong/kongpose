@@ -1,5 +1,14 @@
 # Initial Setup
 
+## MAC M1 users
+
+If you are unlucky enough to have a Mac with an M1 chip, you will have problems. Some of those problems are;
+
+### Keycloak does not start
+
+Try using the ```image: wizzn/keycloak:14``` image for the keycloak container
+
+
 ## Configuration
 
 ### DNS Resolution
