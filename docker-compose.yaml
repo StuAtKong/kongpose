@@ -14,7 +14,7 @@ services:
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
     #image: kong/kong-gateway:2.8.1.4-alpine
-    image: kong/kong-gateway:3.0.0.0-alpine
+    image: kong/kong-gateway:3.0.0.0-rhel
     networks:
       - kongpose-net
     command: "kong migrations bootstrap"
@@ -37,7 +37,8 @@ services:
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
     #image: kong/kong-gateway:2.8.1.4-alpine
-    image: kong/kong-gateway:3.0.0.0-alpine
+    #image: kong/kong-gateway:3.0.0.0-alpine
+    image: kong/kong-gateway:3.0.0.0-rhel
     mem_limit: 2g
     networks:
       - kongpose-net
@@ -49,7 +50,8 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
-      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
+#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
+      - ../kong-plugin-custom-handler/kong/plugins/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
     environment:
       KONG_PROXY_LISTEN: "off"
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl"
@@ -166,6 +168,7 @@ services:
       KONG_ADMIN_GUI_HEADER_BG_COLOR: "green"
       KONG_ADMIN_GUI_HEADER_TXT_COLOR: "white"
       #KONG_PLUGINS: "bundled"
+      KONG_PLUGINS: "bundled, custom-handler"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -182,7 +185,8 @@ services:
     #image: kong/kong-gateway:2.6.0.2-alpine
     #image: kong/kong-gateway:2.7.1.2-alpine
     #image: kong/kong-gateway:2.8.1.4-alpine
-    image: kong/kong-gateway:3.0.0.0-alpine
+    #image: kong/kong-gateway:3.0.0.0-alpine
+    image: kong/kong-gateway:3.0.0.0-rhel
     #mem_limit: 8g
     scale: 1
     networks:
@@ -194,8 +198,8 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./config:/tmp/kong_config
-      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-      - ../go-plugins:/tmp/go-plugins
+#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
+      - ../kong-plugin-custom-handler/kong/plugins/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
     environment:
       KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl reuseport backlog=65536"
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536"
@@ -233,6 +237,7 @@ services:
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
 #      KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
+      KONG_PLUGINS: "bundled, custom-handler"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
