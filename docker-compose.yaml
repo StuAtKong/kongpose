@@ -167,8 +167,8 @@ services:
       KONG_ADMIN_GUI_HEADER_TXT: "*** Support environment ***"
       KONG_ADMIN_GUI_HEADER_BG_COLOR: "green"
       KONG_ADMIN_GUI_HEADER_TXT_COLOR: "white"
-      #KONG_PLUGINS: "bundled"
-      KONG_PLUGINS: "bundled, custom-handler"
+      KONG_PLUGINS: "bundled"
+      #KONG_PLUGINS: "bundled, custom-handler"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
@@ -237,7 +237,8 @@ services:
       KONG_REAL_IP_RECURSIVE: "on"
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
 #      KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
-      KONG_PLUGINS: "bundled, custom-handler"
+      KONG_PLUGINS: "bundled"
+      #KONG_PLUGINS: "bundled, custom-handler"
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
