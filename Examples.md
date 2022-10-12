@@ -608,7 +608,7 @@ openssl s_client -CAfile ssl-certs/rootCA.pem  -connect proxy.kong.lan:5556 -ser
 ### TLS
 
 ```
-$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  proxy.kong.lan:443 hello.HelloService.SayHello
+$ grpcurl -insecure -cacert ./ssl-certs/smallstep/root_ca.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  proxy.kong.lan:8443 hello.HelloService.SayHello
 
 Resolved method descriptor:
 rpc SayHello ( .hello.HelloRequest ) returns ( .hello.HelloResponse );
@@ -639,7 +639,7 @@ Sent 1 request and received 1 response
 ```
 
 ```
-$ grpcurl -cacert ./ssl-certs/rootCA.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  proxy.kong.lan:443 hello.HelloService.LotsOfReplies
+$ Update
 
 Resolved method descriptor:
 rpc LotsOfReplies ( .hello.HelloRequest ) returns ( stream .hello.HelloResponse );
