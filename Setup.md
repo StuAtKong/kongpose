@@ -65,7 +65,7 @@ export KONG_LICENSE_DATA=`cat ./license.json`;
 Then start the utility services & kong containers
 
 ~~~shell
-docker-compose up -d
+docker compose --compatibility up -d kong-dp
 ~~~
 
 This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy server and a Locust load testing server. 
