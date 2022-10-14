@@ -386,7 +386,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.15.1
+    image: kong/deck:v1.12.2
     volumes:
       - ./deck:/tmp/deck:ro
       - ./ssl-certs:/tmp/ssl-certs:ro
