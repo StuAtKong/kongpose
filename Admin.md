@@ -22,6 +22,102 @@ To use the haproxy API;
 echo "help" | socat stdio tcp4-connect:api.kong.lan:9999
 ~~~
 
+### Check DNS service discovery
+
+HAProxy is configured to use DNS Service Discovery. For example, if you scale the kong-dp nodes then these should be picked up automatically and added into the pool. There are 20 "spaces" available for DNS records. For more details, refer to https://www.haproxy.com/blog/dns-service-discovery-haproxy/
+
+You can check which Kong dataplanes are available in the pool with this command;
+
+~~~
+echo "show servers state kong_http_proxy_nodes" | socat stdio tcp4-connect:api.kong.lan:9999
+~~~
+
+As an example, if we start with 3 Kong dataplanes,
+
+~~~
+docker compose --compatibility up -d --scale kong-dp=3
+~~~
+
+then we can see the three address HAProxy will use to send requests;
+
+~~~
+echo "show servers state kong_http_proxy_nodes" | socat stdio tcp4-connect:api.kong.lan:9999
+1
+# be_id be_name srv_id srv_name srv_addr srv_op_state srv_admin_state srv_uweight srv_iweight srv_time_since_last_change srv_check_status srv_check_result srv_check_health srv_check_state srv_agent_state bk_f_forced_id srv_f_forced_id srv_fqdn srv_port srvrecord
+18 kong_http_proxy_nodes 1 kong-proxy-http1 192.168.144.9 2 0 1 1 146 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 2 kong-proxy-http2 192.168.144.11 2 0 1 1 146 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 3 kong-proxy-http3 192.168.144.10 2 0 1 1 146 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 4 kong-proxy-http4 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 5 kong-proxy-http5 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 6 kong-proxy-http6 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 7 kong-proxy-http7 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 8 kong-proxy-http8 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 9 kong-proxy-http9 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 10 kong-proxy-http10 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 11 kong-proxy-http11 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 12 kong-proxy-http12 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 13 kong-proxy-http13 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 14 kong-proxy-http14 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 15 kong-proxy-http15 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 16 kong-proxy-http16 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 17 kong-proxy-http17 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 18 kong-proxy-http18 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 19 kong-proxy-http19 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 20 kong-proxy-http20 - 0 32 1 1 146 1 0 0 14 0 0 0 kong-dp 48000 -
+~~~
+
+Scaling up the Kong dataplanes to 5 and we see the new dataplanes nodes are available
+
+~~~
+$ docker compose --compatibility up -d --scale kong-dp=5
+~~~
+
+~~~
+echo "show servers state kong_http_proxy_nodes" | socat stdio tcp4-connect:api.kong.lan:9999
+1
+# be_id be_name srv_id srv_name srv_addr srv_op_state srv_admin_state srv_uweight srv_iweight srv_time_since_last_change srv_check_status srv_check_result srv_check_health srv_check_state srv_agent_state bk_f_forced_id srv_f_forced_id srv_fqdn srv_port srvrecord
+18 kong_http_proxy_nodes 1 kong-proxy-http1 192.168.144.14 2 0 1 1 29 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 2 kong-proxy-http2 192.168.144.12 2 0 1 1 29 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 3 kong-proxy-http3 192.168.144.11 2 0 1 1 29 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 4 kong-proxy-http4 192.168.144.13 2 0 1 1 29 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 5 kong-proxy-http5 192.168.144.10 2 0 1 1 29 6 3 4 6 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 6 kong-proxy-http6 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 7 kong-proxy-http7 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 8 kong-proxy-http8 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 9 kong-proxy-http9 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 10 kong-proxy-http10 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 11 kong-proxy-http11 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 12 kong-proxy-http12 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 13 kong-proxy-http13 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 14 kong-proxy-http14 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 15 kong-proxy-http15 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 16 kong-proxy-http16 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 17 kong-proxy-http17 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 18 kong-proxy-http18 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 19 kong-proxy-http19 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+18 kong_http_proxy_nodes 20 kong-proxy-http20 - 0 32 1 1 29 1 0 0 14 0 0 0 kong-dp 48000 -
+~~~
+
+If you send a request to the http proxy listener, the nHAProxy will add a header with the IP adress of the Kong dataplane that it used. You can see the requests are send to all the Kong dataplanes with a check like this;
+
+~~~
+$ for i in {1..10}
+> do
+>   echo `curl -s -I http://proxy.kong.lan/httpbin/anything | grep -i "x-kong-dp-node"`;
+>   sleep 0.5
+> done
+x-kong-dp-node: 192.168.144.12
+x-kong-dp-node: 192.168.144.11
+x-kong-dp-node: 192.168.144.13
+x-kong-dp-node: 192.168.144.10
+x-kong-dp-node: 192.168.144.14
+x-kong-dp-node: 192.168.144.12
+x-kong-dp-node: 192.168.144.11
+x-kong-dp-node: 192.168.144.13
+x-kong-dp-node: 192.168.144.10
+x-kong-dp-node: 192.168.144.14
+~~~
+
 ### Gracefully remove server from rotation
 ~~~
 echo "set server kong_http_proxy_nodes/kongpose_kong-dp_3 state drain" | socat stdio tcp4-connect:api.kong.lan:9999
