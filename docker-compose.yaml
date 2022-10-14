@@ -264,7 +264,7 @@ services:
     networks:
       - kongpose-net
     image: "jmalloc/echo-server"
-    profiles: [ "upstream" ]
+    profiles: [ "upstream", "everything" ]
   #    ports:
   #      - "8080:8080/tcp"
 
@@ -272,7 +272,7 @@ services:
     networks:
       - kongpose-net
     image: yesinteractive/dadjokes
-    profiles: [ "upstream" ]
+    profiles: [ "upstream", "everything" ]
   #    ports:
   #      - "8081:80"
 
@@ -280,7 +280,7 @@ services:
     networks:
       - kongpose-net
     image: "moul/grpcbin"
-    profiles: [ "upstream" ]
+    profiles: [ "upstream", "everything" ]
   #   ports:
   #     - "7000:9000/tcp"
   #     - "7001:9001/tcp"
@@ -290,7 +290,7 @@ services:
       - kongpose-net
     #image: jboss/keycloak:9.0.0
     image: jboss/keycloak:15.0.2
-    profiles: [ "auth" ]
+    profiles: [ "auth", "everything" ]
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
       - ./ssl-certs/smallstep/wild.kong.lan.key:/etc/x509/https/tls.key
@@ -315,7 +315,7 @@ services:
       - kongpose-net
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     environment:
       REDIS_HOSTS: redis
     ports:
@@ -325,7 +325,7 @@ services:
     networks:
       - kongpose-net
     image: openzipkin/zipkin
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     ports:
       - "9411:9411/tcp"
 
@@ -333,7 +333,7 @@ services:
     networks:
       - kongpose-net
     image: vault:latest
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: myroot
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
@@ -344,7 +344,7 @@ services:
     networks:
       - kongpose-net
     image: "shopify/toxiproxy"
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     ports:
       - "8474:8474"
 
@@ -353,7 +353,7 @@ services:
     networks:
       - kongpose-net
     image: "shopify/toxiproxy"
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     entrypoint: >
       sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
@@ -386,7 +386,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.12.2
+    image: kong/deck:v1.15.1
     volumes:
       - ./deck:/tmp/deck:ro
       - ./ssl-certs:/tmp/ssl-certs:ro
@@ -408,7 +408,7 @@ services:
     networks:
       - kongpose-net
     image: locustio/locust:2.10.1
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     #ports:
     # - "8089:8089"
     volumes:
@@ -427,7 +427,7 @@ services:
     networks:
       - kongpose-net
     image: mongo:4.2
-    profiles: [ "graylog" ]
+    profiles: [ "graylog", "everything" ]
     healthcheck:
       test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin --quiet | grep 1
       interval: 10s
@@ -438,7 +438,7 @@ services:
     networks:
       - kongpose-net
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
-    profiles: [ "graylog" ]
+    profiles: [ "graylog", "everything" ]
     healthcheck:
       test:
         [
@@ -463,7 +463,7 @@ services:
     networks:
       - kongpose-net
     image: graylog/graylog:4.0.7
-    profiles: [ "graylog" ]
+    profiles: [ "graylog", "everything" ]
     volumes:
       #- ./graylog/server.conf:/etc/graylog/server.conf
       - ./graylog/content_packs:/usr/share/graylog/data/contentpacks
@@ -503,7 +503,7 @@ services:
     networks:
       - kongpose-net
     image: dpage/pgadmin4
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
       - ./pgadmin/config_local.py:/pgadmin4/config_local.py #  - ./pgadmin_data/pgadmin:/var/lib/pgadmin
@@ -516,7 +516,7 @@ services:
 
   zookeeper:
     image: 'bitnami/zookeeper:3.6.2'
-    profiles: [ "kafka" ]
+    profiles: [ "kafka", "everything" ]
     networks:
       - kongpose-net
     #   ports:
@@ -539,7 +539,7 @@ services:
   kafka:
     #image: 'bitnami/kafka:2.7.0'
     image: 'bitnami/kafka:2.2.1'
-    profiles: [ "kafka" ]
+    profiles: [ "kafka", "everything" ]
     networks:
       - kongpose-net
     #   ports:
@@ -566,7 +566,7 @@ services:
 
   kafka-ui:
     image: 'obsidiandynamics/kafdrop'
-    profiles: [ "kafka" ]
+    profiles: [ "kafka", "everything" ]
     environment:
       - KAFKA_BROKERCONNECT=kafka:9092
       - SERVER_PORT=8080
@@ -590,7 +590,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.11.2
-    profiles: [ "utility" ]
+    profiles: [ "utility", "everything" ]
     networks:
       - kongpose-net
     #   hostname: kibana
@@ -612,7 +612,7 @@ services:
 
   statsd-exporter:
     image: prom/statsd-exporter:latest
-    profiles: [ "prometheus" ]
+    profiles: [ "prometheus", "everything" ]
     #image: kong/statsd-exporter-advanced:0.3.1
     networks:
       - kongpose-net
@@ -638,7 +638,7 @@ services:
 
   grafana:
     image: grafana/grafana:7.5.1
-    profiles: [ "prometheus" ]
+    profiles: [ "prometheus", "everything" ]
     networks:
       - kongpose-net
     #   container_name: grafana
@@ -650,7 +650,7 @@ services:
 
   opa:
     image: openpolicyagent/opa:latest
-    profiles: [ "auth" ]
+    profiles: [ "auth", "everything" ]
     networks:
       - kongpose-net
     #   container_name: opa
@@ -662,7 +662,7 @@ services:
 
 #  statsd:
 #    image: statsd/statsd
-#    profiles: ["utility"]
+#    profiles: [ "utility" , "everything"]
 #    networks:
 #      - kongpose-net
 #   ports:
@@ -670,7 +670,7 @@ services:
 
 #  flask-server:
 #    image: flask-app:latest
-#    profiles: ["utility"]
+#    profiles: [ "utility", "everything"]
 #    networks:
 #      - kongpose-net
 #    ports:
