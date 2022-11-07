@@ -9,7 +9,7 @@ x-kong-image:
   #image: kong/kong-gateway:2.6.0.2-alpine
   #image: kong/kong-gateway:2.7.1.2-alpine
   #image: kong/kong-gateway:2.8.1.4-alpine
-  #image: kong/kong-gateway:3.0.0.0-alpine
+  #image: kong/kong-gateway:3.0.0.0-rhel
   &kong-image
   image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.0.0.0-rhel}
 
@@ -675,3 +675,14 @@ services:
 #      - kongpose-net
 #    ports:
 #      - "8432:80"
+
+  squid:
+    image: ubuntu/squid
+    profiles: [ "squid", "everything" ]
+    networks:
+      - kongpose-net
+    ports:
+      - "3128:3128"
+    volumes:
+      - ./squid/squid.conf:/etc/squid/squid.conf
+      - ./squid/passwords:/etc/squid/passwords
