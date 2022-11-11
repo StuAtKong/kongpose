@@ -9,9 +9,10 @@ x-kong-image:
   #image: kong/kong-gateway:2.6.0.2-alpine
   #image: kong/kong-gateway:2.7.1.2-alpine
   #image: kong/kong-gateway:2.8.1.4-alpine
-  #image: kong/kong-gateway:3.0.0.0-rhel
+  #image: kong/kong-gateway:2.8.2.0-alpine
+  #image: kong/kong-gateway:3.0.1.0-rhel
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.0.0.0-rhel}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.0.1.0-rhel}
 
 x-kong-license:
   &kong-license
@@ -53,8 +54,8 @@ x-kong-common-config:
   KONG_TRUSTED_IPS: "0.0.0.0/0"
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
   KONG_REAL_IP_RECURSIVE: "on"
-  #KONG_PLUGINS: "bundled"
-  #KONG_PLUGINS: "bundled, custom-handler"
+#  KONG_PLUGINS: "bundled"
+#  KONG_PLUGINS: "bundled, custom-handler"
 
   # Common values for kong-cp and kong-dp
 x-kong-container-common:
@@ -93,8 +94,8 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
-    #      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-    #      - ../kong-plugin-custom-handler/kong/plugins/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
+#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
+#      - ../kong-plugin-custom-handler/kong/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
     environment:
       <<: [ *kong-license, *kong-db-config, *kong-common-config ]
       KONG_PROXY_LISTEN: "off"
@@ -195,8 +196,9 @@ services:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
       - ./config:/tmp/kong_config
-    #      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-    #      - ../kong-plugin-custom-handler/kong/plugins/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
+#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
+#      - ../kong-plugin-custom-handler/kong/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
+
     environment:
       <<: [ *kong-license, *kong-common-config ]
       KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536"
