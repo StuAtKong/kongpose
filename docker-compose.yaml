@@ -29,7 +29,7 @@ services:
   kong-migrations:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.2.4
     container_name: kong-migrations
     hostname: kong-migrations
     command: kong migrations bootstrap
@@ -46,7 +46,7 @@ services:
   kong-cp:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.2.4
     container_name: kong-cp
     hostname: kong-cp
     user: "${KONG_USER:-kong}"
@@ -87,16 +87,16 @@ services:
       KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
-      KONG_ENFORCE_RBAC: "on"
-      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
+#      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+#      KONG_ENFORCE_RBAC: "on"
+#      KONG_ADMIN_API_URI: "http://api.kong.lan:8001"
       KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
       KONG_ADMIN_GUI_URL: "http://manager.kong.lan:8002"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
-      KONG_ADMIN_GUI_AUTH: "basic-auth"
-      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":false, \"cookie_lifetime\":36000, \"cookie_domain\": \".kong.lan\"}"
+#      KONG_ADMIN_GUI_AUTH: "basic-auth"
+#      KONG_ADMIN_GUI_SESSION_CONF: "{ \"cookie_name\": \"manager-session\", \"secret\": \"this_is_my_other_secret\", \"storage\": \"kong\", \"cookie_secure\":false, \"cookie_lifetime\":36000, \"cookie_domain\": \".kong.lan\"}"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "http"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan:8003"
@@ -117,7 +117,6 @@ services:
       KONG_SMTP_HOST: "smtp-server"
       KONG_SMTP_PORT: 1025
       KONG_SMTP_DOMAIN: "api.kong.lan"
-      KONG_NGINX_WORKER_PROCESSES: 1
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
     healthcheck:
       test: ["CMD", "kong", "health"]
@@ -133,7 +132,7 @@ services:
   kong-dp:
     networks:
       - training-kong-net
-    image: kong/kong-gateway:2.7.1.2-alpine
+    image: kong/kong-gateway:2.8.2.4
     container_name: kong-dp
     hostname: kong-dp
     depends_on:
@@ -154,12 +153,11 @@ services:
       KONG_PROXY_ACCESS_LOG: "/dev/stdout"
       KONG_PROXY_ERROR_LOG: "/dev/stderr"
       KONG_DATABASE: "off"
-      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
+#      KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_VITALS: "on"
       KONG_SSL_CERT_KEY: "/tmp/ssl/customcerts/wildcard.key"
       KONG_SSL_CERT: "/tmp/ssl/customcerts/wildcard.pem"
-      KONG_NGINX_WORKER_PROCESSES: 1
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
