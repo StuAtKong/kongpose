@@ -639,7 +639,7 @@ Sent 1 request and received 1 response
 ```
 
 ```
-$ Update
+$ grpcurl -insecure -cacert ./ssl-certs/smallstep/root_ca.pem -v -H 'kong-debug: 1' -d '{"greeting": "Kong 1.3!"}'  proxy.kong.lan:8443 hello.HelloService.LotsOfReplies
 
 Resolved method descriptor:
 rpc LotsOfReplies ( .hello.HelloRequest ) returns ( stream .hello.HelloResponse );
