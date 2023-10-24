@@ -68,6 +68,12 @@ Then start the utility services & kong containers
 docker compose --compatibility up -d
 ~~~
 
+Then stop all running kongpose containers
+
+~~~shell
+docker compose --profile everything down --volumes
+~~~
+
 This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy server and a Locust load testing server. 
 
 ## Authentication
