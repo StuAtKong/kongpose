@@ -74,8 +74,6 @@ Then stop all running kongpose containers
 docker compose --profile everything down --volumes
 ~~~
 
-This will start Kong EE, Postgres, Keycloak, an LDAP (AD) server, an HAProxy server and a Locust load testing server. 
-
 ## Authentication
 
 By default, ldap-auth is enabled and you can login to Kong Manager with `kong_admin`/`K1ngK0ng` at https://manager.kong.lan
