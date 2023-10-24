@@ -965,7 +965,7 @@ services:
   host: dadjokes
   id: 13c5594b-d39a-45e7-b699-0bb4eab4ff82
   name: local_dadjokes
-  port: 80
+  port: 8100
   protocol: http
   read_timeout: 60000
   retries: 5
