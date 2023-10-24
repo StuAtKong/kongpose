@@ -1,5 +1,54 @@
-_format_version: "1.1"
+_format_version: "3.0"
 _workspace: mtls
+ca_certificates:
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+    NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+    7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+    ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+    PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
+    -----END CERTIFICATE-----
+  cert_digest: f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5
+  id: e3bccd42-4505-4083-af56-f30e37382f25
+  tags:
+  - root-ca
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBqjCCAVCgAwIBAgIQQWShkk03eVYEufcBsSePaDAKBggqhkjOPQQDAjAcMRow
+    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMzAzMDYxMTIxNTdaFw0yNDAz
+    MDUxNzIxNTdaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
+    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARLchnFctnz7DUehDvINMKz
+    9EfLY4bLPJoGGMgFCa9/Oo1r3nsWpkjfk9qDCfdemyt+Si8FkcpvvU9ECz9rrFZg
+    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
+    FgQUrXhDVxTxVU0np2x3E7Wx6neTxkkwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
+    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDSAAwRQIgDTvKUsEvEsnTFL6c7e3CyJmQ1O2h
+    ahVsyUhJ+ScJFWsCIQCJKbPoH9m/1n22B4p+qo2OqD55rufCFDt4VB+jfvMF+A==
+    -----END CERTIFICATE-----
+  cert_digest: 7a169fee42d0272eca26c9fe153bada0d36892fc373b898b2b8923ec8a63b695
+  id: e349dc07-a5b6-4480-a816-6ea64d6bf101
+  tags:
+  - intermediate_ca1
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBuTCCAV6gAwIBAgIQPdhMGtUKOTSKlLmvP5ZLfjAKBggqhkjOPQQDAjAqMSgw
+    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTIzMDkx
+    OTEwMzIwNloXDTI0MDMyMDAxMzIwNlowKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
+    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAu/
+    WghfwVBJD0WGWRazqQBL56orKCsr+oVgI33X24vW/ZzYFghOr1ZOj/vDGZPJTNwR
+    IVu6Z61CN/gQQW2yYLKjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
+    AQH/AgEAMB0GA1UdDgQWBBR6heBKywrkJp99nuoSIlo6PFxxxzAfBgNVHSMEGDAW
+    gBSteENXFPFVTSenbHcTtbHqd5PGSTAKBggqhkjOPQQDAgNJADBGAiEAtVIOh8F8
+    FwpXis0tBnAw4QuX5JdqIw50cY53PEf1/P8CIQDqO1r7ZLfGahb3Xzo0wKbAdyGN
+    HcKAd32RQoBE7aUf6Q==
+    -----END CERTIFICATE-----
+  cert_digest: fdbe005dd7061b1eaf02ece070c91e1a8e634a1b3bcacfd37597ce8adfa9147c
+  id: 9c3f8505-e4b4-455d-aecb-2e75f3aff60b
+  tags:
+  - intermediate_ca2
 certificates:
 - cert: |-
     -----BEGIN CERTIFICATE-----
@@ -44,6 +93,7 @@ consumers:
   username: mtls-consumer
 services:
 - connect_timeout: 60000
+  enabled: true
   host: kongpose_httpbin_1
   id: 17ae005b-3465-4e15-a649-59d64b9a5c24
   name: local-httpbin
@@ -60,6 +110,7 @@ services:
     - /auth/mtls
     plugins:
     - config:
+        allow_partial_chain: false
         anonymous: null
         authenticated_group_by: CN
         ca_certificates:
@@ -71,8 +122,13 @@ services:
         consumer_by:
         - username
         - custom_id
+        http_proxy_host: null
+        http_proxy_port: null
         http_timeout: 30000
+        https_proxy_host: null
+        https_proxy_port: null
         revocation_check_mode: IGNORE_CA_ERROR
+        send_ca_dn: false
         skip_consumer_lookup: false
       enabled: true
       id: 0af92263-9f50-48df-a013-d29955cf260d

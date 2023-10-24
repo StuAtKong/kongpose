@@ -1,34 +1,63 @@
-_format_version: "1.1"
+_format_version: "3.0"
 _workspace: haproxy-hc
+ca_certificates:
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+    NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+    7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+    ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+    PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
+    -----END CERTIFICATE-----
+  cert_digest: f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5
+  id: e3bccd42-4505-4083-af56-f30e37382f25
+  tags:
+  - root-ca
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBqjCCAVCgAwIBAgIQQWShkk03eVYEufcBsSePaDAKBggqhkjOPQQDAjAcMRow
+    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMzAzMDYxMTIxNTdaFw0yNDAz
+    MDUxNzIxNTdaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
+    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARLchnFctnz7DUehDvINMKz
+    9EfLY4bLPJoGGMgFCa9/Oo1r3nsWpkjfk9qDCfdemyt+Si8FkcpvvU9ECz9rrFZg
+    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
+    FgQUrXhDVxTxVU0np2x3E7Wx6neTxkkwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
+    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDSAAwRQIgDTvKUsEvEsnTFL6c7e3CyJmQ1O2h
+    ahVsyUhJ+ScJFWsCIQCJKbPoH9m/1n22B4p+qo2OqD55rufCFDt4VB+jfvMF+A==
+    -----END CERTIFICATE-----
+  cert_digest: 7a169fee42d0272eca26c9fe153bada0d36892fc373b898b2b8923ec8a63b695
+  id: e349dc07-a5b6-4480-a816-6ea64d6bf101
+  tags:
+  - intermediate_ca1
+- cert: |-
+    -----BEGIN CERTIFICATE-----
+    MIIBuTCCAV6gAwIBAgIQPdhMGtUKOTSKlLmvP5ZLfjAKBggqhkjOPQQDAjAqMSgw
+    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTIzMDkx
+    OTEwMzIwNloXDTI0MDMyMDAxMzIwNlowKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
+    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAu/
+    WghfwVBJD0WGWRazqQBL56orKCsr+oVgI33X24vW/ZzYFghOr1ZOj/vDGZPJTNwR
+    IVu6Z61CN/gQQW2yYLKjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
+    AQH/AgEAMB0GA1UdDgQWBBR6heBKywrkJp99nuoSIlo6PFxxxzAfBgNVHSMEGDAW
+    gBSteENXFPFVTSenbHcTtbHqd5PGSTAKBggqhkjOPQQDAgNJADBGAiEAtVIOh8F8
+    FwpXis0tBnAw4QuX5JdqIw50cY53PEf1/P8CIQDqO1r7ZLfGahb3Xzo0wKbAdyGN
+    HcKAd32RQoBE7aUf6Q==
+    -----END CERTIFICATE-----
+  cert_digest: fdbe005dd7061b1eaf02ece070c91e1a8e634a1b3bcacfd37597ce8adfa9147c
+  id: 9c3f8505-e4b4-455d-aecb-2e75f3aff60b
+  tags:
+  - intermediate_ca2
 services:
 - connect_timeout: 60000
+  enabled: true
   host: status-upstream
+  id: 3a38c72c-a7cc-4871-8adb-72e04b06b6d5
   name: healthcheck
   path: /status
-  port: 80
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-  tags:
-  - ha-proxy_healthcheck
-  routes:
-  - name: healthcheck
-    paths:
-    - /health
-    path_handling: v1
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-    tags:
-    - ha-proxy_healthcheck
-    https_redirect_status_code: 426
   plugins:
-  - name: request-transformer
-    config:
+  - config:
       add:
         body: []
         headers:
@@ -53,6 +82,8 @@ services:
         querystring: []
         uri: null
     enabled: true
+    id: af41740b-0931-4763-bc50-10f1657a4e12
+    name: request-transformer
     protocols:
     - grpc
     - grpcs
@@ -60,10 +91,35 @@ services:
     - https
     tags:
     - ha-proxy_healthcheck
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: 27b4403b-d8ba-4051-97ac-157f09cbdf0c
+    name: healthcheck
+    path_handling: v1
+    paths:
+    - /health
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - ha-proxy_healthcheck
+  tags:
+  - ha-proxy_healthcheck
+  write_timeout: 60000
 upstreams:
-- name: status-upstream
-  algorithm: round-robin
-  slots: 10000
+- algorithm: round-robin
+  hash_fallback: none
+  hash_on: none
+  hash_on_cookie_path: /
   healthchecks:
     active:
       concurrency: 10
@@ -75,8 +131,8 @@ upstreams:
         successes: 0
       http_path: /
       https_verify_certificate: true
-      type: http
       timeout: 1
+      type: http
       unhealthy:
         http_failures: 0
         http_statuses:
@@ -88,9 +144,9 @@ upstreams:
         - 503
         - 504
         - 505
+        interval: 0
         tcp_failures: 0
         timeouts: 0
-        interval: 0
     passive:
       healthy:
         http_statuses:
@@ -124,13 +180,15 @@ upstreams:
         tcp_failures: 0
         timeouts: 0
     threshold: 0
-  hash_on: none
-  hash_fallback: none
-  hash_on_cookie_path: /
+  id: 76cc1ea4-e267-4815-9c4b-db3148d013a7
+  name: status-upstream
+  slots: 10000
   tags:
   - ha-proxy_healthcheck
   targets:
-  - target: kongpose_kong-cp_1:48001
-    weight: 100
+  - id: 54c62042-a33c-44c5-9a5b-e0e02f228c86
     tags:
     - ha-proxy_healthcheck
+    target: kongpose_kong-cp_1:48001
+    weight: 100
+  use_srv_name: false
