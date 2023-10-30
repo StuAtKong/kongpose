@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: ff19bfbfb0db0982195b56f96b618d3826bb4874
+    password: 9935f2129bec0eeae766e990aacec16db7108284
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 1502eef4179f3acd46a871f127ed33ba735797fc
+    password: 2695e1b087cdd694e8e941f5519742763bbe15fa
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -959,6 +959,31 @@ services:
     strip_path: true
   tags:
   - rl-test
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin
+  id: 9582b190-eaa7-4159-b4d0-534f967c5665
+  name: local-mockbin
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: 9a234092-4bb5-4311-8bc4-0e409ae90abb
+    name: local-mockbin
+    path_handling: v0
+    paths:
+    - /mockbin
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
   write_timeout: 60000
 - connect_timeout: 60000
   enabled: true
