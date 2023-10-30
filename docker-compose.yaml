@@ -13,7 +13,7 @@ x-kong-image:
   #image: kong/kong-gateway:3.3.1.0}
   &kong-image
   image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.1.1}
-#  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:2.8.4.3}
+#  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:2.8.4.4}
 #  image: custom-kong:latest
 
 x-kong-license:
@@ -322,6 +322,14 @@ services:
     image: "kennethreitz/httpbin"
     deploy:
       replicas: 2
+  #    ports:
+  #      - "80:80/tcp"
+
+  mockbin:
+    networks:
+      - kongpose-net
+      - kongpose-net-internal
+    image: "mashape/mockbin:latest"
   #    ports:
   #      - "80:80/tcp"
 
