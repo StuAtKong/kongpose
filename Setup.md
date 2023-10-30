@@ -65,7 +65,7 @@ export KONG_LICENSE_DATA=`cat ./license.json`;
 Then start the utility services & kong containers
 
 ~~~shell
-docker compose --compatibility up -d
+docker compose up -d
 ~~~
 
 Then stop all running kongpose containers
