@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: 9935f2129bec0eeae766e990aacec16db7108284
+    password: d9b40408535ec9113b074d8ebcba702c07c7cdce
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 2695e1b087cdd694e8e941f5519742763bbe15fa
+    password: 6ec41409e928d5eb6a9418fd1bcfc01830367c04
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -229,6 +229,35 @@ consumers:
 - custom_id: stu+keycloak_user@konghq.com
   id: accb0537-af5f-4d29-8948-e78eaf0e677f
   username: oidc-consumer
+plugins:
+- config:
+    batch_flush_delay: null
+    batch_span_count: null
+    connect_timeout: 1000
+    endpoint: http://jaeger:4318/v1/traces
+    header_type: preserve
+    headers: {}
+    http_response_header_for_traceid: null
+    queue:
+      initial_retry_delay: 0.01
+      max_batch_size: 1
+      max_bytes: null
+      max_coalescing_delay: 1
+      max_entries: 10000
+      max_retry_delay: 60
+      max_retry_time: 60
+    read_timeout: 5000
+    resource_attributes:
+      service.name: kong_support
+    send_timeout: 5000
+  enabled: false
+  id: 4bece5ad-ce97-42a9-8f99-b77d409dd684
+  name: opentelemetry
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
 routes:
 - https_redirect_status_code: 426
   id: 7b44d0b3-2f97-4e1a-b270-69548fb47439
