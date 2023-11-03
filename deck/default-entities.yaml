@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: d9b40408535ec9113b074d8ebcba702c07c7cdce
+    password: b801a36aafd5bafe23ad5e3c1cafda99a2327831
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 6ec41409e928d5eb6a9418fd1bcfc01830367c04
+    password: fdf141b4f78d757784d840c87585838b9a5b3ea4
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -1005,6 +1005,25 @@ services:
     path_handling: v0
     paths:
     - /mockbin
+    plugins:
+    - config:
+        auth_password: password
+        auth_username: user
+        http_proxy_host: squid
+        http_proxy_port: 3128
+        https_proxy_host: squid
+        https_proxy_port: 3128
+        https_verify: false
+        proxy_scheme: http
+        x_headers: append
+      enabled: false
+      id: 8d0afcd7-f95e-4b48-ae17-65651906bcf5
+      name: forward-proxy
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
     preserve_host: false
     protocols:
     - http

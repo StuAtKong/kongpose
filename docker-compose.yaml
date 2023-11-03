@@ -12,7 +12,7 @@ x-kong-image:
   #image: kong/kong-gateway:2.8.2.4-alpine
   #image: kong/kong-gateway:3.3.1.0}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.1.1}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.1.0}
 #  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:2.8.4.4}
 #  image: custom-kong:latest
 
@@ -782,6 +782,7 @@ services:
     profiles: [ "squid", "everything" ]
     networks:
       - kongpose-net
+      - kongpose-net-internal
     ports:
       - "3128:3128"
     volumes:
@@ -814,3 +815,4 @@ services:
 #      - 14268:14268
 #      - 14250:14250
 #      - 9411:9411
+
