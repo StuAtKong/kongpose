@@ -317,6 +317,7 @@ services:
       - "389:389/tcp"
 
   httpbin:
+    platform: linux/amd64
     networks:
       - kongpose-net
       - kongpose-net-internal
@@ -514,6 +515,7 @@ services:
     command: -f /mnt/locust/locustfile.py
 
   fake-smtp-server:
+    platform: linux/amd64
     networks:
       - kongpose-net
     image: reachfive/fake-smtp-server
