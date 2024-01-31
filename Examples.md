@@ -716,7 +716,7 @@ Sent 1 request and received 10 responses
 
 ## proxy_protocol Example
 
-Ports 8443 (ssl) and 8800 (non-ssl) are configured for proxy_protocol support. When using curl with the --haproxy-protocol parameter, the PROXY preamble is sent with the proxy_protocol information.
+Ports 8843 (ssl) and 8800 (non-ssl) are configured for proxy_protocol support. When using curl with the --haproxy-protocol parameter, the PROXY preamble is sent with the proxy_protocol information.
 
 ```
 $ curl -kv --haproxy-protocol https://proxy.kong.lan:8843/httpbin/anything
