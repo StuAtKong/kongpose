@@ -12,9 +12,7 @@ x-kong-image:
   #image: kong/kong-gateway:2.8.2.4-alpine
   #image: kong/kong-gateway:3.3.1.0}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.1.0}
-#  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:2.8.4.4}
-#  image: custom-kong:latest
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.5.0.3}
 
 x-kong-license:
   &kong-license
@@ -62,6 +60,7 @@ x-kong-common-config:
   KONG_EVENT_HOOKS_ENABLED: "on"
   KONG_TRUSTED_IPS: "0.0.0.0/0"
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
+#  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "on"
   KONG_ROUTER_FLAVOR: "traditional"
   KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
@@ -168,7 +167,7 @@ services:
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
-      KONG_ADMIN_GUI_SESSION_CONF: '{ "cookie_name": "admin_session", "secret": "this_is_my_other_secret", "storage": "kong", "cookie_secure":true, "cookie_lifetime":599}'
+      KONG_ADMIN_GUI_SESSION_CONF: '{ "cookie_name": "admin_session", "secret": "this_is_my_other_secret", "storage": "kong", "cookie_secure":true}'
       # Kong Manager auth via BasicAuth
       #KONG_ADMIN_GUI_AUTH: "basic-auth"
       # Kong Manager auth via local LDAP(AD) server
@@ -255,22 +254,24 @@ services:
 
     environment:
       <<: [ *kong-license, *kong-common-config ]
-      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536"
+      KONG_PROXY_LISTEN: "0.0.0.0:48000, 0.0.0.0:48443 http2 ssl reuseport backlog=65536, 0.0.0.0:48800 proxy_protocol, 0.0.0.0:48843 http2 ssl reuseport backlog=65536 proxy_protocol"
       KONG_STREAM_LISTEN: "0.0.0.0:45555, 0.0.0.0:45556 ssl reuseport backlog=65536"
-      KONG_PROXY_ACCESS_LOG: /dev/stdout show_correlation_id
+#     KONG_PROXY_ACCESS_LOG: /dev/stdout show_correlation_id
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_DATABASE: "off"
       KONG_ROLE: data_plane
       KONG_CLUSTER_CONTROL_PLANE: kong-cp:48005
       KONG_CLUSTER_TELEMETRY_ENDPOINT: kong-cp:48006
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
-      #KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
-      KONG_NGINX_HTTP_LOG_FORMAT: "show_correlation_id  '$$remote_addr - $$remote_user [$$time_local] $$request $$status $$body_bytes_sent $$http_referer $$http_user_agent  Kong-Request-ID=$$http_X_Correlation_ID'"
+#      KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
+#      KONG_NGINX_HTTP_LOG_FORMAT: "show_correlation_id  '$$remote_addr - $$remote_user [$$time_local] $$request $$status $$body_bytes_sent $$http_referer $$http_user_agent  Kong-Request-ID=$$http_X_Correlation_ID'"
 #      KONG_PROXY_KEEPALIVE_TIMEOUT: 0
 #      KONG_PROXY_KEEPALIVE_REQUESTS: 1
 #      KONG_NGINX_PROXY_MORE_CLEAR_HEADERS: "kong-route-id kong-route-name kong-service-id kong-service-name"
-      KONG_TRACING_INSTRUMENTATIONS: "all"
-      KONG_TRACING_SAMPLING_RATE: "0.25"
+#      KONG_TRACING_INSTRUMENTATIONS: "all"
+#      KONG_TRACING_SAMPLING_RATE: "0.25"
+#      KONG_HEADERS: "off"
     ports:
       - "18443:48443/tcp"
   db:
@@ -478,6 +479,8 @@ services:
       - "8100-8101:8100-8101/tcp"
       - "8181:8181/tcp"
       - "8404:8404/tcp"
+      - "8800:8800/tcp"
+      - "8843:8843/tcp"
       - "9999:9999/tcp"
       - "5555-5556:5555-5556/tcp"
 
@@ -785,6 +788,7 @@ services:
       - kongpose-net-internal
     ports:
       - "3128:3128"
+      - "4128:4128"
     volumes:
       - ./squid/squid.conf:/etc/squid/squid.conf
       - ./squid/passwords:/etc/squid/passwords
@@ -816,3 +820,14 @@ services:
 #      - 14250:14250
 #      - 9411:9411
 
+  nginx:
+    networks:
+      - kongpose-net
+      - kongpose-net-internal
+    image: nginx
+    profiles: [ "nginx", "everything" ]
+    volumes:
+        - ./nginx/src:/usr/share/nginx/html
+        - ./nginx/nginx-proxy.conf:/etc/nginx/conf.d/nginx-proxy.conf
+    ports:
+      - 8888:8888

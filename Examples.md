@@ -713,3 +713,94 @@ Response trailers received:
 (empty)
 Sent 1 request and received 10 responses
 ```
+
+## proxy_protocol Example
+
+Ports 8443 (ssl) and 8800 (non-ssl) are configured for proxy_protocol support. When using curl with the --haproxy-protocol parameter, the PROXY preamble is sent with the proxy_protocol information.
+
+```
+$ curl -kv --haproxy-protocol https://proxy.kong.lan:8843/httpbin/anything
+*   Trying 10.1.1.12:8843...
+* Connected to proxy.kong.lan (10.1.1.12) port 8843 (#0)
+> PROXY TCP4 10.1.1.12 10.1.1.12 56530 8843
+* ALPN, offering h2
+* ALPN, offering http/1.1
+* TLSv1.0 (OUT), TLS header, Certificate Status (22):
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.2 (IN), TLS header, Certificate Status (22):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.2 (IN), TLS header, Finished (20):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.2 (OUT), TLS header, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server accepted to use h2
+* Server certificate:
+*  subject: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=proxy.kong.lan; emailAddress=stu@konghq.com
+*  start date: Jan 15 11:19:43 2021 GMT
+*  expire date: May 30 11:19:43 2022 GMT
+*  issuer: C=UK; ST=Hampshire; L=Aldershot; O=Kong UK; OU=Support; CN=Support Root CA; emailAddress=stu@konghq.com
+*  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+* Using HTTP2, server supports multiplexing
+* Connection state changed (HTTP/2 confirmed)
+* Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* Using Stream ID: 1 (easy handle 0x561a7f346970)
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+> GET /httpbin/anything HTTP/2
+> Host: proxy.kong.lan:8843
+> user-agent: curl/7.81.0
+> accept: */*
+> 
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* old SSL session ID is stale, removing
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* Connection state changed (MAX_CONCURRENT_STREAMS == 128)!
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+< HTTP/2 200 
+< content-type: application/json
+< content-length: 506
+< server: gunicorn/19.9.0
+< date: Wed, 31 Jan 2024 14:58:42 GMT
+< access-control-allow-origin: *
+< access-control-allow-credentials: true
+< x-passage-proxy-latency: 0
+< x-passage-upstream-latency: 1
+< 
+{
+  "args": {}, 
+  "data": "", 
+  "files": {}, 
+  "form": {}, 
+  "headers": {
+    "Accept": "*/*", 
+    "Connection": "keep-alive", 
+    "Host": "kongpose-httpbin-1", 
+    "User-Agent": "curl/7.81.0", 
+    "X-Forwarded-Host": "proxy.kong.lan", 
+    "X-Forwarded-Path": "/httpbin/anything", 
+    "X-Forwarded-Prefix": "/httpbin", 
+    "X-Kong-Request-Id": "13c16632898ce92ce0bf011399c7e559"
+  }, 
+  "json": null, 
+  "method": "GET", 
+  "origin": "172.20.0.11", 
+  "url": "https://proxy.kong.lan/anything"
+}
+* Connection #0 to host proxy.kong.lan left intact
+```
