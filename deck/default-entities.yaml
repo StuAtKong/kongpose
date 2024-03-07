@@ -18,34 +18,34 @@ ca_certificates:
   - root-ca
 - cert: |-
     -----BEGIN CERTIFICATE-----
-    MIIBqjCCAVCgAwIBAgIQQWShkk03eVYEufcBsSePaDAKBggqhkjOPQQDAjAcMRow
-    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMzAzMDYxMTIxNTdaFw0yNDAz
-    MDUxNzIxNTdaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
-    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARLchnFctnz7DUehDvINMKz
-    9EfLY4bLPJoGGMgFCa9/Oo1r3nsWpkjfk9qDCfdemyt+Si8FkcpvvU9ECz9rrFZg
-    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
-    FgQUrXhDVxTxVU0np2x3E7Wx6neTxkkwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
-    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDSAAwRQIgDTvKUsEvEsnTFL6c7e3CyJmQ1O2h
-    ahVsyUhJ+ScJFWsCIQCJKbPoH9m/1n22B4p+qo2OqD55rufCFDt4VB+jfvMF+A==
+    MIIBqjCCAVGgAwIBAgIRAJY0Ek0UFa0wUjeMqWnkdYIwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjQwMzA3MTAxNDExWhcNMjUw
+    MzA3MTYxNDExWjAqMSgwJgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlh
+    dGUxIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9bF9i/G13GP9a6kXgSjB
+    Db+BZAX+TXAHZF7orTEXUMojR1KJmbEnl0l5rnRhK1vVW7C0/q38430eOTJZpOjM
+    2KNmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0O
+    BBYEFM/x0HGjkl7ZKhMR2tTdQ6VxkYmMMB8GA1UdIwQYMBaAFD0JSI4+GOnsoPZJ
+    xEPFfgjMM6s3MAoGCCqGSM49BAMCA0cAMEQCIAOvAQuRdqzH7o8jB3hGIhmC0mxv
+    RVaz08t2P5FtztUUAiA8i3RFFonP/n4PFKXdu7kp/1stjHFpkWRjbsHoDVZhbQ==
     -----END CERTIFICATE-----
-  cert_digest: 7a169fee42d0272eca26c9fe153bada0d36892fc373b898b2b8923ec8a63b695
+  cert_digest: e5aadbbc8618fd30245cd328b092b9a53f04e2e75f77a724a5c8daf9715da2d7
   id: e349dc07-a5b6-4480-a816-6ea64d6bf101
   tags:
   - intermediate_ca1
 - cert: |-
     -----BEGIN CERTIFICATE-----
-    MIIBuTCCAV6gAwIBAgIQPdhMGtUKOTSKlLmvP5ZLfjAKBggqhkjOPQQDAjAqMSgw
-    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTIzMDkx
-    OTEwMzIwNloXDTI0MDMyMDAxMzIwNlowKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
-    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAu/
-    WghfwVBJD0WGWRazqQBL56orKCsr+oVgI33X24vW/ZzYFghOr1ZOj/vDGZPJTNwR
-    IVu6Z61CN/gQQW2yYLKjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
-    AQH/AgEAMB0GA1UdDgQWBBR6heBKywrkJp99nuoSIlo6PFxxxzAfBgNVHSMEGDAW
-    gBSteENXFPFVTSenbHcTtbHqd5PGSTAKBggqhkjOPQQDAgNJADBGAiEAtVIOh8F8
-    FwpXis0tBnAw4QuX5JdqIw50cY53PEf1/P8CIQDqO1r7ZLfGahb3Xzo0wKbAdyGN
-    HcKAd32RQoBE7aUf6Q==
+    MIIBuDCCAV6gAwIBAgIQfh3pSHayuGmaFcpbGRHNsDAKBggqhkjOPQQDAjAqMSgw
+    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTI0MDMw
+    NzEwMTQyN1oXDTI0MDkwNjAxMTQyN1owKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
+    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABIZA
+    zUIpEVz063+YURIbYJr8soCuk07M8BW4HdAB/6EI3sUil4zOszqrlpCOU4IiTQRt
+    in2unvXfZ8E8WBwe12GjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
+    AQH/AgEAMB0GA1UdDgQWBBROOu1R/x9ahI8j6LHjXsa0AnewgzAfBgNVHSMEGDAW
+    gBTP8dBxo5Je2SoTEdrU3UOlcZGJjDAKBggqhkjOPQQDAgNIADBFAiEA1bwmIMVo
+    JR29uCoZCWObkQ1QbdcVfVbso4f2+TnVAtACIGX8t6MUjr1TDNJJ2kd7UEfO9J+E
+    +NqU6xdDfztzZwzk
     -----END CERTIFICATE-----
-  cert_digest: fdbe005dd7061b1eaf02ece070c91e1a8e634a1b3bcacfd37597ce8adfa9147c
+  cert_digest: a63868c6d092a5c6f629276a4c2eb5636e790d1521e791a019666db995b30016
   id: 9c3f8505-e4b4-455d-aecb-2e75f3aff60b
   tags:
   - intermediate_ca2
@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: b801a36aafd5bafe23ad5e3c1cafda99a2327831
+    password: d83c0b15a2045a2a3ac07db2b51614780fa84c3a
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: fdf141b4f78d757784d840c87585838b9a5b3ea4
+    password: 21e4429534a363afb21f3e1f6e7f6fe01e91304f
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -249,6 +249,7 @@ plugins:
     read_timeout: 5000
     resource_attributes:
       service.name: kong_support
+    sampling_rate: null
     send_timeout: 5000
   enabled: false
   id: 4bece5ad-ce97-42a9-8f99-b77d409dd684
@@ -484,6 +485,7 @@ services:
         introspection_post_args_client: null
         introspection_post_args_names: null
         introspection_post_args_values: null
+        introspection_token_param_name: token
         issuer: http://keycloak.kong.lan:8080/auth/realms/kong
         issuers_allowed: null
         jwt_session_claim: sid
@@ -508,12 +510,19 @@ services:
         logout_revoke_refresh_token: true
         logout_uri_suffix: null
         max_age: null
+        mtls_introspection_endpoint: null
+        mtls_revocation_endpoint: null
+        mtls_token_endpoint: null
         no_proxy: null
         password_param_type:
         - header
         - query
         - body
         preserve_query_args: false
+        proof_of_possession_auth_methods_validation: true
+        proof_of_possession_mtls: "off"
+        pushed_authorization_request_endpoint: null
+        pushed_authorization_request_endpoint_auth_method: null
         redirect_uri: null
         rediscovery_lifetime: 30
         refresh_token_param_name: null
@@ -522,6 +531,8 @@ services:
         - query
         - body
         refresh_tokens: true
+        require_proof_key_for_code_exchange: null
+        require_pushed_authorization_requests: null
         resolve_distributed_claims: false
         response_mode: query
         response_type:
@@ -529,6 +540,7 @@ services:
         reverify: false
         revocation_endpoint: null
         revocation_endpoint_auth_method: null
+        revocation_token_param_name: token
         roles_claim:
         - roles
         roles_required: null
@@ -584,6 +596,8 @@ services:
         session_store_metadata: false
         ssl_verify: false
         timeout: 10000
+        tls_client_auth_cert_id: null
+        tls_client_auth_ssl_verify: true
         token_cache_key_include_scope: false
         token_endpoint: null
         token_endpoint_auth_method: null
@@ -964,6 +978,10 @@ services:
         - 200
         - 301
         - 404
+        response_headers:
+          X-Cache-Key: true
+          X-Cache-Status: true
+          age: true
         storage_ttl: 5000
         strategy: redis
         vary_headers:
@@ -1055,6 +1073,7 @@ services:
         - jokes
         deny: null
         hide_groups_header: false
+        include_consumer_groups: false
       enabled: true
       id: d3564331-f0ff-4181-9f9e-98b1e8887a9d
       name: acl
@@ -1066,6 +1085,7 @@ services:
     - config:
         anonymous: 9226654c-f7f9-46ea-aae0-21aa7fbc4fd0
         hide_credentials: false
+        realm: service
       enabled: true
       id: 3ec93c47-0105-4296-8415-a47195978a4e
       name: basic-auth
@@ -1107,6 +1127,7 @@ services:
         origins:
         - https://portal.kong.lan
         preflight_continue: false
+        private_network: false
       enabled: true
       id: 63d991df-b44a-4ec7-9ecb-54a008a83e98
       name: cors
