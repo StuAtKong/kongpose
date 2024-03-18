@@ -12,7 +12,7 @@ x-kong-image:
   #image: kong/kong-gateway:2.8.2.4-alpine
   #image: kong/kong-gateway:3.3.1.0}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.5.0.3}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.6.0.0}
 
 x-kong-license:
   &kong-license
@@ -62,13 +62,16 @@ x-kong-common-config:
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "on"
-  KONG_ROUTER_FLAVOR: "traditional"
   KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
 #  KONG_PLUGINS: "bundled"
 #  KONG_PLUGINS: "bundled, log-filter"
 #  KONG_PLUGINS: "bundled, custom-handler"
 #  KONG_PLUGINS: "bundled, openid-connect_1051"
 #  KONG_NGINX_PROXY_KEEPALIVE_REQUESTS: 0
+  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
+  KONG_PORTAL_AND_VITALS_KEY: "f843603706a28ff3bbf7d5e163ca67c97067f1f4259b4e069a89109189a2f6ab"
+  KONG_ROUTER_FLAVOR: "traditional"
+#  KONG_ROUTER_FLAVOR: "expressions"
 
   # Common values for kong-cp and kong-dp
 x-kong-container-common:
@@ -214,7 +217,8 @@ services:
       KONG_GENERATE_TRACE_DETAILS: "on"
       KONG_ROLE: control_plane
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 60
-      KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
+      #KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
+      KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf; include /tmp/htdocs/http_server2.conf"
       #KONG_KEYRING_ENABLED: "on"
       #KONG_KEYRING_STRATEGY: "cluster"
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
@@ -372,8 +376,10 @@ services:
     networks:
       - kongpose-net
     #image: jboss/keycloak:9.0.0
-    image: jboss/keycloak:15.0.2
+    #image: jboss/keycloak:15.0.2
+    image: quay.io/keycloak/keycloak:15.0.2
     profiles: [ "auth", "everything" ]
+    mem_limit: 1g
     volumes:
       - ./keycloak/kong-realm.json:/tmp/kong-realm.json
       - ./ssl-certs/smallstep/wild.kong.lan.key:/etc/x509/https/tls.key
@@ -487,7 +493,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck:v1.27.1
+    image: kong/deck
     volumes:
       - ./deck:/tmp/deck:ro
       - ./ssl-certs:/tmp/ssl-certs:ro
@@ -502,8 +508,8 @@ services:
         condition: service_healthy
     entrypoint: >
       sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml;
-             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml;"
+             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml --skip-ca-certificates;
+             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml --skip-ca-certificates;"
 
   locust:
     networks:
