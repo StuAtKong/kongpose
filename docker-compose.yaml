@@ -12,7 +12,7 @@ x-kong-image:
   #image: kong/kong-gateway:2.8.2.4-alpine
   #image: kong/kong-gateway:3.3.1.0}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.6.0.0}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.6.1.3}
 
 x-kong-license:
   &kong-license
@@ -62,16 +62,19 @@ x-kong-common-config:
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "on"
-  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
+#  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
 #  KONG_PLUGINS: "bundled"
 #  KONG_PLUGINS: "bundled, log-filter"
 #  KONG_PLUGINS: "bundled, custom-handler"
 #  KONG_PLUGINS: "bundled, openid-connect_1051"
 #  KONG_NGINX_PROXY_KEEPALIVE_REQUESTS: 0
-  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
-  KONG_PORTAL_AND_VITALS_KEY: "f843603706a28ff3bbf7d5e163ca67c97067f1f4259b4e069a89109189a2f6ab"
-  KONG_ROUTER_FLAVOR: "traditional"
+#  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
+  KONG_PORTAL_AND_VITALS_KEY: "d2cb4be4f720c007d40ebdd6e750324a9e1019e542f97be964c31f8e86ccb8f6"
+#  KONG_ROUTER_FLAVOR: "traditional"
 #  KONG_ROUTER_FLAVOR: "expressions"
+  KONG_NGINX_PROXY_BROTLI: "on"
+  KONG_NGINX_PROXY_BROTLI_COMP_LEVEL: 4
+  KONG_NGINX_PROXY_BROTLI_TYPES: "*"
 
   # Common values for kong-cp and kong-dp
 x-kong-container-common:
@@ -837,3 +840,18 @@ services:
         - ./nginx/nginx-proxy.conf:/etc/nginx/conf.d/nginx-proxy.conf
     ports:
       - 8888:8888
+
+  splunk:
+    networks:
+      - kongpose-net
+      - kongpose-net-internal
+    image: splunk/splunk:9.0.2
+    profiles: [ "splunk", "everything" ]
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_HEC_TOKEN: "abcd1234"
+      SPLUNK_PASSWORD: "K1ngK0ng"
+      SPLUNK_LICENSE_URI: "Free"
+#    ports:
+#      - 8300:8000
+#      - 8388:8088
