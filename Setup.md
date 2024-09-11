@@ -127,6 +127,8 @@ curl --http1.1 --cacert ./ssl-certs/rootCA.pem -X POST 'https://api.kong.lan/def
 If you want to add Kong entities, use deck to dump the configuration making sure to export the entity id's too;
 
 ~~~
-deck dump --with-id --workspace default --output-file deck/default-entities.yaml
+deck gateway dump --headers kong-admin-token:password --yes --with-id --workspace default --output-file deck/default-entities.yaml
+deck gateway dump --headers kong-admin-token:password --yes --skip-ca-certificates --with-id --workspace haproxy-hc --output-file deck/hc-entities.yaml
+deck gateway dump --headers kong-admin-token:password --yes --skip-ca-certificates --with-id --workspace mtls --output-file deck/mtls-entities.yaml
 ~~~
 

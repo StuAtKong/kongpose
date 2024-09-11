@@ -34,18 +34,18 @@ ca_certificates:
   - intermediate_ca1
 - cert: |-
     -----BEGIN CERTIFICATE-----
-    MIIBuDCCAV6gAwIBAgIQfh3pSHayuGmaFcpbGRHNsDAKBggqhkjOPQQDAjAqMSgw
-    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTI0MDMw
-    NzEwMTQyN1oXDTI0MDkwNjAxMTQyN1owKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
-    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABIZA
-    zUIpEVz063+YURIbYJr8soCuk07M8BW4HdAB/6EI3sUil4zOszqrlpCOU4IiTQRt
-    in2unvXfZ8E8WBwe12GjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
-    AQH/AgEAMB0GA1UdDgQWBBROOu1R/x9ahI8j6LHjXsa0AnewgzAfBgNVHSMEGDAW
-    gBTP8dBxo5Je2SoTEdrU3UOlcZGJjDAKBggqhkjOPQQDAgNIADBFAiEA1bwmIMVo
-    JR29uCoZCWObkQ1QbdcVfVbso4f2+TnVAtACIGX8t6MUjr1TDNJJ2kd7UEfO9J+E
-    +NqU6xdDfztzZwzk
+    MIIBtzCCAV6gAwIBAgIQMTCWtLpE0nvL2lLrduFVKjAKBggqhkjOPQQDAjAqMSgw
+    JgYDVQQDEx9EZW1vIEtvbmcgUm9vdCBJbnRlcm1lZGlhdGUxIENBMB4XDTI0MDkw
+    NjEyMTIxNVoXDTI1MDMwODAzMTIxNVowKjEoMCYGA1UEAxMfRGVtbyBLb25nIFJv
+    b3QgSW50ZXJtZWRpYXRlMiBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABH3u
+    eSAyjF033MhBL74svwAhSCQBv0FGwQEjzcz8zDQLhrdBxt2CwsQmqT1TkJUDY5d7
+    KyaEqS5IXvEIbzBVaZKjZjBkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAG
+    AQH/AgEAMB0GA1UdDgQWBBTv4TX1aVYKTOoZCvho6fEWxtw6ozAfBgNVHSMEGDAW
+    gBTP8dBxo5Je2SoTEdrU3UOlcZGJjDAKBggqhkjOPQQDAgNHADBEAiBCUIisgq23
+    gKoBzDC3qtiCsoA6tnSl3wsnbekU7EmFVwIgDdY+nVw001nA6oap0pWl1rK7QOQ2
+    Ig2S4bbsG2rxGd8=
     -----END CERTIFICATE-----
-  cert_digest: a63868c6d092a5c6f629276a4c2eb5636e790d1521e791a019666db995b30016
+  cert_digest: 7ca370f07139e35b363779b2f1ee71e84522ea5551d0df2d5ff4d4b1aa64d50c
   id: 9c3f8505-e4b4-455d-aecb-2e75f3aff60b
   tags:
   - intermediate_ca2
@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: d83c0b15a2045a2a3ac07db2b51614780fa84c3a
+    password: 4f97375e31c9f4a1046fe3798efa406204b0d88c
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 21e4429534a363afb21f3e1f6e7f6fe01e91304f
+    password: 67e248d44a050259a0585ff9f65474b44118cacc
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -234,11 +234,17 @@ plugins:
     batch_flush_delay: null
     batch_span_count: null
     connect_timeout: 1000
-    endpoint: http://jaeger:4318/v1/traces
     header_type: preserve
     headers: {}
     http_response_header_for_traceid: null
+    logs_endpoint: null
+    propagation:
+      clear: null
+      default_format: w3c
+      extract: null
+      inject: null
     queue:
+      concurrency_limit: 1
       initial_retry_delay: 0.01
       max_batch_size: 1
       max_bytes: null
@@ -251,6 +257,7 @@ plugins:
       service.name: kong_support
     sampling_rate: null
     send_timeout: 5000
+    traces_endpoint: http://jaeger:4318/v1/traces
   enabled: false
   id: 4bece5ad-ce97-42a9-8f99-b77d409dd684
   name: opentelemetry
@@ -354,6 +361,7 @@ services:
         - date
         - request-line
         hide_credentials: false
+        realm: null
         validate_request_body: false
       enabled: true
       id: d136a6d0-ae95-4aba-a51c-eb070e85d64e
@@ -416,6 +424,7 @@ services:
         cache_ttl_neg: null
         cache_ttl_resurrect: null
         cache_user_info: true
+        claims_forbidden: null
         client_alg: null
         client_arg: client_id
         client_auth: null
@@ -426,6 +435,32 @@ services:
         client_id: null
         client_jwk: null
         client_secret: null
+        cluster_cache_redis:
+          cluster_addresses: null
+          cluster_max_redirections: 5
+          cluster_nodes: null
+          connect_timeout: 2000
+          connection_is_proxied: false
+          database: 0
+          host: 127.0.0.1
+          keepalive_backlog: null
+          keepalive_pool_size: 256
+          password: null
+          port: 6379
+          read_timeout: 2000
+          send_timeout: 2000
+          sentinel_addresses: null
+          sentinel_master: null
+          sentinel_nodes: null
+          sentinel_password: null
+          sentinel_role: null
+          sentinel_username: null
+          server_name: null
+          ssl: false
+          ssl_verify: false
+          timeout: 2000
+          username: null
+        cluster_cache_strategy: "off"
         consumer_by:
         - username
         - custom_id
@@ -451,6 +486,8 @@ services:
         downstream_session_id_header: null
         downstream_user_info_header: null
         downstream_user_info_jwt_header: null
+        dpop_proof_lifetime: 300
+        dpop_use_nonce: false
         enable_hs_signatures: false
         end_session_endpoint: null
         expose_error_code: true
@@ -520,10 +557,38 @@ services:
         - body
         preserve_query_args: false
         proof_of_possession_auth_methods_validation: true
+        proof_of_possession_dpop: "off"
         proof_of_possession_mtls: "off"
         pushed_authorization_request_endpoint: null
         pushed_authorization_request_endpoint_auth_method: null
         redirect_uri: null
+        redis:
+          cluster_addresses: null
+          cluster_max_redirections: 5
+          cluster_nodes: null
+          connect_timeout: 2000
+          connection_is_proxied: false
+          database: 0
+          host: 127.0.0.1
+          keepalive_backlog: null
+          keepalive_pool_size: 256
+          password: null
+          port: 6379
+          prefix: sessions
+          read_timeout: 2000
+          send_timeout: 2000
+          sentinel_addresses: null
+          sentinel_master: null
+          sentinel_nodes: null
+          sentinel_password: null
+          sentinel_role: null
+          sentinel_username: null
+          server_name: null
+          socket: null
+          ssl: false
+          ssl_verify: false
+          timeout: 2000
+          username: null
         rediscovery_lifetime: 30
         refresh_token_param_name: null
         refresh_token_param_type:
@@ -533,6 +598,7 @@ services:
         refresh_tokens: true
         require_proof_key_for_code_exchange: null
         require_pushed_authorization_requests: null
+        require_signed_request_object: null
         resolve_distributed_claims: false
         response_mode: query
         response_type:
@@ -570,15 +636,15 @@ services:
         session_memcached_port: 11211
         session_memcached_prefix: sessions
         session_memcached_socket: null
-        session_redis_cluster_max_redirections: null
+        session_redis_cluster_max_redirections: 5
         session_redis_cluster_nodes: null
-        session_redis_connect_timeout: null
+        session_redis_connect_timeout: 2000
         session_redis_host: 127.0.0.1
         session_redis_password: null
         session_redis_port: 6379
         session_redis_prefix: sessions
-        session_redis_read_timeout: null
-        session_redis_send_timeout: null
+        session_redis_read_timeout: 2000
+        session_redis_send_timeout: 2000
         session_redis_server_name: null
         session_redis_socket: null
         session_redis_ssl: false
@@ -750,6 +816,7 @@ services:
       auto_approve: false
       description: A simple API that echos the request
       display_name: Echo Server
+      enable_proxy_with_consumer_credential: false
       show_issuer: false
     enabled: false
     id: 4b0638fe-5700-4a6e-8bb5-3664663ebbc4
@@ -793,6 +860,7 @@ services:
         ldap_port: 389
         ldaps: false
         log_search_results: true
+        realm: null
         start_tls: false
         timeout: 10000
         verify_ldap_host: false
@@ -862,6 +930,7 @@ services:
         key_in_query: true
         key_names:
         - apikey
+        realm: null
         run_on_preflight: true
       enabled: true
       id: c3abf3f2-195e-4ff8-86ee-bfe25acd09da
@@ -887,17 +956,21 @@ services:
         path: null
         redis:
           cluster_addresses: null
-          connect_timeout: null
+          cluster_max_redirections: 5
+          cluster_nodes: null
+          connect_timeout: 2000
+          connection_is_proxied: false
           database: 0
           host: redis
           keepalive_backlog: null
           keepalive_pool_size: 30
           password: null
           port: 6379
-          read_timeout: null
-          send_timeout: null
+          read_timeout: 2000
+          send_timeout: 2000
           sentinel_addresses: null
           sentinel_master: null
+          sentinel_nodes: null
           sentinel_password: null
           sentinel_role: null
           sentinel_username: null
@@ -952,17 +1025,21 @@ services:
           dictionary_name: kong_db_cache
         redis:
           cluster_addresses: null
-          connect_timeout: null
+          cluster_max_redirections: 5
+          cluster_nodes: null
+          connect_timeout: 2000
+          connection_is_proxied: false
           database: 0
           host: redis
           keepalive_backlog: null
           keepalive_pool_size: 30
           password: null
           port: 6379
-          read_timeout: null
-          send_timeout: null
+          read_timeout: 2000
+          send_timeout: 2000
           sentinel_addresses: null
           sentinel_master: null
+          sentinel_nodes: null
           sentinel_password: null
           sentinel_role: null
           sentinel_username: null
@@ -1071,6 +1148,7 @@ services:
     - config:
         allow:
         - jokes
+        always_use_authenticated_groups: false
         deny: null
         hide_groups_header: false
         include_consumer_groups: false
