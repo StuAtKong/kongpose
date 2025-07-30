@@ -1,22 +1,30 @@
-version: '2.2'
+#version: '2.2'
+
+secrets:
+  kong_license:
+    file: ../../.kong-license-data/license.json
+  pg_password:
+    environment: "SECRET_PG_PASSWORD"
+  pg_password_in_file:
+    file: ./tmp/POSTGRES_PASSWORD
+
 
 # Specify which Kong image to run
 x-kong-image:
-  #image: kong-docker-kong-enterprise-edition-docker.bintray.io/kong-enterprise-edition:2.3.3.0-alpine
-  #image: kong/kong-gateway:2.4.1.1-alpine
-  #image: kong/kong-gateway:2.5.0.2-alpine
-  #image: kong/kong-gateway:2.5.1.1-alpine
-  #image: kong/kong-gateway:2.6.0.2-alpine
-  #image: kong/kong-gateway:2.7.1.2-alpine
-  #image: kong/kong-gateway:2.8.1.4-alpine
-  #image: kong/kong-gateway:2.8.2.4-alpine
-  #image: kong/kong-gateway:3.3.1.0}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.20}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.8.1.2}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.9.1.2}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.3}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway-dev
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.6.1.3}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
 
 x-kong-license:
   &kong-license
   KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?err}
+  #KONG_LICENSE_PATH: /run/secrets/kong_license
+  KONG_PORTAL_AND_VITALS_KEY: "d2cb4be4f720c007d40ebdd6e750324a9e1019e542f97be964c31f8e86ccb8f6"
 
 # Kong database config
 x-kong-db-config:
@@ -25,7 +33,8 @@ x-kong-db-config:
   KONG_PG_HOST: db
   KONG_PG_DATABASE: kong
   KONG_PG_USER: kong
-  KONG_PG_PASSWORD: kong
+#  KONG_PG_PASSWORD: kong
+  KONG_PG_PASSWORD_FILE: "/run/secrets/pg_password_in_file"
   KONG_PASSWORD: password
 
 #  KONG_DATABASE: cassandra
@@ -40,10 +49,11 @@ x-kong-common-config:
   KONG_PREFIX: "/tmp/kong"
   KONG_ADMIN_LISTEN: "0.0.0.0:48001, 0.0.0.0:48444 http2 ssl reuseport backlog=65536"
   KONG_STATUS_LISTEN: "0.0.0.0:48100 ssl"
+  KONG_DEBUG_LISTEN: "0.0.0.0:48200 ssl"
   KONG_VITALS: "on"
   #KONG_VITALS_STRATEGY: prometheus
-  KONG_VITALS_STATSD_ADDRESS: statsd-exporter:9125
-  KONG_VITALS_TSDB_ADDRESS: prometheus:9090
+  #KONG_VITALS_STATSD_ADDRESS: statsd-exporter:9125
+  #KONG_VITALS_TSDB_ADDRESS: prometheus:9090
   KONG_ANONYMOUS_REPORTS: "off"
   KONG_ADMIN_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
   KONG_ADMIN_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
@@ -54,27 +64,57 @@ x-kong-common-config:
   KONG_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
   KONG_CLUSTER_CERT: /tmp/ssl/customcerts/hybrid/cluster.crt
   KONG_CLUSTER_CERT_KEY: /tmp/ssl/customcerts/hybrid/cluster.key
-  KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
-  KONG_LUA_SSL_VERIFY_DEPTH: 5
-  KONG_NGINX_WORKER_PROCESSES: 1
+  KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
+  KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
+  KONG_DEBUG_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
+  KONG_DEBUG_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
+#  KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
+#  KONG_LUA_SSL_VERIFY_DEPTH: 5
+  KONG_NGINX_PROXY_PROXY_SSL_VERIFY: "on"
+  KONG_NGINX_PROXY_PROXY_SSL_TRUSTED_CERTIFICATE: "/etc/ssl/certs/ca-certificates.crt"
+  KONG_NGINX_PROXY_PROXY_SSL_PROTOCOLS: TLSv1 TLSv1.1 TLSv1.2 TLSv1.3
+  KONG_NGINX_WORKER_PROCESSES: 2
   KONG_EVENT_HOOKS_ENABLED: "on"
   KONG_TRUSTED_IPS: "0.0.0.0/0"
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "on"
 #  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
-#  KONG_PLUGINS: "bundled"
-#  KONG_PLUGINS: "bundled, log-filter"
+  KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/?.lua;;"
+#  KONG_PLUGINS: "bundled, service-protection"
+#  KONG_PLUGINS: "bundled, log-filter, custom-handler"
 #  KONG_PLUGINS: "bundled, custom-handler"
 #  KONG_PLUGINS: "bundled, openid-connect_1051"
+#  KONG_PLUGINS: "bundled, custom_admin_api"
 #  KONG_NGINX_PROXY_KEEPALIVE_REQUESTS: 0
 #  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
-  KONG_PORTAL_AND_VITALS_KEY: "d2cb4be4f720c007d40ebdd6e750324a9e1019e542f97be964c31f8e86ccb8f6"
+
 #  KONG_ROUTER_FLAVOR: "traditional"
 #  KONG_ROUTER_FLAVOR: "expressions"
-  KONG_NGINX_PROXY_BROTLI: "on"
-  KONG_NGINX_PROXY_BROTLI_COMP_LEVEL: 4
-  KONG_NGINX_PROXY_BROTLI_TYPES: "*"
+#  KONG_NGINX_PROXY_BROTLI: "on"
+#  KONG_NGINX_PROXY_BROTLI_COMP_LEVEL: 4
+#  KONG_NGINX_PROXY_BROTLI_TYPES: "*"
+#  KONG_ROUTE_VALIDATION_STRATEGY: "path"
+#  KONG_ENFORCE_ROUTE_PATH_PATTERN: "/$(workspace)/.*"
+
+#  KONG_SSL_PROTOCOLS: "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
+#  KONG_SSL_CIPHER_SUITE: "old"
+#  KONG_SSL_PROTOCOLS: "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
+#  KONG_SSL_CONF_COMMAND: "CipherString DEFAULT:@SECLEVEL=0;"
+#  LUA_SSL_PROTOCOLS: "TLSv1.1 TLSv1.2 TLSv1.3"
+#  LUA_SSL_CONF_COMMAND: "CipherString DEFAULT:@SECLEVEL=0;"
+#  KONG_SSL_CIPHER_SUITE: "custom"
+#  KONG_SSL_CIPHERS: "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:RSA-PSK-AES256-GCM-SHA384:DHE-PSK-AES256-GCM-SHA384:RSA-PSK-CHACHA20-POLY1305:DHE-PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:AES256-GCM-SHA384:PSK-AES256-GCM-SHA384:PSK-CHACHA20-POLY1305:RSA-PSK-AES128-GCM-SHA256:DHE-PSK-AES128-GCM-SHA256:AES128-GCM-SHA256:PSK-AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:ECDHE-PSK-AES256-CBC-SHA384:ECDHE-PSK-AES256-CBC-SHA:SRP-RSA-AES-256-CBC-SHA:SRP-AES-256-CBC-SHA:RSA-PSK-AES256-CBC-SHA384:DHE-PSK-AES256-CBC-SHA384:RSA-PSK-AES256-CBC-SHA:DHE-PSK-AES256-CBC-SHA:AES256-SHA:PSK-AES256-CBC-SHA384:PSK-AES256-CBC-SHA:ECDHE-PSK-AES128-CBC-SHA256:ECDHE-PSK-AES128-CBC-SHA:SRP-RSA-AES-128-CBC-SHA:SRP-AES-128-CBC-SHA:RSA-PSK-AES128-CBC-SHA256:DHE-PSK-AES128-CBC-SHA256:RSA-PSK-AES128-CBC-SHA:DHE-PSK-AES128-CBC-SHA:AES128-SHA:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA"
+#  KONG_NGINX_HTTP_LUA_SHARED_DICT: "kong_rate_limiting_locks 11m; lua_shared_dict kong_service_protection_locks 10m"
+#  KONG_ADMIN_TOKEN_DEV: "dev-token"
+#  KONG_ADMIN_TOKEN_STST_INTERNAL: "stst-internal-token"
+#  KONG_ADMIN_TOKEN_STST_EXTERNAL: "stst-external-token"
+#  KONG_ADMIN_TOKEN_PROD_INTERNAL: "prod-internal-token"
+#  KONG_ADMIN_TOKEN_PROD_EXTERNAL: "prod-external-token"
+#  KONG_ADMIN_TOKEN_CP: "password"
+#  KONG_ADMIN_TOKEN_CP2: "kong-admin-token: password-wrong"
+  KONG_REQUEST_DEBUG_TOKEN: "request_debug_token"
+  KONG_ADMIN_GUI_HIDE_KONNECT_CTA: true
 
   # Common values for kong-cp and kong-dp
 x-kong-container-common:
@@ -106,6 +146,38 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
+
+  kong-migrations-all-up:
+    <<: *kong-image
+    profiles: [ "upgrade", "everything" ]
+    networks:
+      - kongpose-net
+    command: kong migrations up
+    environment:
+      <<: [ *kong-license, *kong-db-config ]
+    restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
+
+  kong-migrations-all-finish:
+    <<: *kong-image
+    profiles: [ "upgrade", "everything" ]
+    depends_on:
+      kong-migrations-all-up:
+        condition: service_completed_successfully
+    networks:
+      - kongpose-net
+    command: kong migrations finish
+    environment:
+      <<: [ *kong-license, *kong-db-config ]
+    restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
 
   kong-migrations-upgrade:
     <<: *kong-image
@@ -116,6 +188,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
 
   kong-migrations-finish:
     <<: *kong-image
@@ -126,6 +201,22 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
+
+  kong-migrations-list:
+    <<: *kong-image
+    profiles: [ "upgrade-list", "everything" ]
+    networks:
+      - kongpose-net
+    command: "kong migrations list"
+    environment:
+      <<: [ *kong-license, *kong-db-config ]
+    restart: on-failure
+    secrets:
+      - pg_password
+      - pg_password_in_file
 
   kong-cp:
     <<: [ *kong-image, *kong-container-common ]
@@ -145,8 +236,13 @@ services:
       - ./tracing:/usr/local/kong/tracing
       - ./http_content:/tmp/htdocs
       - ./grpcbin:/tmp/grpcbin
-#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-      - ../kong-plugin-custom-handler/kong/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
+      - ./custom_plugins:/usr/local/custom_plugins
+#
+    secrets:
+      - kong_license
+      - pg_password
+      - pg_password_in_file
+
     environment:
       <<: [ *kong-license, *kong-db-config, *kong-common-config ]
       KONG_PROXY_LISTEN: "off"
@@ -166,8 +262,6 @@ services:
       KONG_PORTAL_GUI_ERROR_LOG: /dev/stderr
       KONG_STATUS_ACCESS_LOG: /dev/stdout
       KONG_STATUS_ERROR_LOG: /dev/stderr
-      KONG_STATUS_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
-      KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
       KONG_ENFORCE_RBAC: "on"
       KONG_ADMIN_API_URI: "https://api.kong.lan"
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
@@ -227,10 +321,10 @@ services:
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
       #KONG_KEYRING_PRIVATE_KEY: "/tmp/ssl/customcerts/keyring/keyring-private-key.pem"
       KONG_AUDIT_LOG: "on"
-      KONG_AUDIT_LOG_IGNORE_METHODS: "OPTIONS"
+      #KONG_AUDIT_LOG_IGNORE_METHODS: "OPTIONS"
       #KONG_AUDIT_LOG_PAYLOAD_EXCLUDE: "token, secret, password, config.redis.password"
-      KONG_AUDIT_LOG_PAYLOAD_EXCLUDE: "token, secret, password, config"
-      KONG_AUDIT_LOG_RECORD_TTL: 2592000
+      #KONG_AUDIT_LOG_PAYLOAD_EXCLUDE: "token, secret, password, config"
+      #KONG_AUDIT_LOG_RECORD_TTL: 2592000
       KONG_ADMIN_GUI_LOGIN_BANNER_TITLE: "Limited Access"
       KONG_ADMIN_GUI_LOGIN_BANNER_BODY: "Access by unauthorised personnel is prohibited"
       KONG_ADMIN_GUI_HEADER_TXT: "*** Support environment ***"
@@ -256,8 +350,7 @@ services:
       - ./tracing:/usr/local/kong/tracing
       - ./config:/tmp/kong_config
       - ./grpcbin:/tmp/grpcbin
-#      - ../kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/share/lua/5.1/kong/plugins/log-filter
-      - ../kong-plugin-custom-handler/kong/custom-handler:/usr/local/share/lua/5.1/kong/plugins/custom-handler
+      - ./custom_plugins:/usr/local/custom_plugins
 
     environment:
       <<: [ *kong-license, *kong-common-config ]
@@ -273,11 +366,55 @@ services:
       KONG_DATA_PLANE_CONFIG_CACHE_PATH: "/tmp/kong_config/config.cache.json.gz"
 #      KONG_NGINX_PROXY_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
 #      KONG_NGINX_HTTP_LOG_FORMAT: "show_correlation_id  '$$remote_addr - $$remote_user [$$time_local] $$request $$status $$body_bytes_sent $$http_referer $$http_user_agent  Kong-Request-ID=$$http_X_Correlation_ID'"
+#      KONG_NGINX_HTTP_LOG_FORMAT: "athenalog 'escape=json {time_iso8601: $$time_iso8601}'"
+#      KONG_NGINX_HTTP_LOG_FORMAT: "json_combined escape=json '{\"time_local\":\"$$time_local\",\"remote_addr\":\"$$remote_addr\",\"remote_user\":\"$$remote_user\",\"request\":\"$$request\",\"status\":\"$$status\",\"body_bytes_sent\":\"$$body_bytes_sent\",\"request_time\":\"$$request_time\",\"http_referrer\":\"$$http_referer\",\"http_user_agent\":\"$$http_user_agent\"}'"
+#      KONG_NGINX_HTTP_LOG_FORMAT:  "athenalog escape=json '{\"gateway_log_type\": \"FULLLOG [AUDIT]\",\"time_iso8601\": \"$$time_iso8601\",\"gateway_request_id\": \"gateway_request_id\",\"athena_gw_request_id\": \"athena_gw_request_id\",\"remote_user\": \"$$remote_user\",\"request_method\": \"$$request_method\",\"uri\": \"$$uri\",\"host\": \"$$host\",\"scheme\": \"$$scheme\",\"server_name\": \"$$server_name\",\"upstream_addr\": \"$$upstream_addr\",\"status\": \"$$status\",\"upstream_status\": \"$$upstream_status\",\"proxy_host\": \"$$proxy_host\",\"upstream_http_Location\": \"$$upstream_http_Location\",\"http_x_client_id\": \"$$http_x_client_id\",\"document_root\":\"$$document_root\",\"server_addr\": \"$$server_addr\",\"http_user_agent\": \"$$http_user_agent\",\"http_x_forwarded_for\": \"$$http_x_forwarded_for\",\"http_x_forwarded_host\": \"$$http_x_forwarded_host\",\"http_x_forwarded_proto\": \"$$http_x_forwarded_proto\",\"http_x_forwarded_port\": \"$$http_x_forwarded_port\",\"server_port\": \"$$server_port\",\"msec\": \"$$msec\",\"request_length\": \"$$request_length\",\"body_bytes_sent\": \"$$body_bytes_sent\",\"request_time\": \"$$request_time\",\"upstream_connect_time\": \"$$upstream_connect_time\",\"upstream_header_time\": \"$$upstream_header_time\",\"upstream_response_time\": \"$$upstream_response_time\",\"stack_id\": \"stack_id\",\"context_id\": \"context_id\",\"client_id\": \"client_id\",\"kong_service_name\": \"kong_service_name\",\"route_name\": \"route_name\",\"environment\": \"environment\"};'"
+
+# log_format athenalog escape=json '{'
+#                '"gateway_log_type": "FULLLOG [AUDIT]",'
+#                '"time_iso8601": "$time_iso8601",'
+#                '"gateway_request_id": "$gateway_request_id",'
+#                '"athena_gw_request_id": "$athena_gw_request_id",'
+#                '"remote_user": "$remote_user",'
+#                '"request_method": "$request_method",'
+#                '"uri": "$uri",'
+#                '"host": "$host",'
+#                '"scheme": "$scheme",'
+#                '"server_name": "$server_name",'
+#                '"upstream_addr": "$upstream_addr",'
+#                '"status": "$status",'
+#                '"upstream_status": "$upstream_status",'
+#                '"proxy_host": "$proxy_host",'
+#                '"upstream_http_Location": "$upstream_http_Location",'
+#                '"http_x_client_id": "$http_x_client_id",'
+#                '"document_root":"$document_root",'
+#                '"server_addr": "$server_addr",'
+#                '"http_user_agent": "$http_user_agent",'
+#                '"http_x_forwarded_for": "$http_x_forwarded_for",'
+#                '"http_x_forwarded_host": "$http_x_forwarded_host",'
+#                '"http_x_forwarded_proto": "$http_x_forwarded_proto",'
+#                '"http_x_forwarded_port": "$http_x_forwarded_port",'
+#                '"server_port": "$server_port",'
+#                '"msec": "$msec",'
+#                '"request_length": "$request_length",'
+#                '"body_bytes_sent": "$body_bytes_sent",'
+#                '"request_time": "$request_time",'
+#                '"upstream_connect_time": "$upstream_connect_time",'
+#                '"upstream_header_time": "$upstream_header_time",'
+#                '"upstream_response_time": "$upstream_response_time",'
+#                '"stack_id": "$stack_id",'
+#                '"context_id": "$context_id",'
+#                '"client_id": "$client_id",'
+#                '"kong_service_name": "$kong_service_name",'
+#                '"route_name": "$route_name",'
+#                '"environment": "$environment"'
+#                '}';
+
 #      KONG_PROXY_KEEPALIVE_TIMEOUT: 0
 #      KONG_PROXY_KEEPALIVE_REQUESTS: 1
 #      KONG_NGINX_PROXY_MORE_CLEAR_HEADERS: "kong-route-id kong-route-name kong-service-id kong-service-name"
-#      KONG_TRACING_INSTRUMENTATIONS: "all"
-#      KONG_TRACING_SAMPLING_RATE: "0.25"
+      KONG_TRACING_INSTRUMENTATIONS: "all"
+      KONG_TRACING_SAMPLING_RATE: "1"
 #      KONG_HEADERS: "off"
     ports:
       - "18443:48443/tcp"
@@ -358,6 +495,18 @@ services:
   #    ports:
   #      - "8080:8080/tcp"
 
+  echo-http-https:
+    networks:
+      - kongpose-net
+    image: "mendhak/http-https-echo"
+    profiles: [ "upstream", "everything" ]
+    environment:
+      MTLS_ENABLE: 1
+  #    ports:
+  #      - "8080:8080/tcp"
+  #      - "8443:8443/tcp"
+
+
   dadjokes:
     networks:
       - kongpose-net
@@ -396,6 +545,14 @@ services:
       - "28443:8443/tcp"
 
   redis:
+    networks:
+      - kongpose-net
+      - kongpose-net-internal
+    image: redis:latest
+  #    ports:
+  #      - "6379:6379/tcp"
+
+  redis-new:
     networks:
       - kongpose-net
       - kongpose-net-internal
@@ -462,10 +619,8 @@ services:
     image: "shopify/toxiproxy"
     profiles: [ "utility", "everything" ]
     entrypoint: >
-      sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create postgres_network --listen 0.0.0.0:5432 --upstream db:5432;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add postgres_network -t latency -a latency=100 -a jitter=50;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream httpbin:80;
-             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency -t latency -a latency=250 -a jitter=150;"
+      sh -c "/go/bin/toxiproxy-cli -h toxiproxy:8474 create proxy_latency --listen 0.0.0.0:8000 --upstream httpbin:80;
+             /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency --upstream -t latency -a latency=5000 -a jitter=0;"
 
   ha-proxy:
     networks:
@@ -487,6 +642,7 @@ services:
       - "8443-8447:8443-8447/tcp"
       - "8100-8101:8100-8101/tcp"
       - "8181:8181/tcp"
+      - "8200-8201:8200-8201/tcp"
       - "8404:8404/tcp"
       - "8800:8800/tcp"
       - "8843:8843/tcp"
@@ -496,7 +652,7 @@ services:
   deck:
     networks:
       - kongpose-net
-    image: kong/deck
+    image: kong/deck:latest
     volumes:
       - ./deck:/tmp/deck:ro
       - ./ssl-certs:/tmp/ssl-certs:ro
@@ -510,14 +666,15 @@ services:
       kong-dp:
         condition: service_healthy
     entrypoint: >
-      sh -c "/usr/local/bin/deck sync --workspace default --state /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck sync --workspace haproxy-hc --state /tmp/deck/hc-entities.yaml --skip-ca-certificates;
-             /usr/local/bin/deck sync --workspace mtls --state /tmp/deck/mtls-entities.yaml --skip-ca-certificates;"
+      sh -c "/usr/local/bin/deck gateway sync --workspace default /tmp/deck/default-entities.yaml;
+             /usr/local/bin/deck gateway sync --skip-ca-certificates --workspace haproxy-hc /tmp/deck/hc-entities.yaml;
+             /usr/local/bin/deck gateway sync --skip-ca-certificates --workspace mtls /tmp/deck/mtls-entities.yaml;"
 
   locust:
     networks:
       - kongpose-net
-    image: locustio/locust:2.14.2
+#    image: locustio/locust:2.14.2
+    image: locustio/locust
     profiles: [ "utility", "everything" ]
     #ports:
     # - "8089:8089"
@@ -814,7 +971,8 @@ services:
     networks:
       - kongpose-net
       - kongpose-net-internal
-    image: jaegertracing/all-in-one:1.50
+#   image: jaegertracing/all-in-one:1.50
+    image: jaegertracing/all-in-one
     profiles: [ "tracing", "everything" ]
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411
@@ -836,7 +994,7 @@ services:
     image: nginx
     profiles: [ "nginx", "everything" ]
     volumes:
-        - ./nginx/src:/usr/share/nginx/html
+        - ./nginx/src:/var/www
         - ./nginx/nginx-proxy.conf:/etc/nginx/conf.d/nginx-proxy.conf
     ports:
       - 8888:8888
@@ -855,3 +1013,72 @@ services:
 #    ports:
 #      - 8300:8000
 #      - 8388:8088
+
+  otel-collector:
+      networks:
+        - kongpose-net
+        - kongpose-net-internal
+      image: otel/opentelemetry-collector-contrib
+      profiles: [ "otel", "everything" ]
+      volumes:
+        - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml
+      ports:
+        - 1888:1888 # pprof extension
+        - 8888:8888 # Prometheus metrics exposed by the Collector
+        - 8889:8889 # Prometheus exporter metrics
+        - 13133:13133 # health_check extension
+        - 4317:4317 # OTLP gRPC receiver
+        - 4318:4318 # OTLP http receiver
+        - 55679:55679 # zpages extension
+
+  konnect-dp:
+      <<: [ *kong-image ]
+#      image: kong/kong-gateway:3.10.0.3
+      networks:
+        - kongpose-net
+        - kongpose-net-internal
+      profiles: [ "konnect", "everything" ]
+      environment:
+        KONG_ANONYMOUS_REPORTS: "off"
+        KONG_ROLE: "data_plane"
+        KONG_DATABASE: "off"
+        KONG_LOG_LEVEL: "debug"
+        KONG_VITALS: "off"
+        KONG_CLUSTER_MTLS: "pki"
+        KONG_CLUSTER_CONTROL_PLANE: "68152badf0.us.cp0.konghq.com:443"
+        KONG_CLUSTER_SERVER_NAME: "68152badf0.us.cp0.konghq.com"
+        KONG_CLUSTER_TELEMETRY_ENDPOINT: "68152badf0.us.tp0.konghq.com:443"
+        KONG_CLUSTER_TELEMETRY_SERVER_NAME: "68152badf0.us.tp0.konghq.com"
+        KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICBTCCAaygAwIBAgIBATAKBggqhkjOPQQDBDA0MTIwCQYDVQQGEwJVUzAlBgNV\nBAMeHgBrAG8AbgBuAGUAYwB0AC0AZABlAGYAYQB1AGwAdDAeFw0yNTAyMjYxMTI5\nMTNaFw0zNTAyMjYxMTI5MTNaMDQxMjAJBgNVBAYTAlVTMCUGA1UEAx4eAGsAbwBu\nAG4AZQBjAHQALQBkAGUAZgBhAHUAbAB0MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAEs1zKFKNQpGdAAb3wlvPF+ONRUccKtyYoL5avWmqr0yUTsM5x0SrX7+Yw0Wyy\ncmLPurJXYDvftXGXkcppSPbPj6OBrjCBqzAMBgNVHRMBAf8EAjAAMAsGA1UdDwQE\nAwIABjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFwYJKwYBBAGCNxQC\nBAoMCGNlcnRUeXBlMCMGCSsGAQQBgjcVAgQWBBQBAQEBAQEBAQEBAQEBAQEBAQEB\nATAcBgkrBgEEAYI3FQcEDzANBgUpAQEBAQIBCgIBFDATBgkrBgEEAYI3FQEEBgIE\nABQACjAKBggqhkjOPQQDBANHADBEAiB4lSqd+N/SZ7xDlDJ1WmXRMVsJc14rGZoY\nxwMB4N31RgIgEoE7Y3TKcQPiQozMgkfp+o6Tl8Gckb59wJ9BfSYmx2Q=\n-----END CERTIFICATE-----"
+        KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgq1n36mmuuRBJKrPA\nv/0gNWeDMyAcXZky8HanNjEwSAKgCgYIKoZIzj0DAQehRANCAASzXMoUo1CkZ0AB\nvfCW88X441FRxwq3Jigvlq9aaqvTJROwznHRKtfv5jDRbLJyYs+6sldgO9+1cZeR\nymlI9s+P\n-----END PRIVATE KEY-----" 
+        KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+        KONG_KONNECT_MODE: "on"
+        KONG_CLUSTER_RPC: "on"
+        KONG_ACTIVE_TRACING: "on"
+#      ports:
+#       - 8000:8000
+#       - 8443:8443
+
+
+  solace:
+#      image: solace/solace-pubsub-standard
+      image: solace/solace-pubsub-standard
+      shm_size: '1g'
+      platform: linux/amd64
+      networks:
+        - kongpose-net
+        - kongpose-net-internal
+      profiles: [ "solace", "everything" ]
+      environment:
+        username_admin_globalaccesslevel: "admin"
+        username_admin_password: "admin"
+      ports:
+        - 8080:8080  # Use this port when configuring the message broker container with Solace PubSub+ Broker Manager.
+        - 55555:55555 # Your applications can use Solace APIs to connect to the message broker on this port
+        - 8008:8008 # The JavaScript sample applications below use this port to pass Web Messaging traffic through the message broker
+#        - 1883:1883 # Ports for MQTT connectivity, over TCP 
+#        - 8000:8000 # Ports for MQTT connectivity, over WebSockets
+#        - 5672:5672 # AMQP 1.0 applications using Apache QPID APIs would connect here
+        - 9000:9000 # Use REST to send messaging and event data with Solace’s RESTful API port
+        - 2222:2222 # Use SSH to connect to the Solace Command Line Interface (CLI) for advanced configuration
+
