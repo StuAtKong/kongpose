@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: 815d4f5e5803d8d1d2b128a80c825d49152743f0
+    password: 284a4785108651a62ae80d06d229a53d436915a5
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: a563aa5ebc0e99b4885aa4d1aa19cce7aeb3deb5
+    password: 71aee9a1f430434769390e59f8135447f758b969
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -268,6 +268,7 @@ routes:
       forward_uri: false
       keepalive: 60000
       keepalive_enabled: false
+      key_query_arg: null
       message_by_lua_functions: null
       producer_async: true
       producer_async_buffering_limits_messages_in_memory: 50000
@@ -278,6 +279,8 @@ routes:
       producer_request_retries_backoff_timeout: 100
       producer_request_retries_max_attempts: 10
       producer_request_timeout: 2000
+      schema_registry:
+        confluent: null
       security:
         certificate_id: null
         ssl: null
@@ -661,6 +664,63 @@ services:
     path_handling: v0
     paths:
     - /httpbin
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  - https_redirect_status_code: 426
+    id: 8a49cc26-7894-432b-be4a-77d50c48f544
+    name: local-solace
+    path_handling: v0
+    paths:
+    - /solace
+    plugins:
+    - config:
+        message:
+          ack_timeout: 2000
+          default_content: null
+          delivery_mode: PERSISTENT
+          destinations:
+          - name: kong
+            type: QUEUE
+          dmq_eligible: false
+          forward_body: true
+          forward_headers: true
+          forward_method: true
+          forward_uri: true
+          functions:
+          - message.headers["x-test"] = nil return message
+          priority: 4
+          sender_id: kong
+          tracing: true
+          tracing_sampled: false
+          ttl: 0
+        session:
+          authentication:
+            access_token: null
+            access_token_header: null
+            id_token: null
+            id_token_header: null
+            password: admin
+            scheme: BASIC
+            username: admin
+          connect_timeout: 3000
+          host: tcp://solace:55555
+          properties: {}
+          ssl_validate_certificate: false
+          vpn_name: default
+      enabled: true
+      id: bc35fedd-b391-42ce-b318-89d722f169ab
+      name: solace-upstream
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
     preserve_host: false
     protocols:
     - http
