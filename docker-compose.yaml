@@ -3,10 +3,10 @@
 secrets:
   kong_license:
     file: ../../.kong-license-data/license.json
-  pg_password:
-    environment: "SECRET_PG_PASSWORD"
-  pg_password_in_file:
-    file: ./tmp/POSTGRES_PASSWORD
+#  pg_password:
+#    environment: "SECRET_PG_PASSWORD"
+#  pg_password_in_file:
+#    file: ./tmp/POSTGRES_PASSWORD
 
 
 # Specify which Kong image to run
@@ -15,7 +15,7 @@ x-kong-image:
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.8.1.2}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.9.1.2}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.3}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.2}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway-dev
   &kong-image
   image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
@@ -33,8 +33,8 @@ x-kong-db-config:
   KONG_PG_HOST: db
   KONG_PG_DATABASE: kong
   KONG_PG_USER: kong
-#  KONG_PG_PASSWORD: kong
-  KONG_PG_PASSWORD_FILE: "/run/secrets/pg_password_in_file"
+  KONG_PG_PASSWORD: kong
+#  KONG_PG_PASSWORD_FILE: "/run/secrets/pg_password_in_file"
   KONG_PASSWORD: password
 
 #  KONG_DATABASE: cassandra
@@ -146,9 +146,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-migrations-all-up:
     <<: *kong-image
@@ -159,9 +159,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-migrations-all-finish:
     <<: *kong-image
@@ -175,9 +175,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-migrations-upgrade:
     <<: *kong-image
@@ -188,9 +188,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-migrations-finish:
     <<: *kong-image
@@ -201,9 +201,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-migrations-list:
     <<: *kong-image
@@ -214,9 +214,9 @@ services:
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
-    secrets:
-      - pg_password
-      - pg_password_in_file
+#    secrets:
+#      - pg_password
+#      - pg_password_in_file
 
   kong-cp:
     <<: [ *kong-image, *kong-container-common ]
@@ -240,8 +240,8 @@ services:
 #
     secrets:
       - kong_license
-      - pg_password
-      - pg_password_in_file
+#      - pg_password
+#      - pg_password_in_file
 
     environment:
       <<: [ *kong-license, *kong-db-config, *kong-common-config ]
@@ -545,14 +545,6 @@ services:
       - "28443:8443/tcp"
 
   redis:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
-    image: redis:latest
-  #    ports:
-  #      - "6379:6379/tcp"
-
-  redis-new:
     networks:
       - kongpose-net
       - kongpose-net-internal
@@ -1032,8 +1024,8 @@ services:
         - 55679:55679 # zpages extension
 
   konnect-dp:
-      <<: [ *kong-image ]
-#      image: kong/kong-gateway:3.10.0.3
+      #<<: [ *kong-image ]
+      image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
       networks:
         - kongpose-net
         - kongpose-net-internal
@@ -1061,7 +1053,6 @@ services:
 
 
   solace:
-#      image: solace/solace-pubsub-standard
       image: solace/solace-pubsub-standard
       shm_size: '1g'
       platform: linux/amd64
