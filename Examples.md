@@ -1,5 +1,19 @@
 # Examples
 
+# Contents
+ - [Simple echo proxy](#simple-echo-proxy)
+ - [Rate Limited Proxy](#rate-limited-proxy)
+ - [LDAP Auth](#ldap-auth)
+ - [OPA Auth](#opa--auth)
+ - [OIDC Auth](#oidc-auth)
+ - [Mutual-TLS Auth - Client to Kong](#mutual-tls-auth---client-to-kong)
+ - [Mutual TLS Auth - Kong to Upstream](#mutual-tls-auth---kong-to-upstream)
+ - [Websocket Example](#websocket-example)
+ - [GRPC Example](#grpc-example)
+ - [proxy_protocol Example](#proxy_protocol-example)
+ - [Soalce Example](#soalce-example)
+
+
 ## Test kong is working by making an Admin API request
 
 It is necessary to pass the CA certificate with the request to allow curl to verify the certs (or use -k which is not recommended);
@@ -847,6 +861,3 @@ stm config init
 stm manage connection --url ws://localhost:8008 --vpn default --username admin --password admin
 stm receive -q kong
 ~~~
-
-
-curl -v -X POST http://proxy.kong.lan/solace/anything -H 'Content-Type: application/json' -d '{"message":"This is test message 3"}'
