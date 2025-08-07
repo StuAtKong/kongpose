@@ -11,7 +11,7 @@
  - [Websocket Example](#websocket-example)
  - [GRPC Example](#grpc-example)
  - [proxy_protocol Example](#proxy_protocol-example)
- - [Soalce Example](#soalce-example)
+ - [Solace Example](#solace-example)
 
 
 ## Test kong is working by making an Admin API request
@@ -819,7 +819,7 @@ $ curl -kv --haproxy-protocol https://proxy.kong.lan:8843/httpbin/anything
 * Connection #0 to host proxy.kong.lan left intact
 ```
 
-## Soalce Example
+## Solace Example
 
 Start the solace server
 
