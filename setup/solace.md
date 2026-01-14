@@ -38,7 +38,7 @@ Open the Solace web GUI and login with the username and password of `admin/admin
 
 ## Kong Setup
 
-There is a single Route/Plugin in the kongposer setup that will forward the HTTP request to a Solace topic. The plugin is configured to send message to a Solace topic named `kong`. It will also remove headers named `x-test` from the message sent to Solace
+There is a single Route/Plugin in the kongpose setup that will forward the HTTP request to a Solace topic. The plugin is configured to send message to a Solace topic named `kong`. It will also remove headers named `x-test` from the message sent to Solace
 
 ~~~
 config:
