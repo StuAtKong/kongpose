@@ -28,7 +28,7 @@ ca_certificates:
     Q8V+CMwzqzcwCgYIKoZIzj0EAwIDRwAwRAIgWfpdJH03RRFwqNQC72hSesKjK6tS
     NbEyd3ZRQ0Qo8v0CIG3wcHsesqKTNpFu5W+F9oLDNb4aTJaxxAHOceTTYLiZ
     -----END CERTIFICATE-----
-  cert_digest: 62446d10914c0cf494a8c1ed1bdabd523fcf0f70fe873f580260a2519abdde6a
+  cert_digest: 1c260e038e8e377f5d9d3f5b33f026d18810e2f9574dc7cd3b4f573bda04f5d2
   id: e349dc07-a5b6-4480-a816-6ea64d6bf101
   tags:
   - intermediate_ca1
@@ -45,7 +45,7 @@ ca_certificates:
     HbGUSEK9W/EVLOsGcd2QK+xOdO3rgdIlJDMCIQDlXaxo8/D4e5qqGNgaSgKJhdAH
     hYMfcdUXzpx4+rqveA==
     -----END CERTIFICATE-----
-  cert_digest: 718ed571b5e98d167020f947df5b1efb25427f973dbe7a4765a55164fb26e891
+  cert_digest: ab0f3bbece6b90971aa391a128f84d5bfafaa0e57e6ee395f552c3a4c9e06558
   id: 9c3f8505-e4b4-455d-aecb-2e75f3aff60b
   tags:
   - intermediate_ca2
@@ -204,7 +204,7 @@ consumers:
     id: d18259f5-14ea-4164-8328-9aebb1cfc103
   basicauth_credentials:
   - id: cccff412-6f9c-42cb-9487-6c07ec645ac3
-    password: 284a4785108651a62ae80d06d229a53d436915a5
+    password: ab05946ac1d45ca5dd4ce926f9ad5ebfb21d0e4a
     username: consA
   id: df473d53-0ab4-4fd7-8615-0dabf1c19866
   keyauth_credentials:
@@ -213,7 +213,7 @@ consumers:
   username: consA
 - basicauth_credentials:
   - id: 0cb7723b-424a-43b6-b902-728ce7248668
-    password: 71aee9a1f430434769390e59f8135447f758b969
+    password: 1e5b3fb2f2f2209e0f9028223c462ea4e9cd6b90
     username: consB
   id: cc3e8260-80d8-4109-ad13-881eed5f1e71
   keyauth_credentials:
@@ -686,7 +686,7 @@ services:
           delivery_mode: PERSISTENT
           destinations:
           - name: kong
-            type: QUEUE
+            type: TOPIC
           dmq_eligible: false
           forward_body: true
           forward_headers: true
