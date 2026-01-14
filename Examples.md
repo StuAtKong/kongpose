@@ -11,7 +11,7 @@
  - [Websocket Example](#websocket-example)
  - [GRPC Example](#grpc-example)
  - [proxy_protocol Example](#proxy_protocol-example)
- - [Solace Example](#solace-example)
+ - [Solace Example](setup/solace.md)
 
 
 ## Test kong is working by making an Admin API request
@@ -818,46 +818,3 @@ $ curl -kv --haproxy-protocol https://proxy.kong.lan:8843/httpbin/anything
 }
 * Connection #0 to host proxy.kong.lan left intact
 ```
-
-## Solace Example
-
-Start the solace server
-
-~~~
-docker compose up -d solace
-~~~
-
-Create a Solace queue
-
-Open the Solace web GUI and login with admin/admin
-
-~~~
-https://solace.kong.lan
-~~~
-
-Send a request
-
-~~~
-curl -X POST http://proxy.kong.lan/solace/anything -H 'Content-Type: text/plain' -d '"This is a text test message"'
-curl -X POST http://proxy.kong.lan/solace/anything -H "x-test:abc" -H 'Content-Type: application/json' -d '{"message":"This is json test message"}'
-~~~
-
-Start the Solace CLI
-
-~~~
-docker compose exec -it solace /usr/sw/loads/currentload/bin/cli -Ad/bin/cli -A
-~~~
-
-Get the Solace TryMe! tool
-
-~~~
-https://docs.solace.com/Get-Started/tutorial/try-me-cli-tool.htm#linux-or-wsl-on-windows-using-apt-get
-~~~
-
-and start listening to the kong queue
-
-~~~
-stm config init
-stm manage connection --url ws://localhost:8008 --vpn default --username admin --password admin
-stm receive -q kong
-~~~
