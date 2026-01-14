@@ -7,7 +7,7 @@ https://smallstep.com/docs/step-cli/basic-crypto-operations
 
 ## Generate Private CA key and certificate
 
-### Create a template file for the Root CA generation (root.tpl);
+### Create a template file for the Root CA generation ($(pwd)/ssl-certs/smallstep/root.tpl);
 
 ```
 {
@@ -34,7 +34,7 @@ smallstep/step-cli step certificate create --template /tmp/root.tpl --not-after=
 
 ## Generate Intermediate CA SSL/TLS Certificates
 
-### Create a template file for the 1st Intermediate CA generation (intermediate1.tpl);
+### Create a template file for the 1st Intermediate CA generation ($(pwd)/ssl-certs/smallstep/intermediate1.tpl);
 
 ```
 {

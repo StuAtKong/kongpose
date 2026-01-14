@@ -315,7 +315,7 @@ services:
       KONG_ROLE: control_plane
       KONG_CLUSTER_DATA_PLANE_PURGE_DELAY: 60
       #KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf"
-      KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf; include /tmp/htdocs/http_server2.conf"
+      #KONG_NGINX_HTTP_INCLUDE: "/tmp/htdocs/http_server.conf; include /tmp/htdocs/http_server2.conf"
       #KONG_KEYRING_ENABLED: "on"
       #KONG_KEYRING_STRATEGY: "cluster"
       #KONG_KEYRING_PUBLIC_KEY: "/tmp/ssl/customcerts/keyring/keyring-public-key.pem"
