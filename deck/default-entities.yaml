@@ -677,7 +677,7 @@ services:
     name: local-solace
     path_handling: v0
     paths:
-    - /solace
+    - ~/solace/(?<vpn>.+)/(?<topic>.+)$
     plugins:
     - config:
         message:
@@ -685,7 +685,7 @@ services:
           default_content: null
           delivery_mode: PERSISTENT
           destinations:
-          - name: kong
+          - name: $(uri_captures['topic'])
             type: TOPIC
           dmq_eligible: false
           forward_body: true

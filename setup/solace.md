@@ -6,9 +6,10 @@ This example will configure a Solace broker to allow  Kong to publish messages
  - [Concepts](#concepts)
  - [Setup the Solace Broker](#solace-broker-setup)
  - [Kong setup](#kong-setup)
- - [Get the Solace TryMe! tool]()
+ - [Get the Solace TryMe! tool](#get-the-solace-tryme-tool)
  - [Send a request](#send-a-request)
- - [Start the Solace CLI]()
+ - [Start the Solace CLI](#start-the-solace-cli)
+ - [Setup Solace Auth](#setup-solace-auth)
 
 ## Concepts
 
@@ -60,9 +61,9 @@ name: solace-upstream
     tracing: true
     forward_uri: true
     destinations:
-      - name: kong
+      - name: $(uri_captures['topic'])
         type: TOPIC
-  session:
+    session:
     properties: {}
     host: tcp://solace:55555
     ssl_validate_certificate: false
@@ -122,13 +123,13 @@ v0.0.81 - https://github.com/SolaceLabs/solace-tryme-cli
 Send a plain text request to Solace via Kong
 
 ~~~
-curl -X POST http://proxy.kong.lan/solace/anything -H 'Content-Type: text/plain' -d '"This is a text test message"'
+curl -X POST http://proxy.kong.lan/solace/default/kong -H 'Content-Type: text/plain' -d '"This is a text test message"'
 ~~~
 
 Send a json request to Solace via Kong
 
 ~~~
-curl -X POST http://proxy.kong.lan/solace/anything -H "x-test:abc" -H 'Content-Type: application/json' -d '{"message":"This is json test message"}'
+curl -X POST http://proxy.kong.lan/solace/default/kong -H "x-test:abc" -H 'Content-Type: application/json' -d '{"message":"This is json test message"}'
 ~~~
 
 If you check the Solace Try-me tool, then you should see the messages from Kong;
@@ -152,7 +153,7 @@ waiting   1 receiving message [01/14/2026, 16:38:40.891]
   "body_args": [],
   "method": "POST",
   "uri_args": [],
-  "uri": "/solace/anything"
+  "uri": "/solace/default/kong"
 }
 …  waiting   2 receiving message [01/14/2026, 16:38:48.271]
 ✔  success   success: received BINARY message on topic [Topic kong]
@@ -174,7 +175,7 @@ waiting   1 receiving message [01/14/2026, 16:38:40.891]
   },
   "method": "POST",
   "uri_args": [],
-  "uri": "/solace/anything"
+  "uri": "/solace/default/kong"
 }
 ~~~
 
@@ -293,7 +294,7 @@ class QuickstartUser(HttpUser):
         }
 
         with self.client.post(
-            "/solace/anything", 
+            "/solace/default/kong", 
             json=payload, 
             headers=headers,
             catch_response=True
@@ -306,3 +307,37 @@ class QuickstartUser(HttpUser):
                 response.failure(failure_msg)
 ~~~
 
+## Setup Solace Auth
+
+
+** NOT COMPLETE YET - USE AT YOUR OWN RISK **
+
+1. Create a new message vpn, acl and user
+~~~
+sh setup/solace/setup_solace_auth_vpn.sh
+~~~
+
+2. Setup a listener
+
+~~~
+stm receive --url tcp://localhost:55555 --vpn auth-vpn -u kong -p 'K1ngK0ng!' -t kong-topic-auth
+~~~
+
+3. Send a test message with authentication to the `kong-topic-auth`
+
+~~~
+stm send --url tcp://localhost:55555 --vpn auth-vpn -u kong -p 'K1ngK0ng!' -t kong-topic-auth -m "This will succeed"
+~~~
+
+4. Send a test message with authentication to the `kong-topic-fails`
+
+This message will fail due to ACL rules, but there is no "failure" message to the client;
+
+~~~
+stm send --url tcp://localhost:55555 --vpn auth-vpn -u kong -p 'K1ngK0ng!' -t kong-topic-fails -m "This will fail due to ACL permissions"
+~~~
+
+To see the failure, check the message vpn metrics and see the `discardedRxMsgCount` increasing
+~~~
+curl -s -u admin:admin "http://localhost:8080/SEMP/v2/monitor/msgVpns/auth-vpn" | jq .data.counter.discardedRxMsgCount
+~~~
