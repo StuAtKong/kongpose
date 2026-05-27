@@ -138,7 +138,7 @@ networks:
     internal: true
 
 services:
-  kong-migrations:
+  kong-migrations-bootstrap:
     <<: *kong-image
     networks: *public-networks
     command: "kong migrations bootstrap"
@@ -149,7 +149,7 @@ services:
 #      - pg_password
 #      - pg_password_in_file
 
-  kong-migrations-all-up:
+  kong-migrations-up:
     <<: *kong-image
     profiles: [ "upgrade", "everything" ]
     networks: *public-networks
@@ -161,50 +161,14 @@ services:
 #      - pg_password
 #      - pg_password_in_file
 
-  kong-migrations-all-finish:
+  kong-migrations-finish:
     <<: *kong-image
     profiles: [ "upgrade", "everything" ]
     depends_on:
-      kong-migrations-all-up:
+      kong-migrations-up:
         condition: service_completed_successfully
     networks: *public-networks
     command: kong migrations finish
-    environment:
-      <<: [ *kong-license, *kong-db-config ]
-    restart: on-failure
-#    secrets:
-#      - pg_password
-#      - pg_password_in_file
-
-  kong-migrations-upgrade:
-    <<: *kong-image
-    profiles: [ "upgrade", "everything" ]
-    networks: *public-networks
-    command: "kong migrations up"
-    environment:
-      <<: [ *kong-license, *kong-db-config ]
-    restart: on-failure
-#    secrets:
-#      - pg_password
-#      - pg_password_in_file
-
-  kong-migrations-finish:
-    <<: *kong-image
-    profiles: [ "upgrade-finish", "everything" ]
-    networks: *public-networks
-    command: "kong migrations finish"
-    environment:
-      <<: [ *kong-license, *kong-db-config ]
-    restart: on-failure
-#    secrets:
-#      - pg_password
-#      - pg_password_in_file
-
-  kong-migrations-list:
-    <<: *kong-image
-    profiles: [ "upgrade-list", "everything" ]
-    networks: *public-networks
-    command: "kong migrations list"
     environment:
       <<: [ *kong-license, *kong-db-config ]
     restart: on-failure
@@ -223,6 +187,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      kong-migrations-bootstrap:
+        condition: service_completed_successfully
     volumes:
       - ./ssl-certs:/tmp/ssl/customcerts
       - ./tracing:/usr/local/kong/tracing
