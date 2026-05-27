@@ -1,5 +1,3 @@
-#version: '2.2'
-
 secrets:
   kong_license:
     file: ../../.kong-license-data/license.json
@@ -36,12 +34,6 @@ x-kong-db-config:
   KONG_PG_PASSWORD: kong
 #  KONG_PG_PASSWORD_FILE: "/run/secrets/pg_password_in_file"
   KONG_PASSWORD: password
-
-#  KONG_DATABASE: cassandra
-#  KONG_CASSANDRA_CONTACT_POINTS: db
-#  KONG_DB_UPDATE_PROPAGATION: 1
- # KONG_PASSWORD: password
- # KONG_LICENSE_DATA: ${KONG_LICENSE_DATA}
 
 # Common config values
 x-kong-common-config:
@@ -104,8 +96,6 @@ x-kong-common-config:
 #  KONG_SSL_CONF_COMMAND: "CipherString DEFAULT:@SECLEVEL=0;"
 #  LUA_SSL_PROTOCOLS: "TLSv1.1 TLSv1.2 TLSv1.3"
 #  LUA_SSL_CONF_COMMAND: "CipherString DEFAULT:@SECLEVEL=0;"
-#  KONG_SSL_CIPHER_SUITE: "custom"
-#  KONG_SSL_CIPHERS: "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:RSA-PSK-AES256-GCM-SHA384:DHE-PSK-AES256-GCM-SHA384:RSA-PSK-CHACHA20-POLY1305:DHE-PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:AES256-GCM-SHA384:PSK-AES256-GCM-SHA384:PSK-CHACHA20-POLY1305:RSA-PSK-AES128-GCM-SHA256:DHE-PSK-AES128-GCM-SHA256:AES128-GCM-SHA256:PSK-AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:ECDHE-PSK-AES256-CBC-SHA384:ECDHE-PSK-AES256-CBC-SHA:SRP-RSA-AES-256-CBC-SHA:SRP-AES-256-CBC-SHA:RSA-PSK-AES256-CBC-SHA384:DHE-PSK-AES256-CBC-SHA384:RSA-PSK-AES256-CBC-SHA:DHE-PSK-AES256-CBC-SHA:AES256-SHA:PSK-AES256-CBC-SHA384:PSK-AES256-CBC-SHA:ECDHE-PSK-AES128-CBC-SHA256:ECDHE-PSK-AES128-CBC-SHA:SRP-RSA-AES-128-CBC-SHA:SRP-AES-128-CBC-SHA:RSA-PSK-AES128-CBC-SHA256:DHE-PSK-AES128-CBC-SHA256:RSA-PSK-AES128-CBC-SHA:DHE-PSK-AES128-CBC-SHA:AES128-SHA:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA"
 #  KONG_NGINX_HTTP_LUA_SHARED_DICT: "kong_rate_limiting_locks 11m; lua_shared_dict kong_service_protection_locks 10m"
 #  KONG_ADMIN_TOKEN_DEV: "dev-token"
 #  KONG_ADMIN_TOKEN_STST_INTERNAL: "stst-internal-token"
@@ -372,46 +362,6 @@ services:
 #      KONG_NGINX_HTTP_LOG_FORMAT: "json_combined escape=json '{\"time_local\":\"$$time_local\",\"remote_addr\":\"$$remote_addr\",\"remote_user\":\"$$remote_user\",\"request\":\"$$request\",\"status\":\"$$status\",\"body_bytes_sent\":\"$$body_bytes_sent\",\"request_time\":\"$$request_time\",\"http_referrer\":\"$$http_referer\",\"http_user_agent\":\"$$http_user_agent\"}'"
 #      KONG_NGINX_HTTP_LOG_FORMAT:  "athenalog escape=json '{\"gateway_log_type\": \"FULLLOG [AUDIT]\",\"time_iso8601\": \"$$time_iso8601\",\"gateway_request_id\": \"gateway_request_id\",\"athena_gw_request_id\": \"athena_gw_request_id\",\"remote_user\": \"$$remote_user\",\"request_method\": \"$$request_method\",\"uri\": \"$$uri\",\"host\": \"$$host\",\"scheme\": \"$$scheme\",\"server_name\": \"$$server_name\",\"upstream_addr\": \"$$upstream_addr\",\"status\": \"$$status\",\"upstream_status\": \"$$upstream_status\",\"proxy_host\": \"$$proxy_host\",\"upstream_http_Location\": \"$$upstream_http_Location\",\"http_x_client_id\": \"$$http_x_client_id\",\"document_root\":\"$$document_root\",\"server_addr\": \"$$server_addr\",\"http_user_agent\": \"$$http_user_agent\",\"http_x_forwarded_for\": \"$$http_x_forwarded_for\",\"http_x_forwarded_host\": \"$$http_x_forwarded_host\",\"http_x_forwarded_proto\": \"$$http_x_forwarded_proto\",\"http_x_forwarded_port\": \"$$http_x_forwarded_port\",\"server_port\": \"$$server_port\",\"msec\": \"$$msec\",\"request_length\": \"$$request_length\",\"body_bytes_sent\": \"$$body_bytes_sent\",\"request_time\": \"$$request_time\",\"upstream_connect_time\": \"$$upstream_connect_time\",\"upstream_header_time\": \"$$upstream_header_time\",\"upstream_response_time\": \"$$upstream_response_time\",\"stack_id\": \"stack_id\",\"context_id\": \"context_id\",\"client_id\": \"client_id\",\"kong_service_name\": \"kong_service_name\",\"route_name\": \"route_name\",\"environment\": \"environment\"};'"
 
-# log_format athenalog escape=json '{'
-#                '"gateway_log_type": "FULLLOG [AUDIT]",'
-#                '"time_iso8601": "$time_iso8601",'
-#                '"gateway_request_id": "$gateway_request_id",'
-#                '"athena_gw_request_id": "$athena_gw_request_id",'
-#                '"remote_user": "$remote_user",'
-#                '"request_method": "$request_method",'
-#                '"uri": "$uri",'
-#                '"host": "$host",'
-#                '"scheme": "$scheme",'
-#                '"server_name": "$server_name",'
-#                '"upstream_addr": "$upstream_addr",'
-#                '"status": "$status",'
-#                '"upstream_status": "$upstream_status",'
-#                '"proxy_host": "$proxy_host",'
-#                '"upstream_http_Location": "$upstream_http_Location",'
-#                '"http_x_client_id": "$http_x_client_id",'
-#                '"document_root":"$document_root",'
-#                '"server_addr": "$server_addr",'
-#                '"http_user_agent": "$http_user_agent",'
-#                '"http_x_forwarded_for": "$http_x_forwarded_for",'
-#                '"http_x_forwarded_host": "$http_x_forwarded_host",'
-#                '"http_x_forwarded_proto": "$http_x_forwarded_proto",'
-#                '"http_x_forwarded_port": "$http_x_forwarded_port",'
-#                '"server_port": "$server_port",'
-#                '"msec": "$msec",'
-#                '"request_length": "$request_length",'
-#                '"body_bytes_sent": "$body_bytes_sent",'
-#                '"request_time": "$request_time",'
-#                '"upstream_connect_time": "$upstream_connect_time",'
-#                '"upstream_header_time": "$upstream_header_time",'
-#                '"upstream_response_time": "$upstream_response_time",'
-#                '"stack_id": "$stack_id",'
-#                '"context_id": "$context_id",'
-#                '"client_id": "$client_id",'
-#                '"kong_service_name": "$kong_service_name",'
-#                '"route_name": "$route_name",'
-#                '"environment": "$environment"'
-#                '}';
-
 #      KONG_PROXY_KEEPALIVE_TIMEOUT: 0
 #      KONG_PROXY_KEEPALIVE_REQUESTS: 1
 #      KONG_NGINX_PROXY_MORE_CLEAR_HEADERS: "kong-route-id kong-route-name kong-service-id kong-service-name"
@@ -439,16 +389,6 @@ services:
     restart: on-failure
     stdin_open: true
     tty: true
-
-#  db:
-#    networks:
-#      - kongpose-net
-#    image: cassandra:3
-#    healthcheck:
-#      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
 
   ad-server:
     networks: *public-networks
@@ -818,7 +758,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.35.0
-    profiles: [ "prometheus" ]
+    profiles: [ "prometheus", "everything" ]
     networks: *public-networks
     volumes:
       - ./prometheus/:/etc/prometheus/
@@ -1099,6 +1039,7 @@ services:
 
   minio:
     image: quay.io/minio/minio
+    networks: *default-networks
 #    container_name: minio
     profiles: [ "minio", "everything" ]
     ports:
