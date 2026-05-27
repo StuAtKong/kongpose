@@ -5,6 +5,7 @@ locust/__pycache__/*
 zookeeper/*
 kafka/*
 ssl-certs/rootCA.srl
+ssl-certs/.cert-backup-*/
 http_content/test.txt
 ha-proxy/haproxy.cfg
 tmp/*

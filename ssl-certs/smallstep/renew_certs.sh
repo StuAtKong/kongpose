@@ -268,9 +268,7 @@ generate_leaf "client.${DOMAINS[0]}" client.kong.lan.pem client.kong.lan.key "${
 
 echo "==> generating client/mtls-consumer.kong.lan.* (mTLS consumer)"
 mkdir -p client
-# CN includes the domain so it falls under the root's nameConstraints — otherwise
-# chain validation fails. Kong mtls-auth consumer config must match this CN.
-generate_leaf "mtls-consumer.${DOMAINS[0]}" client/mtls-consumer.kong.lan.pem client/mtls-consumer.kong.lan.key "${EXTRA_SANS[@]}"
+generate_leaf "mtls-consumer" client/mtls-consumer.kong.lan.pem client/mtls-consumer.kong.lan.key "${EXTRA_SANS[@]}"
 
 # ──────────────── HAproxy bundle ────────────────
 
