@@ -6,7 +6,6 @@ secrets:
 #  pg_password_in_file:
 #    file: ./tmp/POSTGRES_PASSWORD
 
-
 # Specify which Kong image to run
 x-kong-image:
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.26}
@@ -436,7 +435,6 @@ services:
 #    ports:
 #      - "8080:80"
 
-
   mockbin:
     networks: *default-networks
     image: "mashape/mockbin:latest"
@@ -467,7 +465,6 @@ services:
   #    ports:
   #      - "8080:8080/tcp"
   #      - "8443:8443/tcp"
-
 
   dadjokes:
     networks: *public-networks
@@ -934,7 +931,6 @@ services:
     ports:
       - 8000:8000
       - 8443:8443
-
 
   knep:
     image: kong/kong-native-event-proxy:latest
