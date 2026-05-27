@@ -44,15 +44,37 @@ Now you can configure the hostname resolution to use 10.0.10.1 for the IP addres
 
 ### SSL Certificates
 
-The docker-compose file expects to find the SSL certifcate pairs in the `./ssl-certs`, `./ssl-certs/hybrid` and `./ssl-certs/client` directories in this repository; these directories are mapped via docker volumes in the docker-compose file for Kong to access the certificates. There are a few pairs of certificates required for HTTPS access to Kong Manager, the Developer Portal, etc and a final set for the Control Plane/Data Plane communication.
+The docker-compose file expects to find SSL certificate pairs in `./ssl-certs/smallstep/`, `./ssl-certs/hybrid/` and `./ssl-certs/client/` — these directories are bind-mounted into Kong and HAproxy. **Cert files are not checked into the repo** (see `.gitignore`), so you need to generate them on first clone:
 
-Some default certificates are included, but you can also create you own by following the steps below;
+~~~shell
+./ssl-certs/smallstep/renew_certs.sh
+~~~
 
-1) Create the SSL certificates for the api.kong.lan hostname [here](ssl-certs/README.md)
+The script is idempotent and safe to re-run any time:
 
-2) Create the hybrid CP/DP certs [here](ssl-certs/hybrid/README.md)
+- Regenerates only certs that are missing or expiring within the next 30 days.
+- Generates the full CA hierarchy (root → intermediate1 → intermediate2) plus leaf certs for `*.kong.lan` / `*.kong.com` SANs.
+- Syncs `deck/default-entities.yaml` so its `ca_certificates` and tagged `certificates` entries match the current on-disk PEMs.
+- Prunes old `ssl-certs/.cert-backup-*` directories, keeping the most recent 3.
+- Prompts to restart cert-consuming containers (kong-cp, kong-dp, ha-proxy, keycloak, solace) if any are currently running.
 
-Make sure to install the private CA certificate to the OS truststore or you will have issues connecting to Kong Manager via the browser. Details can be found [here](ssl-certs/README.md#add-the-private-ca-to-the-os-trustore)
+For details on the cert layout, customising the domain list (e.g. adding `kong.dev`), or generating one-off certs by hand, see [ssl-certs/README.md](ssl-certs/README.md).
+
+For the hybrid CP/DP cluster cert specifically, see [ssl-certs/hybrid/README.md](ssl-certs/hybrid/README.md).
+
+Once certs exist, **import the demo root CA into your OS/browser truststore** or browsers will reject https://manager.kong.lan and friends:
+
+~~~shell
+# macOS
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain \
+    ./ssl-certs/smallstep/root_ca.pem
+
+# Linux (Debian/Ubuntu)
+sudo cp ./ssl-certs/smallstep/root_ca.pem /usr/local/share/ca-certificates/kong-demo-root.crt
+sudo update-ca-certificates
+~~~
+
+After importing, **fully restart your browser** — Chrome and Firefox cache trust decisions per-process and a tab reload won't pick up new roots.
 
 ## Start containers
 

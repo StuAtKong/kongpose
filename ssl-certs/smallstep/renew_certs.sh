@@ -26,6 +26,7 @@ cd "$(dirname "$0")"
 STEP_IMAGE="smallstep/step-cli:0.28.6"   # pin for reproducibility; bump deliberately
 
 GRACE_DAYS=30                            # treat anything expiring within N days as "needs renewal"
+MAX_BACKUP_KEEP=3                        # keep this many ../.cert-backup-* dirs; older ones get pruned
 
 # step-cli's --not-after uses Go duration syntax (h/m/s only — no "d"), so express in hours.
 ROOT_CA_HOURS=87600                       # 10y (3650d)
@@ -85,15 +86,95 @@ needs_renewal() {
     return 0
 }
 
-# ──────────────── Short-circuit if nothing needs doing ────────────────
+# Sync the ca_certificates and certificates blocks of deck/default-entities.yaml
+# with the on-disk PEM/key files. Match is by tag. Idempotent.
+update_deck_certs() {
+    local deck_file="../../deck/default-entities.yaml"
+    if [[ ! -f "$deck_file" ]]; then
+        return
+    fi
+    if ! command -v yq >/dev/null; then
+        echo "    yq not installed — skipping deck/default-entities.yaml update"
+        echo "    (install: snap install yq, brew install yq, or github.com/mikefarah/yq)"
+        return
+    fi
 
-if ! needs_renewal kong.lan.pem; then
+    local updated=()
+    local pair tag cert_file key_file triple
+
+    # ca_certificates: tag → cert PEM file (cert only)
+    for pair in "root-ca:root_ca.pem" "intermediate_ca1:intermediate_ca1.pem" "intermediate_ca2:intermediate_ca2.pem"; do
+        tag="${pair%%:*}"
+        cert_file="${pair##*:}"
+        [[ -f "$cert_file" ]] || continue
+        tag="$tag" cert_content="$(cat "$cert_file")" yq -i \
+            '(.ca_certificates[] | select(.tags[] == strenv(tag))).cert = strenv(cert_content)' \
+            "$deck_file"
+        updated+=("ca:$tag")
+    done
+
+    # Strip stale cert_digest from all ca_certificates entries — Kong recomputes
+    # it server-side on sync, and keeping the literal value in the YAML just
+    # creates drift whenever the cert is rotated.
+    yq -i 'del(.ca_certificates[].cert_digest)' "$deck_file"
+
+    # The legacy mtls-consumer cert was created untagged. Tag it (one-time,
+    # identified by its stable id) so the loop below can address it by tag.
+    yq -i '(.certificates[] | select(.id == "f3ae1bb2-ea6a-4caf-a7a7-2f078b7842db") | select(.tags == null)).tags = ["mtls-consumer"]' "$deck_file"
+
+    # certificates: tag → cert+key pair.
+    # - proxy.kong.lan uses kong.lan.* (proxy.kong.lan is a SAN on that cert)
+    # - mtls-consumer uses the dedicated mTLS client identity cert
+    for triple in \
+        "proxy.kong.lan:kong.lan.pem:kong.lan.key" \
+        "mtls-consumer:client/mtls-consumer.kong.lan.pem:client/mtls-consumer.kong.lan.key"
+    do
+        IFS=':' read -r tag cert_file key_file <<< "$triple"
+        [[ -f "$cert_file" && -f "$key_file" ]] || continue
+        tag="$tag" cert_content="$(cat "$cert_file")" key_content="$(cat "$key_file")" yq -i \
+            '(.certificates[] | select(.tags[] == strenv(tag))) |= (.cert = strenv(cert_content) | .key = strenv(key_content))' \
+            "$deck_file"
+        updated+=("cert:$tag")
+    done
+
+    if (( ${#updated[@]} > 0 )); then
+        echo "==> synced deck/default-entities.yaml: ${updated[*]}"
+    fi
+}
+
+# Delete oldest ../.cert-backup-* dirs beyond MAX_BACKUP_KEEP. Names are
+# .cert-backup-YYYYMMDD_HHMMSS, so lexicographic sort == chronological.
+prune_old_backups() {
+    shopt -s nullglob
+    local backups=(../.cert-backup-*)
+    shopt -u nullglob
+    if (( ${#backups[@]} <= MAX_BACKUP_KEEP )); then
+        return
+    fi
+    local sorted
+    mapfile -t sorted < <(printf '%s\n' "${backups[@]}" | sort)
+    local to_delete=$(( ${#sorted[@]} - MAX_BACKUP_KEEP ))
+    local i
+    for ((i=0; i<to_delete; i++)); do
+        rm -rf "${sorted[$i]}"
+        echo "    pruned old backup: $(basename "${sorted[$i]}")"
+    done
+}
+
+# ──────────────── Decide if renewal is needed ────────────────
+# Renewal is gated, but the deck/backup-pruning housekeeping below always runs
+# so a no-op invocation still keeps the deck file in sync and trims old backups.
+
+RENEWAL_NEEDED=false
+if needs_renewal kong.lan.pem; then
+    RENEWAL_NEEDED=true
+    echo "==> kong.lan.pem missing or near expiry — starting renewal"
+else
     expiry=$(openssl x509 -in kong.lan.pem -enddate -noout | cut -d= -f2)
-    echo "kong.lan.pem is valid until $expiry (more than ${GRACE_DAYS}d away). Nothing to do."
-    exit 0
+    echo "kong.lan.pem is valid until $expiry (more than ${GRACE_DAYS}d away). Skipping cert regeneration."
 fi
 
-echo "==> kong.lan.pem missing or near expiry — starting renewal"
+if $RENEWAL_NEEDED; then
 
 # ──────────────── Backup ────────────────
 
@@ -286,54 +367,68 @@ if compgen -G "client/*" > /dev/null; then
     chmod 644 client/*.pem client/*.key
 fi
 
+fi  # end RENEWAL_NEEDED block
+
+# ──────────────── Housekeeping (always runs) ────────────────
+
+update_deck_certs
+prune_old_backups
+
 # ──────────────── Summary ────────────────
 
-echo ""
-echo "Renewal complete."
-echo ""
-echo "Generated files:"
-ls -lh root_ca.pem intermediate_ca1.pem intermediate_ca2.pem \
-       kong.lan.pem kong.lan.key \
-       wild.kong.lan.pem wild.kong.lan.key \
-       client.kong.lan.pem client.kong.lan.key \
-       combined-wild.pem 2>/dev/null
-if [[ -d client ]]; then
+if $RENEWAL_NEEDED; then
     echo ""
-    ls -lh client/*.pem client/*.key 2>/dev/null || true
-fi
-
-leaf_expiry=$(openssl x509 -in kong.lan.pem -enddate -noout | cut -d= -f2)
-echo ""
-echo "kong.lan leaf expires: $leaf_expiry"
-echo "Backup of previous certs: $BACKUP_DIR"
-echo ""
-# ──────────────── Restart cert-consuming containers ────────────────
-# Restart only services that are actually running so we don't error on stopped
-# profile-gated ones (keycloak, solace).
-
-CERT_CONSUMERS=(kong-cp kong-dp ha-proxy keycloak solace)
-running_consumers=()
-if running_list=$(cd ../.. && docker compose ps --services --status running 2>/dev/null); then
-    for svc in "${CERT_CONSUMERS[@]}"; do
-        if grep -qxF "$svc" <<<"$running_list"; then
-            running_consumers+=("$svc")
-        fi
-    done
-fi
-
-if (( ${#running_consumers[@]} == 0 )); then
-    echo "No cert-consuming services are currently running. Start the stack with 'docker compose up'."
-elif [[ -t 0 ]]; then
-    read -rp "Restart [${running_consumers[*]}] to pick up new certs? [Y/n] " answer
-    answer="${answer:-Y}"
-    if [[ "$answer" =~ ^[Yy] ]]; then
-        (cd ../.. && docker compose restart "${running_consumers[@]}")
-    else
-        echo "Skipped. Restart manually with: docker compose restart ${running_consumers[*]}"
+    echo "Renewal complete."
+    echo ""
+    echo "Generated files:"
+    ls -lh root_ca.pem intermediate_ca1.pem intermediate_ca2.pem \
+           kong.lan.pem kong.lan.key \
+           wild.kong.lan.pem wild.kong.lan.key \
+           client.kong.lan.pem client.kong.lan.key \
+           combined-wild.pem 2>/dev/null
+    if [[ -d client ]]; then
+        echo ""
+        ls -lh client/*.pem client/*.key 2>/dev/null || true
     fi
-else
-    echo "Non-interactive shell; skipping auto-restart. Run manually:"
-    echo "    docker compose restart ${running_consumers[*]}"
+
+    leaf_expiry=$(openssl x509 -in kong.lan.pem -enddate -noout | cut -d= -f2)
+    echo ""
+    echo "kong.lan leaf expires: $leaf_expiry"
+    echo "Backup of previous certs: $BACKUP_DIR"
+fi
+
+# ──────────────── Restart cert-consuming containers (only if certs changed) ─
+
+if $RENEWAL_NEEDED; then
+    # Restart only services that are actually running so we don't error on stopped
+    # profile-gated ones (keycloak, solace).
+    CERT_CONSUMERS=(kong-cp kong-dp ha-proxy keycloak solace)
+    running_consumers=()
+    if running_list=$(cd ../.. && docker compose ps --services --status running 2>/dev/null); then
+        for svc in "${CERT_CONSUMERS[@]}"; do
+            if grep -qxF "$svc" <<<"$running_list"; then
+                running_consumers+=("$svc")
+            fi
+        done
+    fi
+
+    if (( ${#running_consumers[@]} == 0 )); then
+        echo ""
+        echo "No cert-consuming services are currently running. Start the stack with 'docker compose up'."
+    elif [[ -t 0 ]]; then
+        echo ""
+        read -rp "Restart [${running_consumers[*]}] to pick up new certs? [Y/n] " answer
+        answer="${answer:-Y}"
+        if [[ "$answer" =~ ^[Yy] ]]; then
+            (cd ../.. && docker compose restart "${running_consumers[@]}")
+        else
+            echo "Skipped. Restart manually with: docker compose restart ${running_consumers[*]}"
+        fi
+    else
+        echo ""
+        echo "Non-interactive shell; skipping auto-restart. Run manually:"
+        echo "    docker compose restart ${running_consumers[*]}"
+    fi
 fi
 
 echo ""
