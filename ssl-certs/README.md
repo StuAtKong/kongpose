@@ -66,9 +66,32 @@ Compatibility: macOS Keychain, Chrome, Firefox, and modern Java all enforce `nam
 
 For browsers to accept the certs, your OS keychain must trust `root_ca.pem`. The intermediates are presented in the chain, so they don't need to be imported — but doing so doesn't hurt.
 
-**macOS:** double-click `root_ca.pem`, then in Keychain Access set it to "Always Trust".
+**macOS (GUI):** double-click `root_ca.pem`, then in Keychain Access set it to "Always Trust".
 
 ![OSX keystore](/images/import-ca-cert.png)
+
+**macOS (CLI):** alternatively, add and trust the root from the terminal.
+
+Login keychain (per-user, no sudo):
+```sh
+security add-trusted-cert -r trustRoot \
+  -k ~/Library/Keychains/login.keychain-db \
+  ssl-certs/smallstep/root_ca.pem
+```
+
+System keychain (machine-wide, requires sudo):
+```sh
+sudo security add-trusted-cert -d -r trustRoot \
+  -k /Library/Keychains/System.keychain \
+  ssl-certs/smallstep/root_ca.pem
+```
+
+To remove it later:
+```sh
+sudo security delete-certificate -c "Demo Kong Root CA" /Library/Keychains/System.keychain
+# or for the login keychain:
+security delete-certificate -c "Demo Kong Root CA" ~/Library/Keychains/login.keychain-db
+```
 
 **Linux (Debian/Ubuntu):**
 ```sh
