@@ -16,7 +16,7 @@ x-kong-image:
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.4}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.10}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
 
 x-kong-license:
   &kong-license
