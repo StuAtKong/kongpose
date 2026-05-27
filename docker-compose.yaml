@@ -16,7 +16,6 @@
 #   kafka          kafka, schema-registry, kafka-ui
 #   knep           Konnect Native Event Proxy
 #   konnect        Konnect-managed data plane
-#   rabobank       Konnect-managed DP (separate tenant)
 #   solace         solace pubsub broker
 #   minio          MinIO S3-compatible object store
 #   splunk         splunk enterprise (HEC)
@@ -30,6 +29,10 @@
 secrets:
   kong_license:
     file: ../../.kong-license-data/license.json
+  konnect_cluster_cert:
+    file: ./ssl-certs/konnect/dp/cluster.crt
+  konnect_cluster_key:
+    file: ./ssl-certs/konnect/dp/cluster.key
 #  pg_password:
 #    environment: "SECRET_PG_PASSWORD"
 #  pg_password_in_file:
@@ -881,6 +884,9 @@ services:
 #    image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.2}
     networks: *default-networks
     profiles: [ "konnect", "everything" ]
+    secrets:
+      - konnect_cluster_cert
+      - konnect_cluster_key
     environment:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_ROLE: "data_plane"
@@ -892,8 +898,8 @@ services:
       KONG_CLUSTER_SERVER_NAME: "5c67fd445b.eu.cp.konghq.com"
       KONG_CLUSTER_TELEMETRY_ENDPOINT: "5c67fd445b.eu.tp.konghq.com:443"
       KONG_CLUSTER_TELEMETRY_SERVER_NAME: "5c67fd445b.eu.tp.konghq.com"
-      KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICBjCCAaygAwIBAgIBATAKBggqhkjOPQQDBDA0MTIwCQYDVQQGEwJFVTAlBgNV\nBAMeHgBrAG8AbgBuAGUAYwB0AC0AZABlAGYAYQB1AGwAdDAeFw0yNjAyMTkxMDQx\nMzlaFw0zNjAyMTkxMDQxMzlaMDQxMjAJBgNVBAYTAkVVMCUGA1UEAx4eAGsAbwBu\nAG4AZQBjAHQALQBkAGUAZgBhAHUAbAB0MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAEF31vTRoZef0OHgi7qPiOOZ70yXLKQGPWdYXXllZXjh8iEvP27vsGqrTS4qcM\n6abStv6BHWJ2pV8AO3rmJ4xjLaOBrjCBqzAMBgNVHRMBAf8EAjAAMAsGA1UdDwQE\nAwIABjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFwYJKwYBBAGCNxQC\nBAoMCGNlcnRUeXBlMCMGCSsGAQQBgjcVAgQWBBQBAQEBAQEBAQEBAQEBAQEBAQEB\nATAcBgkrBgEEAYI3FQcEDzANBgUpAQEBAQIBCgIBFDATBgkrBgEEAYI3FQEEBgIE\nABQACjAKBggqhkjOPQQDBANIADBFAiA5fQ1dUQwJy83IXoLcZmKvZ0CaxhOcNLB6\ne8Nk7S/4swIhAITq5Rs9Qfl/KV+d5IpWGKQmpvZMwLdIGHwkbVeV/m7s\n-----END CERTIFICATE-----"
-      KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgRqj5DMH3mpd8/JQK\nlD8W1ollxMlFK7II9B+nKQWhjWKgCgYIKoZIzj0DAQehRANCAAQXfW9NGhl5/Q4e\nCLuo+I45nvTJcspAY9Z1hdeWVleOHyIS8/bu+waqtNLipwzpptK2/oEdYnalXwA7\neuYnjGMt\n-----END PRIVATE KEY-----"
+      KONG_CLUSTER_CERT: /run/secrets/konnect_cluster_cert
+      KONG_CLUSTER_CERT_KEY: /run/secrets/konnect_cluster_key
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
       KONG_KONNECT_MODE: "on"
       KONG_CLUSTER_RPC: "on"
@@ -902,31 +908,6 @@ services:
 #    ports:
 #     - 8000:8000
 #     - 8443:8443
-
-  konnect-rabo-dp:
-#    <<: [ *kong-image ]
-    image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.3}
-    networks: *default-networks
-    profiles: [ "rabobank", "everything" ]
-    environment:
-      KONG_ANONYMOUS_REPORTS: "off"
-      KONG_ROLE: "data_plane"
-      KONG_DATABASE: "off"
-      KONG_LOG_LEVEL: "debug"
-      KONG_VITALS: "off"
-      KONG_CLUSTER_MTLS: "pki"
-      KONG_CLUSTER_CONTROL_PLANE: "f8b71584a9.eu.cp.konghq.com:443"
-      KONG_CLUSTER_SERVER_NAME: "f8b71584a9.eu.cp.konghq.com"
-      KONG_CLUSTER_TELEMETRY_ENDPOINT: "f8b71584a9.eu.tp.konghq.com:443"
-      KONG_CLUSTER_TELEMETRY_SERVER_NAME: "f8b71584a9.eu.tp.konghq.com"
-      KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICDjCCAbSgAwIBAgIBATAKBggqhkjOPQQDBDA4MTYwCQYDVQQGEwJFVTApBgNV\nBAMeIgBrAG8AbgBuAGUAYwB0AC0AcgBhAGIAbwAtAHQAZQBzAHQwHhcNMjYwMTA4\nMTI0NTUyWhcNMzYwMTA4MTI0NTUyWjA4MTYwCQYDVQQGEwJFVTApBgNVBAMeIgBr\nAG8AbgBuAGUAYwB0AC0AcgBhAGIAbwAtAHQAZQBzAHQwWTATBgcqhkjOPQIBBggq\nhkjOPQMBBwNCAAR/At0yn8yHsYATOAVMvffX+uPtsHXWgFS3doUw2/qmVTgP6dqi\nXD3ptCb02bQxJIbOvqKTByJrvvzThsojlIbao4GuMIGrMAwGA1UdEwEB/wQCMAAw\nCwYDVR0PBAQDAgAGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAXBgkr\nBgEEAYI3FAIECgwIY2VydFR5cGUwIwYJKwYBBAGCNxUCBBYEFAEBAQEBAQEBAQEB\nAQEBAQEBAQEBMBwGCSsGAQQBgjcVBwQPMA0GBSkBAQEBAgEKAgEUMBMGCSsGAQQB\ngjcVAQQGAgQAFAAKMAoGCCqGSM49BAMEA0gAMEUCIQCBfewgyIx9ZNUDo8bXWaUv\nGHfP4di+H+ExUplxaC1HzAIgKmSF5N+D2QzsgGgFMGMM8RnhOnPQAEqIcfnhh3r8\nAfM=\n-----END CERTIFICATE-----"
-      KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQguNbusyoYqa0te9Uy\ng2wka/I8roKXGtlg/kmgNvNdaYKgCgYIKoZIzj0DAQehRANCAAR/At0yn8yHsYAT\nOAVMvffX+uPtsHXWgFS3doUw2/qmVTgP6dqiXD3ptCb02bQxJIbOvqKTByJrvvzT\nhsojlIba\n-----END PRIVATE KEY-----"
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
-      KONG_KONNECT_MODE: "on"
-#      KONG_HEADERS: "X-Kong-Request-Id"
-    ports:
-      - 8000:8000
-      - 8443:8443
 
   knep:
     image: kong/kong-native-event-proxy:latest
