@@ -1,3 +1,32 @@
+# kongpose — local Kong Gateway demo stack.
+# See README.md for setup; see ssl-certs/README.md for certificate handling.
+#
+# Default `docker compose up` starts:
+#   db, kong-migrations-bootstrap, kong-cp, kong-dp, ha-proxy, deck,
+#   ad-server (LDAP), httpbin, httpbin-logger, mockbin, redis, fake-smtp-server.
+#
+# Optional profiles — use one or more: `docker compose --profile <name> up`
+#   upgrade        Run Kong DB migrations (`kong migrations up` + `finish`)
+#   upstream       Extra mock backends: dadjokes, echo-server, echo-http-https, grpc-server
+#   auth           keycloak + opa
+#   utility        redis-commander, zipkin, vault, toxiproxy, locust, pgadmin, kibana, flask
+#   tracing        jaeger
+#   graylog        graylog + mongodb + elasticsearch
+#   prometheus     prometheus, grafana, statsd-exporter
+#   kafka          kafka, schema-registry, kafka-ui
+#   knep           Konnect Native Event Proxy
+#   konnect        Konnect-managed data plane
+#   rabobank       Konnect-managed DP (separate tenant)
+#   solace         solace pubsub broker
+#   minio          MinIO S3-compatible object store
+#   splunk         splunk enterprise (HEC)
+#   nginx          standalone nginx (for proxy testing)
+#   otel           OpenTelemetry collector
+#   redis-cluster  6-node redis cluster (instead of single `redis`)
+#   squid          squid forward proxy
+#   tcpdump        capture traffic on kong-dp's network namespace
+#   everything     everything above
+
 secrets:
   kong_license:
     file: ../../.kong-license-data/license.json
@@ -138,6 +167,24 @@ networks:
     internal: true
 
 services:
+  db:
+    networks: *public-networks
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+      POSTGRES_USER: kong
+      # Uncomment if kong version <2.3.2.0 i.e. does not support scram-sha256
+      #POSTGRES_HOST_AUTH_METHOD: md5
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "kong" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: on-failure
+    stdin_open: true
+    tty: true
+
   kong-migrations-bootstrap:
     <<: *kong-image
     networks: *public-networks
@@ -337,23 +384,6 @@ services:
       DATAPLANE_INFRA: "production"
     ports:
       - "18443:48443/tcp"
-  db:
-    networks: *public-networks
-    image: postgres:14-alpine
-    environment:
-      POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
-      POSTGRES_USER: kong
-      # Uncomment if kong version <2.3.2.0 i.e. does not support scram-sha256
-      #POSTGRES_HOST_AUTH_METHOD: md5
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "kong" ]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    restart: on-failure
-    stdin_open: true
-    tty: true
 
   ad-server:
     networks: *public-networks
@@ -368,16 +398,37 @@ services:
     ports:
       - "389:389/tcp"
 
-# This is your "lens" - it listens on port 80 and logs everything
-  httpbin-logger:
-    image: alpine/socat
-    networks: *default-networks
-#    ports:
-#      - "80:80"
-    # -v (verbose) prints raw data to stdout
-    # TCP-LISTEN:80 listens on port 80
-    # TCP:httpbin-real:80 forwards it to the backend
-    command: -v TCP-LISTEN:80,fork,reuseaddr TCP:httpbin:80
+  dadjokes:
+    networks: *public-networks
+    image: yesinteractive/dadjokes
+    profiles: [ "upstream", "everything" ]
+  #    ports:
+  #      - "8081:80"
+
+  echo-http-https:
+    networks: *public-networks
+    image: "mendhak/http-https-echo"
+    profiles: [ "upstream", "everything" ]
+    environment:
+      MTLS_ENABLE: 1
+  #    ports:
+  #      - "8080:8080/tcp"
+  #      - "8443:8443/tcp"
+
+  echo-server:
+    networks: *public-networks
+    image: "jmalloc/echo-server"
+    profiles: [ "upstream", "everything" ]
+  #    ports:
+  #      - "8080:8080/tcp"
+
+  grpc-server:
+    networks: *public-networks
+    image: "moul/grpcbin"
+    profiles: [ "upstream", "everything" ]
+    ports:
+      - "9000:9000/tcp"
+      - "9001:9001/tcp"
 
   httpbin:
     networks: *default-networks
@@ -401,6 +452,17 @@ services:
 #    ports:
 #      - "8080:80"
 
+# This is your "lens" - it listens on port 80 and logs everything
+  httpbin-logger:
+    image: alpine/socat
+    networks: *default-networks
+#    ports:
+#      - "80:80"
+    # -v (verbose) prints raw data to stdout
+    # TCP-LISTEN:80 listens on port 80
+    # TCP:httpbin-real:80 forwards it to the backend
+    command: -v TCP-LISTEN:80,fork,reuseaddr TCP:httpbin:80
+
   mockbin:
     networks: *default-networks
     image: "mashape/mockbin:latest"
@@ -414,38 +476,6 @@ services:
   #   networks:
   #     - kongpose-net
   #   image: "tcpbin:latest"
-
-  echo-server:
-    networks: *public-networks
-    image: "jmalloc/echo-server"
-    profiles: [ "upstream", "everything" ]
-  #    ports:
-  #      - "8080:8080/tcp"
-
-  echo-http-https:
-    networks: *public-networks
-    image: "mendhak/http-https-echo"
-    profiles: [ "upstream", "everything" ]
-    environment:
-      MTLS_ENABLE: 1
-  #    ports:
-  #      - "8080:8080/tcp"
-  #      - "8443:8443/tcp"
-
-  dadjokes:
-    networks: *public-networks
-    image: yesinteractive/dadjokes
-    profiles: [ "upstream", "everything" ]
-  #    ports:
-  #      - "8081:80"
-
-  grpc-server:
-    networks: *public-networks
-    image: "moul/grpcbin"
-    profiles: [ "upstream", "everything" ]
-    ports:
-      - "9000:9000/tcp"
-      - "9001:9001/tcp"
 
   keycloak:
     networks: *public-networks
