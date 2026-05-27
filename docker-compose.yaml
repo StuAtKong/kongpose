@@ -11,14 +11,14 @@ secrets:
 
 # Specify which Kong image to run
 x-kong-image:
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.20}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.8.1.2}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.9.1.2}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.3}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.2}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway-dev
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.26}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.11}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.11}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.6}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.4}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.10}
 
 x-kong-license:
   &kong-license
@@ -68,17 +68,18 @@ x-kong-common-config:
   KONG_STATUS_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
   KONG_DEBUG_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
   KONG_DEBUG_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
-#  KONG_LUA_SSL_TRUSTED_CERTIFICATE: /tmp/ssl/customcerts/hybrid/cluster.crt,system
-#  KONG_LUA_SSL_VERIFY_DEPTH: 5
+  KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+  KONG_LUA_SSL_VERIFY_DEPTH: 5
   KONG_NGINX_PROXY_PROXY_SSL_VERIFY: "on"
   KONG_NGINX_PROXY_PROXY_SSL_TRUSTED_CERTIFICATE: "/etc/ssl/certs/ca-certificates.crt"
   KONG_NGINX_PROXY_PROXY_SSL_PROTOCOLS: TLSv1 TLSv1.1 TLSv1.2 TLSv1.3
-  KONG_NGINX_WORKER_PROCESSES: 2
+  KONG_NGINX_WORKER_PROCESSES: 4
   KONG_EVENT_HOOKS_ENABLED: "on"
   KONG_TRUSTED_IPS: "0.0.0.0/0"
+  #KONG_TRUSTED_IPS: "172.18.0.12/32"
   KONG_REAL_IP_HEADER: "X-Forwarded-For"
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
-  KONG_REAL_IP_RECURSIVE: "on"
+  KONG_REAL_IP_RECURSIVE: "off"
 #  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
   KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/?.lua;;"
 #  KONG_PLUGINS: "bundled, service-protection"
@@ -115,6 +116,8 @@ x-kong-common-config:
 #  KONG_ADMIN_TOKEN_CP2: "kong-admin-token: password-wrong"
   KONG_REQUEST_DEBUG_TOKEN: "request_debug_token"
   KONG_ADMIN_GUI_HIDE_KONNECT_CTA: true
+  KONG_INCREMENTAL_SYNC: "on"
+#  KONG_NGINX_HTTP_LUA_SHARED_DICT: "iberia_rate_limiting_counters 256m; lua_shared_dict otel_metrics 20m"
 
   # Common values for kong-cp and kong-dp
 x-kong-container-common:
@@ -128,6 +131,14 @@ x-kong-container-common:
 #  read_only: true
   tmpfs:
     - /tmp
+
+x-default-networks: &default-networks
+  - kongpose-net
+  - kongpose-net-internal
+
+x-public-networks: &public-networks
+  - kongpose-net
+
 networks:
   kongpose-net:
     name: kongpose-net
@@ -140,8 +151,7 @@ networks:
 services:
   kong-migrations:
     <<: *kong-image
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: "kong migrations bootstrap"
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -153,8 +163,7 @@ services:
   kong-migrations-all-up:
     <<: *kong-image
     profiles: [ "upgrade", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: kong migrations up
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -169,8 +178,7 @@ services:
     depends_on:
       kong-migrations-all-up:
         condition: service_completed_successfully
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: kong migrations finish
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -182,8 +190,7 @@ services:
   kong-migrations-upgrade:
     <<: *kong-image
     profiles: [ "upgrade", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: "kong migrations up"
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -195,8 +202,7 @@ services:
   kong-migrations-finish:
     <<: *kong-image
     profiles: [ "upgrade-finish", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: "kong migrations finish"
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -208,8 +214,7 @@ services:
   kong-migrations-list:
     <<: *kong-image
     profiles: [ "upgrade-list", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     command: "kong migrations list"
     environment:
       <<: [ *kong-license, *kong-db-config ]
@@ -224,9 +229,7 @@ services:
       replicas: 1
     mem_limit: 2g
     cpus: 1
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     user: "${KONG_USER:-kong}"
     depends_on:
       db:
@@ -267,14 +270,15 @@ services:
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
-      KONG_ADMIN_GUI_SESSION_CONF: '{ "cookie_name": "admin_session", "secret": "this_is_my_other_secret", "storage": "kong", "cookie_secure":true}'
+      KONG_ADMIN_GUI_SESSION_CONF: '{ "cookie_name": "session", "secret": "this_is_my_other_secret", "storage": "kong", "cookie_secure":true}'
       # Kong Manager auth via BasicAuth
       #KONG_ADMIN_GUI_AUTH: "basic-auth"
       # Kong Manager auth via local LDAP(AD) server
       KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
       KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false, \"log_search_results\":true }"
-      # KONG_ADMIN_GUI_AUTH: "openid-connect"
-      # Kong Manager auth via OIDC & Auth0
+#      KONG_ADMIN_GUI_AUTH: "openid-connect"
+      # Kong Manager auth via OIDC & Google
+#      KONG_ADMIN_GUI_AUTH_CONF: "{\"issuer\": \"https://accounts.google.com\",\"admin_claim\": \"email\",\"client_id\": [\"433654550263-5j65201nlpo4conh8m6d76vf4trm03lm.apps.googleusercontent.com\"],\"client_secret\": [\"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\"],\"ssl_verify\": true,\"leeway\": 60,\"redirect_uri\": [\"https://api.kong.com/auth\"],\"login_redirect_uri\": [\"https://manager.kong.com\"],\"logout_redirect_uri\": [\"https://manager.kong.com\"],\"scopes\": [\"openid\",\"profile\",\"email\"],\"admin_auto_create\": true}"
       # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
       # Kong Manager auth via OIDC & Azure AD
@@ -294,7 +298,7 @@ services:
       # KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"7zxU14d1b5NTNf31p5lhShVX1N1UfWp3BHayU8kw\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"0oa4q0et31F47l9Nq4x6\"],\"issuer\":\"https://dev-885513.okta.com/oauth2/default/.well-known/oauth-authorization-server\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
       # Kong DevPortal auth via OIDC & Azure AD
       KONG_PORTAL_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"authorization_cookie_domain\":\".kong.lan\",\"authorization_cookie_samesite\":\"None\",\"authorization_cookie_secure\":true,\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"leeway\":100,\"login_action\":\"redirect\",\"login_redirect_mode\":\"query\",\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"logout_methods\":[\"GET\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_domain\":\".kong.lan\",\"session_cookie_samesite\":\"None\",\"session_cookie_secure\":true,\"session_storage\":\"cookie\",\"ssl_verify\":false,\"verify_parameters\":false,\"by_username_ignore_case\":true}"
-      #KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
+      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"default-portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
       KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
@@ -308,7 +312,7 @@ services:
       KONG_SMTP_HOST: "fake-smtp-server"
       KONG_SMTP_PORT: 1025
       KONG_SMTP_DOMAIN: "api.kong.lan"
-      KONG_TRACING: "off"
+      KONG_TRACING: "on"
       KONG_TRACING_DEBUG_HEADER: "X-Kong-Debug"
       KONG_TRACING_WRITE_ENDPOINT: "/usr/local/kong/tracing/kong-postgres.trc"
       KONG_GENERATE_TRACE_DETAILS: "on"
@@ -336,9 +340,7 @@ services:
     #mem_limit: 8g
     deploy:
       replicas: 1
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     # add this capability if you want to install and run iptables rules on the DP
     cap_add:
       - NET_ADMIN
@@ -416,11 +418,12 @@ services:
       KONG_TRACING_INSTRUMENTATIONS: "all"
       KONG_TRACING_SAMPLING_RATE: "1"
 #      KONG_HEADERS: "off"
+      KONG_UNTRUSTED_LUA: "on"
+      DATAPLANE_INFRA: "production"
     ports:
       - "18443:48443/tcp"
   db:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: postgres:14-alpine
     environment:
       POSTGRES_DB: kong
@@ -448,8 +451,7 @@ services:
 #      retries: 5
 
   ad-server:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: alpine:3.17
     volumes:
       - ./ldap-server:/setup-ad/:ro
@@ -461,20 +463,42 @@ services:
     ports:
       - "389:389/tcp"
 
+# This is your "lens" - it listens on port 80 and logs everything
+  httpbin-logger:
+    image: alpine/socat
+    networks: *default-networks
+#    ports:
+#      - "80:80"
+    # -v (verbose) prints raw data to stdout
+    # TCP-LISTEN:80 listens on port 80
+    # TCP:httpbin-real:80 forwards it to the backend
+    command: -v TCP-LISTEN:80,fork,reuseaddr TCP:httpbin:80
+
   httpbin:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: "kennethreitz/httpbin"
-    deploy:
-      replicas: 2
+    environment:
+      - GUNICORN_CMD_ARGS=--capture-output --error-logfile - --access-logfile - --access-logformat '%(h)s %(t)s %(r)s %(s)s'
+#    deploy:
+#      replicas: 2
   #    ports:
   #      - "80:80/tcp"
 
+#  httpbin:
+#    networks:
+#      - kongpose-net
+#      - kongpose-net-internal
+#    image: mccutchen/go-httpbin
+#    environment:
+      # Optional: set max body size if you're testing large uploads (default is 1MB)
+#      MAX_BODY_SIZE: 10485760
+#      PORT: 80
+#    ports:
+#      - "8080:80"
+
+
   mockbin:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: "mashape/mockbin:latest"
   #    ports:
   #      - "80:80/tcp"
@@ -488,16 +512,14 @@ services:
   #   image: "tcpbin:latest"
 
   echo-server:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: "jmalloc/echo-server"
     profiles: [ "upstream", "everything" ]
   #    ports:
   #      - "8080:8080/tcp"
 
   echo-http-https:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: "mendhak/http-https-echo"
     profiles: [ "upstream", "everything" ]
     environment:
@@ -508,16 +530,14 @@ services:
 
 
   dadjokes:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: yesinteractive/dadjokes
     profiles: [ "upstream", "everything" ]
   #    ports:
   #      - "8081:80"
 
   grpc-server:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: "moul/grpcbin"
     profiles: [ "upstream", "everything" ]
     ports:
@@ -525,8 +545,7 @@ services:
       - "9001:9001/tcp"
 
   keycloak:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     #image: jboss/keycloak:9.0.0
     #image: jboss/keycloak:15.0.2
     image: quay.io/keycloak/keycloak:15.0.2
@@ -544,18 +563,24 @@ services:
       - "8080:8080/tcp"
       - "28443:8443/tcp"
 
-  redis:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
-    image: redis:latest
+#  redis:
+#    networks:
+#      - kongpose-net
+#      - kongpose-net-internal
+#    image: redis:latest
   #    ports:
   #      - "6379:6379/tcp"
 
+  redis:
+    image: redis/redis-stack:latest
+#    profiles: [ "redis-stack", "everything" ]
+    networks: *default-networks
+#    ports:
+#      - "6379:6379"
+#      - "7001:8001"
+
   redis-cluster:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: redis:latest
     hostname: redis-node
     deploy:
@@ -566,9 +591,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
 
   redis-commander:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     profiles: [ "utility", "everything" ]
@@ -578,16 +601,14 @@ services:
       - "8081:8081"
 
   zipkin:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: openzipkin/zipkin
     profiles: [ "utility", "everything" ]
     ports:
       - "9411:9411/tcp"
 
   vault:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: vault:latest
     profiles: [ "utility", "everything" ]
     environment:
@@ -597,8 +618,7 @@ services:
   #      - "8200:8200/tcp"
 
   toxiproxy:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: "shopify/toxiproxy"
     profiles: [ "utility", "everything" ]
     ports:
@@ -606,8 +626,7 @@ services:
 
   # Create a toxiproxy configuration for postgres latency
   toxiproxy-config:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: "shopify/toxiproxy"
     profiles: [ "utility", "everything" ]
     entrypoint: >
@@ -615,9 +634,7 @@ services:
              /go/bin/toxiproxy-cli -h toxiproxy:8474 toxic add proxy_latency --upstream -t latency -a latency=5000 -a jitter=0;"
 
   ha-proxy:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: haproxy:2.3.5-alpine
     volumes:
       - ./ha-proxy:/usr/local/etc/haproxy:ro
@@ -642,8 +659,7 @@ services:
       - "5555-5556:5555-5556/tcp"
 
   deck:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: kong/deck:latest
     volumes:
       - ./deck:/tmp/deck:ro
@@ -658,13 +674,12 @@ services:
       kong-dp:
         condition: service_healthy
     entrypoint: >
-      sh -c "/usr/local/bin/deck gateway sync --workspace default /tmp/deck/default-entities.yaml;
-             /usr/local/bin/deck gateway sync --skip-ca-certificates --workspace haproxy-hc /tmp/deck/hc-entities.yaml;
-             /usr/local/bin/deck gateway sync --skip-ca-certificates --workspace mtls /tmp/deck/mtls-entities.yaml;"
+          sh -c "/usr/local/bin/deck gateway sync --silence-events --workspace default /tmp/deck/default-entities.yaml;
+            /usr/local/bin/deck gateway sync --silence-events --skip-ca-certificates --workspace haproxy-hc /tmp/deck/hc-entities.yaml;
+            /usr/local/bin/deck gateway sync --silence-events --skip-ca-certificates --workspace mtls /tmp/deck/mtls-entities.yaml;"
 
   locust:
-    networks:
-      - kongpose-net
+    networks: *public-networks
 #    image: locustio/locust:2.14.2
     image: locustio/locust
     profiles: [ "utility", "everything" ]
@@ -675,16 +690,14 @@ services:
     command: -f /mnt/locust/locustfile.py
 
   fake-smtp-server:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: reachfive/fake-smtp-server
     #ports:
     #- "25:1025/tcp"
     #- "1080:1080/tcp"
 
   mongodb:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: mongo:4.2
     profiles: [ "graylog", "everything" ]
     healthcheck:
@@ -694,8 +707,7 @@ services:
       retries: 3
 
   elasticsearch:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     profiles: [ "graylog", "everything" ]
     healthcheck:
@@ -719,8 +731,7 @@ services:
     mem_limit: 1g
 
   graylog:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: graylog/graylog:4.0.7
     profiles: [ "graylog", "everything" ]
     volumes:
@@ -759,8 +770,7 @@ services:
       #- "5555:5555/udp"
 
   pgadmin:
-    networks:
-      - kongpose-net
+    networks: *public-networks
     image: dpage/pgadmin4
     profiles: [ "utility", "everything" ]
     volumes:
@@ -773,85 +783,10 @@ services:
     ports:
       - "7071:7071"
 
-  zookeeper:
-    image: 'bitnami/zookeeper:3.6.2'
-    profiles: [ "kafka", "everything" ]
-    networks:
-      - kongpose-net
-    #   ports:
-    #     - '12181:12181'
-    #   volumes:
-    #     - zk-1:/bitnami/zookeeper
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-      - ZOO_PORT_NUMBER=12181
-      - ZOO_SERVER_ID=1
-      - ZOO_SERVERS=0.0.0.0:2888:3888
-      - ZOO_TICK_TIME=2000
-      - ZOO_INIT_LIMIT=10
-      - ZOO_SYNC_LIMIT=5
-      - ZOO_MAX_CLIENT_CNXNS=60
-      - ZOO_HEAP_SIZE=1024
-      - ZOO_AUTOPURGE_PURGEINTERVAL=72
-      - ZOO_AUTOPURGE_SNAPRETAINCOUNT=3
-
-  kafka:
-    #image: 'bitnami/kafka:2.7.0'
-    image: 'bitnami/kafka:2.2.1'
-    profiles: [ "kafka", "everything" ]
-    networks:
-      - kongpose-net
-    #   ports:
-    #     - '19093:19093'
-    environment:
-      - KAFKA_CFG_BROKER_ID=101
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:12181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:19093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9092,EXTERNAL://kafka-1:19093
-      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
-      - KAFKA_CFG_NUM_PARTITIONS=1
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
-      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_HEAP_OPTS=-Xmx1024m -Xms1024m
-
-    #   volumes:
-    #     - 'kafka_data:/bitnami'
-    depends_on:
-      - zookeeper
-
-  kafka-ui:
-    image: 'obsidiandynamics/kafdrop'
-    profiles: [ "kafka", "everything" ]
-    environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
-      - SERVER_PORT=8080
-    networks:
-      - kongpose-net
-    #   ports:
-    #     - "8787:8080"
-    depends_on:
-      - kafka
-      - zookeeper
-
-  # elasticsearch-v:
-  #   container_name: elasticsearch
-  #   hostname: elasticsearch
-  #   networks:
-  #     - kongpose-net
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.11.2
-  #   environment:
-  #     - ES_JAVA_OPTS=-Xms1g -Xmx1g
-  #     - discovery.type=single-node
-
   kibana:
     image: docker.elastic.co/kibana/kibana:7.11.2
     profiles: [ "utility", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     #   hostname: kibana
     #   container_name: kibana
     ports:
@@ -873,8 +808,7 @@ services:
     image: prom/statsd-exporter:latest
     profiles: [ "prometheus", "everything" ]
     #image: kong/statsd-exporter-advanced:0.3.1
-    networks:
-      - kongpose-net
+    networks: *public-networks
     user: root
     volumes:
       - ./statsd-exporter/statsd.rules.yaml:/tmp/statsd.rules.yaml
@@ -885,8 +819,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.35.0
     profiles: [ "prometheus" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     volumes:
       - ./prometheus/:/etc/prometheus/
     command:
@@ -898,8 +831,7 @@ services:
   grafana:
     image: grafana/grafana:7.5.1
     profiles: [ "prometheus", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     #   container_name: grafana
     ports:
       - 3000:3000
@@ -910,8 +842,7 @@ services:
   opa:
     image: openpolicyagent/opa:latest
     profiles: [ "auth", "everything" ]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     #   container_name: opa
     #   ports:
     #     - "8181:8181"
@@ -931,8 +862,7 @@ services:
 #    image: flask-app:latest
     image: python:latest
     profiles: [ "utility", "everything"]
-    networks:
-      - kongpose-net
+    networks: *public-networks
     volumes:
       - ./flask/:/flask
 #    ports:
@@ -941,9 +871,7 @@ services:
   squid:
     image: ubuntu/squid
     profiles: [ "squid", "everything" ]
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     ports:
       - "3128:3128"
       - "4128:4128"
@@ -960,9 +888,7 @@ services:
     command: [ "-s", "0", "-i", "any", "-w", "/tcpdump/dns.pcap", "port 53"]
 
   jaeger:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
 #   image: jaegertracing/all-in-one:1.50
     image: jaegertracing/all-in-one
     profiles: [ "tracing", "everything" ]
@@ -980,9 +906,7 @@ services:
 #      - 9411:9411
 
   nginx:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: nginx
     profiles: [ "nginx", "everything" ]
     volumes:
@@ -992,9 +916,7 @@ services:
       - 8888:8888
 
   splunk:
-    networks:
-      - kongpose-net
-      - kongpose-net-internal
+    networks: *default-networks
     image: splunk/splunk:9.0.2
     profiles: [ "splunk", "everything" ]
     environment:
@@ -1007,69 +929,180 @@ services:
 #      - 8388:8088
 
   otel-collector:
-      networks:
-        - kongpose-net
-        - kongpose-net-internal
-      image: otel/opentelemetry-collector-contrib
-      profiles: [ "otel", "everything" ]
-      volumes:
-        - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml
-      ports:
-        - 1888:1888 # pprof extension
-        - 8888:8888 # Prometheus metrics exposed by the Collector
-        - 8889:8889 # Prometheus exporter metrics
-        - 13133:13133 # health_check extension
-        - 4317:4317 # OTLP gRPC receiver
-        - 4318:4318 # OTLP http receiver
-        - 55679:55679 # zpages extension
+    networks: *default-networks
+    image: otel/opentelemetry-collector-contrib
+    profiles: [ "otel", "everything" ]
+    volumes:
+      - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - 1888:1888 # pprof extension
+      - 8888:8888 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
 
   konnect-dp:
-      #<<: [ *kong-image ]
-      image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.1}
-      networks:
-        - kongpose-net
-        - kongpose-net-internal
-      profiles: [ "konnect", "everything" ]
-      environment:
-        KONG_ANONYMOUS_REPORTS: "off"
-        KONG_ROLE: "data_plane"
-        KONG_DATABASE: "off"
-        KONG_LOG_LEVEL: "debug"
-        KONG_VITALS: "off"
-        KONG_CLUSTER_MTLS: "pki"
-        KONG_CLUSTER_CONTROL_PLANE: "68152badf0.us.cp0.konghq.com:443"
-        KONG_CLUSTER_SERVER_NAME: "68152badf0.us.cp0.konghq.com"
-        KONG_CLUSTER_TELEMETRY_ENDPOINT: "68152badf0.us.tp0.konghq.com:443"
-        KONG_CLUSTER_TELEMETRY_SERVER_NAME: "68152badf0.us.tp0.konghq.com"
-        KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICBTCCAaygAwIBAgIBATAKBggqhkjOPQQDBDA0MTIwCQYDVQQGEwJVUzAlBgNV\nBAMeHgBrAG8AbgBuAGUAYwB0AC0AZABlAGYAYQB1AGwAdDAeFw0yNTAyMjYxMTI5\nMTNaFw0zNTAyMjYxMTI5MTNaMDQxMjAJBgNVBAYTAlVTMCUGA1UEAx4eAGsAbwBu\nAG4AZQBjAHQALQBkAGUAZgBhAHUAbAB0MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAEs1zKFKNQpGdAAb3wlvPF+ONRUccKtyYoL5avWmqr0yUTsM5x0SrX7+Yw0Wyy\ncmLPurJXYDvftXGXkcppSPbPj6OBrjCBqzAMBgNVHRMBAf8EAjAAMAsGA1UdDwQE\nAwIABjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFwYJKwYBBAGCNxQC\nBAoMCGNlcnRUeXBlMCMGCSsGAQQBgjcVAgQWBBQBAQEBAQEBAQEBAQEBAQEBAQEB\nATAcBgkrBgEEAYI3FQcEDzANBgUpAQEBAQIBCgIBFDATBgkrBgEEAYI3FQEEBgIE\nABQACjAKBggqhkjOPQQDBANHADBEAiB4lSqd+N/SZ7xDlDJ1WmXRMVsJc14rGZoY\nxwMB4N31RgIgEoE7Y3TKcQPiQozMgkfp+o6Tl8Gckb59wJ9BfSYmx2Q=\n-----END CERTIFICATE-----"
-        KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgq1n36mmuuRBJKrPA\nv/0gNWeDMyAcXZky8HanNjEwSAKgCgYIKoZIzj0DAQehRANCAASzXMoUo1CkZ0AB\nvfCW88X441FRxwq3Jigvlq9aaqvTJROwznHRKtfv5jDRbLJyYs+6sldgO9+1cZeR\nymlI9s+P\n-----END PRIVATE KEY-----" 
-        KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
-        KONG_KONNECT_MODE: "on"
-        KONG_CLUSTER_RPC: "on"
-        KONG_ACTIVE_TRACING: "on"
-#      ports:
-#       - 8000:8000
-#       - 8443:8443
+    <<: [ *kong-image ]
+#    image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.2}
+    networks: *default-networks
+    profiles: [ "konnect", "everything" ]
+    environment:
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_ROLE: "data_plane"
+      KONG_DATABASE: "off"
+      KONG_LOG_LEVEL: "debug"
+      KONG_VITALS: "off"
+      KONG_CLUSTER_MTLS: "pki"
+      KONG_CLUSTER_CONTROL_PLANE: "5c67fd445b.eu.cp.konghq.com:443"
+      KONG_CLUSTER_SERVER_NAME: "5c67fd445b.eu.cp.konghq.com"
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: "5c67fd445b.eu.tp.konghq.com:443"
+      KONG_CLUSTER_TELEMETRY_SERVER_NAME: "5c67fd445b.eu.tp.konghq.com"
+      KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICBjCCAaygAwIBAgIBATAKBggqhkjOPQQDBDA0MTIwCQYDVQQGEwJFVTAlBgNV\nBAMeHgBrAG8AbgBuAGUAYwB0AC0AZABlAGYAYQB1AGwAdDAeFw0yNjAyMTkxMDQx\nMzlaFw0zNjAyMTkxMDQxMzlaMDQxMjAJBgNVBAYTAkVVMCUGA1UEAx4eAGsAbwBu\nAG4AZQBjAHQALQBkAGUAZgBhAHUAbAB0MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\nQgAEF31vTRoZef0OHgi7qPiOOZ70yXLKQGPWdYXXllZXjh8iEvP27vsGqrTS4qcM\n6abStv6BHWJ2pV8AO3rmJ4xjLaOBrjCBqzAMBgNVHRMBAf8EAjAAMAsGA1UdDwQE\nAwIABjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFwYJKwYBBAGCNxQC\nBAoMCGNlcnRUeXBlMCMGCSsGAQQBgjcVAgQWBBQBAQEBAQEBAQEBAQEBAQEBAQEB\nATAcBgkrBgEEAYI3FQcEDzANBgUpAQEBAQIBCgIBFDATBgkrBgEEAYI3FQEEBgIE\nABQACjAKBggqhkjOPQQDBANIADBFAiA5fQ1dUQwJy83IXoLcZmKvZ0CaxhOcNLB6\ne8Nk7S/4swIhAITq5Rs9Qfl/KV+d5IpWGKQmpvZMwLdIGHwkbVeV/m7s\n-----END CERTIFICATE-----"
+      KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgRqj5DMH3mpd8/JQK\nlD8W1ollxMlFK7II9B+nKQWhjWKgCgYIKoZIzj0DAQehRANCAAQXfW9NGhl5/Q4e\nCLuo+I45nvTJcspAY9Z1hdeWVleOHyIS8/bu+waqtNLipwzpptK2/oEdYnalXwA7\neuYnjGMt\n-----END PRIVATE KEY-----"
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+      KONG_KONNECT_MODE: "on"
+      KONG_CLUSTER_RPC: "on"
+      KONG_ACTIVE_TRACING: "on"
+#      KONG_HEADERS: "server_tokens, latency_tokens"
+#    ports:
+#     - 8000:8000
+#     - 8443:8443
 
+  konnect-rabo-dp:
+#    <<: [ *kong-image ]
+    image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.3}
+    networks: *default-networks
+    profiles: [ "rabobank", "everything" ]
+    environment:
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_ROLE: "data_plane"
+      KONG_DATABASE: "off"
+      KONG_LOG_LEVEL: "debug"
+      KONG_VITALS: "off"
+      KONG_CLUSTER_MTLS: "pki"
+      KONG_CLUSTER_CONTROL_PLANE: "f8b71584a9.eu.cp.konghq.com:443"
+      KONG_CLUSTER_SERVER_NAME: "f8b71584a9.eu.cp.konghq.com"
+      KONG_CLUSTER_TELEMETRY_ENDPOINT: "f8b71584a9.eu.tp.konghq.com:443"
+      KONG_CLUSTER_TELEMETRY_SERVER_NAME: "f8b71584a9.eu.tp.konghq.com"
+      KONG_CLUSTER_CERT: "-----BEGIN CERTIFICATE-----\nMIICDjCCAbSgAwIBAgIBATAKBggqhkjOPQQDBDA4MTYwCQYDVQQGEwJFVTApBgNV\nBAMeIgBrAG8AbgBuAGUAYwB0AC0AcgBhAGIAbwAtAHQAZQBzAHQwHhcNMjYwMTA4\nMTI0NTUyWhcNMzYwMTA4MTI0NTUyWjA4MTYwCQYDVQQGEwJFVTApBgNVBAMeIgBr\nAG8AbgBuAGUAYwB0AC0AcgBhAGIAbwAtAHQAZQBzAHQwWTATBgcqhkjOPQIBBggq\nhkjOPQMBBwNCAAR/At0yn8yHsYATOAVMvffX+uPtsHXWgFS3doUw2/qmVTgP6dqi\nXD3ptCb02bQxJIbOvqKTByJrvvzThsojlIbao4GuMIGrMAwGA1UdEwEB/wQCMAAw\nCwYDVR0PBAQDAgAGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAXBgkr\nBgEEAYI3FAIECgwIY2VydFR5cGUwIwYJKwYBBAGCNxUCBBYEFAEBAQEBAQEBAQEB\nAQEBAQEBAQEBMBwGCSsGAQQBgjcVBwQPMA0GBSkBAQEBAgEKAgEUMBMGCSsGAQQB\ngjcVAQQGAgQAFAAKMAoGCCqGSM49BAMEA0gAMEUCIQCBfewgyIx9ZNUDo8bXWaUv\nGHfP4di+H+ExUplxaC1HzAIgKmSF5N+D2QzsgGgFMGMM8RnhOnPQAEqIcfnhh3r8\nAfM=\n-----END CERTIFICATE-----"
+      KONG_CLUSTER_CERT_KEY: "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQguNbusyoYqa0te9Uy\ng2wka/I8roKXGtlg/kmgNvNdaYKgCgYIKoZIzj0DAQehRANCAAR/At0yn8yHsYAT\nOAVMvffX+uPtsHXWgFS3doUw2/qmVTgP6dqiXD3ptCb02bQxJIbOvqKTByJrvvzT\nhsojlIba\n-----END PRIVATE KEY-----"
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: "system"
+      KONG_KONNECT_MODE: "on"
+#      KONG_HEADERS: "X-Kong-Request-Id"
+    ports:
+      - 8000:8000
+      - 8443:8443
+
+
+  knep:
+    image: kong/kong-native-event-proxy:latest
+    networks: *default-networks
+    profiles: [ "knep", "everything" ]
+    environment:
+      KONNECT_API_HOSTNAME: "us.api.konghq.com"
+      KONNECT_CONTROL_PLANE_ID: "36ba42a3-0351-4539-8172-b960efe71c90"
+      KONNECT_API_TOKEN: "kpat_82hBAhcZGbdpGF5kltVB7H9cdw0dfFACaFGTMaX8enqgAFSRS"
+      KNEP__RUNTIME__DRAIN_DURATION: 1s # makes shutdown quicker, not recommended to be set like this in production 
+      KNEP__OBSERVABILITY__LOG_FLAGS: "info,knep=debug" # Uncomment for debug logging
+    ports:
+      - 8080:8080
+      - 19092:19092
+    healthcheck:
+      test: curl -f http://localhost:8080/health/probes/liveness
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: apache/kafka:3.9.0
+    profiles: [ "kafka", "everything" ]
+    networks: *default-networks
+    container_name: kafka
+    ports:
+      - "9092:19092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: INTERNAL://kafka:9092,CONTROLLER://kafka:9093,EXTERNAL://0.0.0.0:19092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CLUSTER_ID: 'abcdefghijklmnopqrstuv'
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    profiles: [ "kafka", "everything" ]
+    networks: *default-networks
+    container_name: schema-registry
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: curl -f http://localhost:8081/subjects
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    profiles: [ "kafka", "everything" ]
+    networks: *default-networks
+    container_name: kafka-ui
+    environment:
+      # First cluster configuration (direct Kafka connection)
+      KAFKA_CLUSTERS_0_NAME: "direct-kafka-cluster"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "http://schema-registry:8081"
+
+      # Second cluster configuration (KNEP proxy connection)
+      KAFKA_CLUSTERS_1_NAME: "knep-proxy-cluster"
+      KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS: "knep:9092"
+      KAFKA_CLUSTERS_1_SCHEMAREGISTRY: "http://schema-registry:8081"
+      
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
 
   solace:
-      image: solace/solace-pubsub-standard
-      shm_size: '1g'
-      platform: linux/amd64
-      networks:
-        - kongpose-net
-        - kongpose-net-internal
-      profiles: [ "solace", "everything" ]
-      environment:
-        username_admin_globalaccesslevel: "admin"
-        username_admin_password: "admin"
-      ports:
-        - 8080:8080  # Use this port when configuring the message broker container with Solace PubSub+ Broker Manager.
-        - 55555:55555 # Your applications can use Solace APIs to connect to the message broker on this port
-        - 8008:8008 # The JavaScript sample applications below use this port to pass Web Messaging traffic through the message broker
-#        - 1883:1883 # Ports for MQTT connectivity, over TCP 
-#        - 8000:8000 # Ports for MQTT connectivity, over WebSockets
-#        - 5672:5672 # AMQP 1.0 applications using Apache QPID APIs would connect here
-        - 9000:9000 # Use REST to send messaging and event data with Solace’s RESTful API port
-        - 2222:2222 # Use SSH to connect to the Solace Command Line Interface (CLI) for advanced configuration
+    image: solace/solace-pubsub-standard:10.25.13
+    shm_size: '1g'
+    platform: linux/amd64
+    networks: *default-networks
+    profiles: [ "solace", "everything" ]
+    volumes:
+      - ./ssl-certs/smallstep:/usr/sw/var/etc/certs
+#    volumes:
+#      - ./ssl-certs/smallstep/combined-wild.pem:/usr/sw/jail/certs/tls.crt
+#      - ./ssl-certs/smallstep:/tmp/certs
+    environment:
+      username_admin_globalaccesslevel: "admin"
+      username_admin_password: "admin"
+    ports:
+      - 8080:8080  # Use this port when configuring the message broker container with Solace PubSub+ Broker Manager.
+      - 55555:55555 # Your applications can use Solace APIs to connect to the message broker on this port
+      - 8008:8008 # The JavaScript sample applications below use this port to pass Web Messaging traffic through the message broker
+#      - 1883:1883 # Ports for MQTT connectivity, over TCP 
+#      - 8000:8000 # Ports for MQTT connectivity, over WebSockets
+#      - 5672:5672 # AMQP 1.0 applications using Apache QPID APIs would connect here
+      - 9000:9000 # Use REST to send messaging and event data with Solace’s RESTful API port
+      - 2222:2222 # Use SSH to connect to the Solace Command Line Interface (CLI) for advanced configuration
 
+  minio:
+    image: quay.io/minio/minio
+#    container_name: minio
+    profiles: [ "minio", "everything" ]
+    ports:
+      - "9000:9000" # API port
+      - "9001:9001" # Web Console port
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
