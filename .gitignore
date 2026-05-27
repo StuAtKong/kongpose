@@ -4,7 +4,13 @@ license.json
 locust/__pycache__/*
 zookeeper/*
 kafka/*
-ssl-certs/rootCA.srl
+# Certificates and keys — regenerated via ssl-certs/smallstep/renew_certs.sh.
+# Templates (.tpl) and the script itself stay tracked.
+ssl-certs/**/*.pem
+ssl-certs/**/*.key
+ssl-certs/**/*.crt
+ssl-certs/**/*.csr
+ssl-certs/**/*.srl
 ssl-certs/.cert-backup-*/
 http_content/test.txt
 ha-proxy/haproxy.cfg
