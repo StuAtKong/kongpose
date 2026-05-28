@@ -78,6 +78,41 @@ run_step() {
         "$STEP_IMAGE" "$@"
 }
 
+# Refresh macOS trust stores for the demo root CA.
+# Login keychain is always attempted; system keychain is updated only if writable
+# or passwordless sudo is available.
+refresh_macos_root_trust() {
+    [[ "$OSTYPE" == darwin* ]] || return 0
+
+    local cert_name="Demo Kong Root CA"
+    local cert_path="root_ca.pem"
+    local login_keychain="$HOME/Library/Keychains/login.keychain-db"
+    local system_keychain="/Library/Keychains/System.keychain"
+
+    if [[ ! -f "$cert_path" ]]; then
+        echo "    macOS trust refresh skipped: $cert_path not found"
+        return 0
+    fi
+
+    echo "==> macOS trust: refreshing '$cert_name' in login keychain"
+    security delete-certificate -c "$cert_name" "$login_keychain" >/dev/null 2>&1 || true
+    security add-trusted-cert -r trustRoot -k "$login_keychain" "$cert_path"
+
+    if [[ -w "$system_keychain" ]]; then
+        echo "==> macOS trust: refreshing '$cert_name' in system keychain"
+        security delete-certificate -c "$cert_name" "$system_keychain" >/dev/null 2>&1 || true
+        security add-trusted-cert -d -r trustRoot -k "$system_keychain" "$cert_path"
+    elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+        echo "==> macOS trust: refreshing '$cert_name' in system keychain (sudo -n)"
+        sudo security delete-certificate -c "$cert_name" "$system_keychain" >/dev/null 2>&1 || true
+        sudo security add-trusted-cert -d -r trustRoot -k "$system_keychain" "$cert_path"
+    else
+        echo "    system keychain not updated (needs sudo). Run manually if desired:"
+        echo "    sudo security delete-certificate -c '$cert_name' $system_keychain"
+        echo "    sudo security add-trusted-cert -d -r trustRoot -k $system_keychain ssl-certs/smallstep/$cert_path"
+    fi
+}
+
 # Returns 0 if file is missing or will expire within GRACE_DAYS, 1 otherwise.
 needs_renewal() {
     local file="$1"
@@ -221,6 +256,8 @@ shopt -u nullglob
 
 if $SMALLSTEP_NEEDED; then
 
+ROOT_CA_ROTATED=false
+
 # ──────────────── Templates ────────────────
 # Step CLI templates that pin maxPathLen for the 3-level CA hierarchy.
 # Without these, intermediate2 may not be permitted to sign leaves.
@@ -307,6 +344,7 @@ if needs_renewal root_ca.pem; then
         --template /app/root.tpl \
         --not-after "${ROOT_CA_HOURS}h" \
         --no-password --insecure --force
+    ROOT_CA_ROTATED=true
 fi
 
 if needs_renewal intermediate_ca1.pem; then
@@ -400,6 +438,10 @@ cat wild.kong.lan.pem intermediate_ca2.pem intermediate_ca1.pem root_ca.pem wild
 chmod 644 *.pem *.key
 if compgen -G "client/*" > /dev/null; then
     chmod 644 client/*.pem client/*.key
+fi
+
+if $ROOT_CA_ROTATED; then
+    refresh_macos_root_trust
 fi
 
 fi  # end SMALLSTEP_NEEDED block
