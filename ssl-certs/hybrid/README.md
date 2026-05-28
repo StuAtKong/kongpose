@@ -1,21 +1,34 @@
 # Hybrid SSL certificates for CP/DP communication
 
-Place the hybrid deployment certificiates here (cluster.key and cluster.crt)
+Place the hybrid deployment certificates here (`cluster.key` and `cluster.crt`).
 
-See here for info on creating cluster certificates; https://docs.konghq.com/enterprise/2.5.x/deployment/hybrid-mode-setup/#step-1-generate-a-certificatekey-pair
+See the Kong docs for background; https://docs.konghq.com/gateway/latest/production/deployment-topologies/hybrid-mode/setup/#generate-a-certificate-key-pair
 
-To create the certificates, you can start a temporary kong container using a command as below (this maps the repository directory to the container which allows the certificates to be saved to the docker host);
+## Quickest option: openssl on the host
 
-```
-docker run --rm -it --user root -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid kong:2.5.0-alpine /bin/sh
-```
-
-Then run;
+`kong hybrid gen_cert` is a thin wrapper around openssl, so you can generate the pair directly without spinning up a container. From the repo root:
 
 ```
-cd /tmp/ssl/hybrid
-kong hybrid gen_cert
-exit
+cd ssl-certs/hybrid
+openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp384r1) \
+  -keyout cluster.key -out cluster.crt -days 1095 -subj "/CN=kong_clustering"
+chmod 644 cluster.key
 ```
 
-Make sure the permissions for the cluster certs are correct (they will be owned by root). It is likely you'll need to run `sudo chmod 644 cluster.key` for the hybrid cluster ssl key.
+The `chmod` is needed because openssl writes the key with `0600` perms by default, and the non-root `kong` user inside the container won't be able to read it otherwise (nginx will fail to load the cluster cert key with `Permission denied`).
+
+## Alternative: one-shot Docker command
+
+If you'd rather use the Kong image (for parity with CI, etc.), run it as a single command instead of an interactive shell:
+
+```
+docker run --rm --user root \
+  -v $(pwd)/ssl-certs/hybrid:/tmp/ssl/hybrid -w /tmp/ssl/hybrid \
+  kong/kong-gateway:3.14.0.3 kong hybrid gen_cert
+```
+
+Because this runs as root inside the container, the resulting files will be owned by root on the host. Fix the key permissions so your user can read it:
+
+```
+sudo chown $(id -u):$(id -g) ssl-certs/hybrid/cluster.{key,crt}
+```
