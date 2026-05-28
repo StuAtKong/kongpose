@@ -156,8 +156,11 @@ prune_old_backups() {
     if (( ${#backups[@]} <= MAX_BACKUP_KEEP )); then
         return
     fi
-    local sorted
-    mapfile -t sorted < <(printf '%s\n' "${backups[@]}" | sort)
+    local sorted=()
+    local line
+    while IFS= read -r line; do
+        sorted+=("$line")
+    done < <(printf '%s\n' "${backups[@]}" | sort)
     local to_delete=$(( ${#sorted[@]} - MAX_BACKUP_KEEP ))
     local i
     for ((i=0; i<to_delete; i++)); do
@@ -337,14 +340,14 @@ generate_leaf() {
     local cn="$1" cert_path="$2" key_path="$3"
     shift 3
 
-    local -A seen=()
     local unique_sans=()
-    local s
+    local s existing found
     for s in "$cn" "$@"; do
-        if [[ -z "${seen[$s]:-}" ]]; then
-            seen[$s]=1
-            unique_sans+=("$s")
-        fi
+        found=0
+        for existing in "${unique_sans[@]}"; do
+            [[ "$existing" == "$s" ]] && { found=1; break; }
+        done
+        [[ $found -eq 0 ]] && unique_sans+=("$s")
     done
 
     local args=(
