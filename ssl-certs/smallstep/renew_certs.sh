@@ -23,6 +23,18 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+usage() {
+        cat <<'EOF'
+Usage: ./renew_certs.sh [options]
+
+Options:
+    -r, --regenerate-all   Regenerate all certs regardless of expiry.
+    -u, --update-macos-ca  Refresh macOS trust for root_ca.pem (remove + re-add).
+    -d, --delete-all       Delete generated cert files and backups.
+    -h, --help         Show this help.
+EOF
+}
+
 # ──────────────── Configuration ────────────────
 
 STEP_IMAGE="smallstep/step-cli:0.28.6"   # pin for reproducibility; bump deliberately
@@ -61,6 +73,35 @@ for domain in "${DOMAINS[@]}"; do
     PRIMARY_SANS+=("$domain")
 done
 PRIMARY_SANS+=("${EXTRA_SANS[@]}")
+
+FORCE_REGENERATE_ALL=false
+UPDATE_MACOS_CA=false
+DELETE_ALL_GENERATED=false
+
+while (( $# > 0 )); do
+    case "$1" in
+        -r|--regenerate-all)
+            FORCE_REGENERATE_ALL=true
+            ;;
+        -u|--update-macos-ca)
+            UPDATE_MACOS_CA=true
+            ;;
+        -d|--delete-all)
+            DELETE_ALL_GENERATED=true
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "ERROR: unknown option: $1"
+            echo ""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 # ──────────────── Pre-flight ────────────────
 
@@ -113,8 +154,45 @@ refresh_macos_root_trust() {
     fi
 }
 
+delete_generated_certs() {
+    echo "==> deleting generated certificates and backups"
+
+    shopt -s nullglob
+    local files=(
+        ./*.pem
+        ./*.key
+        ./combined-wild.pem
+        ./client/*.pem
+        ./client/*.key
+        ../hybrid/cluster.crt
+        ../hybrid/cluster.key
+        ../.cert-backup-*
+    )
+    shopt -u nullglob
+
+    if (( ${#files[@]} == 0 )); then
+        echo "    nothing to delete"
+        return 0
+    fi
+
+    local p
+    for p in "${files[@]}"; do
+        if [[ -d "$p" ]]; then
+            rm -rf "$p"
+        else
+            rm -f "$p"
+        fi
+    done
+
+    rmdir ./client 2>/dev/null || true
+    echo "    deleted ${#files[@]} path(s)"
+}
+
 # Returns 0 if file is missing or will expire within GRACE_DAYS, 1 otherwise.
 needs_renewal() {
+    if $FORCE_REGENERATE_ALL; then
+        return 0
+    fi
     local file="$1"
     if [[ ! -f "$file" ]]; then
         return 0
@@ -208,6 +286,20 @@ prune_old_backups() {
 # Renewal is gated, but the deck/backup-pruning housekeeping below always runs
 # so a no-op invocation still keeps the deck file in sync and trims old backups.
 
+if $DELETE_ALL_GENERATED; then
+    delete_generated_certs
+    if ! $FORCE_REGENERATE_ALL && ! $UPDATE_MACOS_CA; then
+        exit 0
+    fi
+fi
+
+if $UPDATE_MACOS_CA && ! $FORCE_REGENERATE_ALL; then
+    refresh_macos_root_trust
+    if ! $DELETE_ALL_GENERATED; then
+        exit 0
+    fi
+fi
+
 RENEWAL_NEEDED=false
 SMALLSTEP_NEEDED=false
 HYBRID_NEEDED=false
@@ -215,7 +307,11 @@ HYBRID_NEEDED=false
 if needs_renewal kong.lan.pem; then
     SMALLSTEP_NEEDED=true
     RENEWAL_NEEDED=true
-    echo "==> kong.lan.pem missing or near expiry — will regenerate smallstep CA chain + leaves"
+    if $FORCE_REGENERATE_ALL; then
+        echo "==> --regenerate-all set — regenerating smallstep CA chain + leaves"
+    else
+        echo "==> kong.lan.pem missing or near expiry — will regenerate smallstep CA chain + leaves"
+    fi
 else
     expiry=$(openssl x509 -in kong.lan.pem -enddate -noout | cut -d= -f2)
     echo "kong.lan.pem is valid until $expiry (more than ${GRACE_DAYS}d away). Skipping smallstep regeneration."
@@ -224,7 +320,11 @@ fi
 if needs_renewal ../hybrid/cluster.crt; then
     HYBRID_NEEDED=true
     RENEWAL_NEEDED=true
-    echo "==> ../hybrid/cluster.crt missing or near expiry — will regenerate hybrid CP/DP cert"
+    if $FORCE_REGENERATE_ALL; then
+        echo "==> --regenerate-all set — regenerating hybrid CP/DP cert"
+    else
+        echo "==> ../hybrid/cluster.crt missing or near expiry — will regenerate hybrid CP/DP cert"
+    fi
 else
     expiry=$(openssl x509 -in ../hybrid/cluster.crt -enddate -noout | cut -d= -f2)
     echo "../hybrid/cluster.crt is valid until $expiry (more than ${GRACE_DAYS}d away). Skipping hybrid regeneration."
@@ -382,7 +482,7 @@ generate_leaf() {
     local s existing found i
     for s in "$cn" "$@"; do
         found=0
-        # Index-based loop avoids empty-array expansion issues with `set -u`.
+        # Bash 3-compatible de-dup (macOS default bash has no associative arrays).
         for ((i=0; i<${#unique_sans[@]}; i++)); do
             existing="${unique_sans[i]}"
             [[ "$existing" == "$s" ]] && { found=1; break; }
@@ -537,6 +637,10 @@ if $RENEWAL_NEEDED; then
         echo "Non-interactive shell; skipping auto-restart. Run manually:"
         echo "    docker compose restart ${running_consumers[*]}"
     fi
+fi
+
+if $UPDATE_MACOS_CA; then
+    refresh_macos_root_trust
 fi
 
 echo ""
