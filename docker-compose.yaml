@@ -53,7 +53,7 @@ x-kong-license:
   &kong-license
   KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?err}
   #KONG_LICENSE_PATH: /run/secrets/kong_license
-  KONG_PORTAL_AND_VITALS_KEY: "d2cb4be4f720c007d40ebdd6e750324a9e1019e542f97be964c31f8e86ccb8f6"
+  KONG_PORTAL_AND_VITALS_KEY: "${KONG_PORTAL_AND_VITALS_KEY:-}"
 
 # Kong database config
 x-kong-db-config:
@@ -62,9 +62,9 @@ x-kong-db-config:
   KONG_PG_HOST: db
   KONG_PG_DATABASE: kong
   KONG_PG_USER: kong
-  KONG_PG_PASSWORD: kong
+  KONG_PG_PASSWORD: "${KONG_PG_PASSWORD:?set in .env}"
 #  KONG_PG_PASSWORD_FILE: "/run/secrets/pg_password_in_file"
-  KONG_PASSWORD: password
+  KONG_PASSWORD: "${KONG_ADMIN_TOKEN:?set in .env}"
 
 # Common config values
 x-kong-common-config:
@@ -135,7 +135,7 @@ x-kong-common-config:
 #  KONG_ADMIN_TOKEN_PROD_EXTERNAL: "prod-external-token"
 #  KONG_ADMIN_TOKEN_CP: "password"
 #  KONG_ADMIN_TOKEN_CP2: "kong-admin-token: password-wrong"
-  KONG_REQUEST_DEBUG_TOKEN: "request_debug_token"
+  KONG_REQUEST_DEBUG_TOKEN: "${KONG_REQUEST_DEBUG_TOKEN:?set in .env}"
   KONG_ADMIN_GUI_HIDE_KONNECT_CTA: true
   KONG_INCREMENTAL_SYNC: "on"
 #  KONG_NGINX_HTTP_LUA_SHARED_DICT: "iberia_rate_limiting_counters 256m; lua_shared_dict otel_metrics 20m"
@@ -175,7 +175,7 @@ services:
     image: postgres:14-alpine
     environment:
       POSTGRES_DB: kong
-      POSTGRES_PASSWORD: kong
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set in .env}"
       POSTGRES_USER: kong
       # Uncomment if kong version <2.3.2.0 i.e. does not support scram-sha256
       #POSTGRES_HOST_AUTH_METHOD: md5
@@ -275,21 +275,19 @@ services:
       KONG_ADMIN_GUI_URL: "https://manager.kong.lan"
       KONG_ADMIN_GUI_SSL_CERT_KEY: "/tmp/ssl/customcerts/smallstep/kong.lan.key"
       KONG_ADMIN_GUI_SSL_CERT: "/tmp/ssl/customcerts/smallstep/kong.lan.pem"
-      KONG_ADMIN_GUI_SESSION_CONF: '{ "cookie_name": "session", "secret": "this_is_my_other_secret", "storage": "kong", "cookie_secure":true}'
+      KONG_ADMIN_GUI_SESSION_CONF: "${KONG_ADMIN_GUI_SESSION_CONF:?set in .env}"
       # Kong Manager auth via BasicAuth
       #KONG_ADMIN_GUI_AUTH: "basic-auth"
       # Kong Manager auth via local LDAP(AD) server
       KONG_ADMIN_GUI_AUTH: "ldap-auth-advanced"
-      KONG_ADMIN_GUI_AUTH_CONF: "{\"bind_dn\":\"cn=Administrator,cn=users,dc=ldap,dc=kong,dc=com\",\"ldap_password\":\"Passw0rd\",\"attribute\":\"sAMAccountName\",\"base_dn\":\"cn=Users,dc=ldap,dc=kong,dc=com\",\"cache_ttl\":2,\"header_type\":\"Basic\",\"keepalive\":60000,\"ldap_host\":\"ad-server\",\"ldap_port\":389,\"ldaps\":false,\"start_tls\":false,\"timeout\":10000,\"verify_ldap_host\": false, \"log_search_results\":true }"
+      KONG_ADMIN_GUI_AUTH_CONF: "${KONG_ADMIN_GUI_AUTH_CONF:?set in .env}"
 #      KONG_ADMIN_GUI_AUTH: "openid-connect"
       # Kong Manager auth via OIDC & Google
-#      KONG_ADMIN_GUI_AUTH_CONF: "{\"issuer\": \"https://accounts.google.com\",\"admin_claim\": \"email\",\"client_id\": [\"433654550263-5j65201nlpo4conh8m6d76vf4trm03lm.apps.googleusercontent.com\"],\"client_secret\": [\"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\"],\"ssl_verify\": true,\"leeway\": 60,\"redirect_uri\": [\"https://api.kong.com/auth\"],\"login_redirect_uri\": [\"https://manager.kong.com\"],\"logout_redirect_uri\": [\"https://manager.kong.com\"],\"scopes\": [\"openid\",\"profile\",\"email\"],\"admin_auto_create\": true}"
-      # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
-      # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"client_id\":[\"nXSQjPrb12T73C0zj5dnCoQ7e96w16MZ\"],\"client_secret\":[\"PZW96frUNv_dydghldnP73aDyeAC1M3-6knRv5pZ_Ia1R2oMksA9hB6x1brR2dHy\"],\"consumer_by\":[\"username\",\"custom_id\"],\"consumer_claim\":[\"name\"],\"issuer\":\"https://dev-37bfcwdn.eu.auth0.com\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false}"
+  # KONG_ADMIN_GUI_AUTH_CONF: "<redacted example: move full JSON into .env as KONG_ADMIN_GUI_AUTH_CONF>"
       # Kong Manager auth via OIDC & Azure AD
-      # KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"password\"],\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\"],\"admin_claim\":\"name\",\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\":[\"https://manager.kong.lan/\"],\"logout_methods\":[\"GET\",\"DELETE\",\"POST\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://manager.kong.lan/\"],\"redirect_uri\":[\"https://manager.kong.lan/\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\":\"kong_manager_session\",\"ssl_verify\":false, \"authenticated_groups_claim\":[\"groups\"]}"
+  # KONG_ADMIN_GUI_AUTH_CONF: "<redacted azuread example>"
       # Kong Manager auth via OIDC & Azure AD with a POST method (from 2.8.4.0)
-      #KONG_ADMIN_GUI_AUTH_CONF: "{\"auth_methods\": [\"authorization_code\", \"password\", \"session\"],\"client_id\": [\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\": [\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\": [\"username\", \"custom_id\"],\"admin_claim\": \"name\",\"issuer\": \"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"login_redirect_uri\": [\"https://manager.kong.lan/\"],\"logout_methods\": [\"GET\", \"DELETE\", \"POST\"],\"logout_query_arg\": \"logout\",\"logout_redirect_uri\": [\"https://manager.kong.lan/\"],\"redirect_uri\": [\"https://api.kong.lan/auth\"],\"scopes\": [\"openid\", \"profile\", \"email\", \"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_name\": \"kong_manager_session\",\"ssl_verify\": false,\"authenticated_groups_claim\": [\"groups\"],\n\"preserve_query_args\": true,\"login_action\": \"redirect\",\n\"response_mode\": \"form_post\"}"
+  #KONG_ADMIN_GUI_AUTH_CONF: "<redacted azuread form_post example>"
       KONG_PORTAL: "on"
       KONG_PORTAL_GUI_PROTOCOL: "https"
       KONG_PORTAL_GUI_HOST: "portal.kong.lan"
@@ -298,12 +296,12 @@ services:
       KONG_PORTAL_API_URL: "https://portal-api.kong.lan"
       KONG_PORTAL_AUTH: "openid-connect"
       # Kong DevPortal auth via OIDC & KeyCloak
-      #KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"ab523f45-e04a-43ec-bac7-2e268c2ff05c\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"kong\"],\"issuer\":\"https://keycloak.kong.lan:18443/auth/realms/kong/.well-known/openid-configuration\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\",\"by_username_ignore_case\":true}"
+      #KONG_PORTAL_AUTH_CONF: "<redacted keycloak example>"
       # Kong DevPortal auth via OIDC & Okta
-      # KONG_PORTAL_AUTH_CONF: "{\"client_secret\":[\"7zxU14d1b5NTNf31p5lhShVX1N1UfWp3BHayU8kw\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"offline_access\"],\"logout_query_arg\":\"logout\",\"logout_methods\":[\"GET\"],\"login_action\":\"redirect\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"client_id\":[\"0oa4q0et31F47l9Nq4x6\"],\"issuer\":\"https://dev-885513.okta.com/oauth2/default/.well-known/oauth-authorization-server\",\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"leeway\":100,\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"ssl_verify\":false,\"consumer_claim\":[\"email\"],\"login_redirect_mode\":\"query\",\"session_cookie_domain\": \".kong.lan\"}"
+      # KONG_PORTAL_AUTH_CONF: "<redacted okta example>"
       # Kong DevPortal auth via OIDC & Azure AD
-      KONG_PORTAL_AUTH_CONF: "{\"auth_methods\":[\"authorization_code\",\"session\"],\"authorization_cookie_domain\":\".kong.lan\",\"authorization_cookie_samesite\":\"None\",\"authorization_cookie_secure\":true,\"client_id\":[\"4bf4e6a0-43db-4f89-b901-342045486873\"],\"client_secret\":[\"wdy7Q~aIi_hEE4eQd~wwkm5UK2.g.jr1SZVhl\"],\"consumer_by\":[\"username\",\"custom_id\",\"id\"],\"consumer_claim\":[\"email\"],\"forbidden_redirect_uri\":[\"https://portal.kong.lan/default/unauthorized\"],\"issuer\":\"https://login.microsoftonline.com/e4bf00f3-2010-40d6-b82f-58df9f957e49/v2.0/.well-known/openid-configuration\",\"leeway\":100,\"login_action\":\"redirect\",\"login_redirect_mode\":\"query\",\"login_redirect_uri\":[\"https://portal.kong.lan/default\"],\"logout_methods\":[\"GET\"],\"logout_query_arg\":\"logout\",\"logout_redirect_uri\":[\"https://portal.kong.lan/default\"],\"redirect_uri\":[\"https://portal-api.kong.lan/default/auth\"],\"scopes\":[\"openid\",\"profile\",\"email\",\"4bf4e6a0-43db-4f89-b901-342045486873/.default\"],\"session_cookie_domain\":\".kong.lan\",\"session_cookie_samesite\":\"None\",\"session_cookie_secure\":true,\"session_storage\":\"cookie\",\"ssl_verify\":false,\"verify_parameters\":false,\"by_username_ignore_case\":true}"
-      KONG_PORTAL_SESSION_CONF: "{\"cookie_name\":\"default-portal-session\",\"secret\":\"this_is_my_secret\",\"storage\":\"kong\",\"cookie_secure\":true, \"cookie_domain\":\".kong.lan\", \"cookie_samesite\":\"off\"}"
+      KONG_PORTAL_AUTH_CONF: "${KONG_PORTAL_AUTH_CONF:?set in .env}"
+      KONG_PORTAL_SESSION_CONF: "${KONG_PORTAL_SESSION_CONF:?set in .env}"
       KONG_PORTAL_EMAIL_VERIFICATION: "off"
       KONG_PORTAL_EMAILS_FROM: "stu@konghq.com"
       KONG_PORTAL_EMAILS_REPLY_TO: "stu@konghq.com"
@@ -493,7 +491,7 @@ services:
       - ./ssl-certs/smallstep/wild.kong.lan.pem:/etc/x509/https/tls.crt
     environment:
       KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_PASSWORD: "${KEYCLOAK_PASSWORD:?set in .env}"
       KEYCLOAK_IMPORT: /tmp/kong-realm.json -Dkeycloak.profile.feature.upload_scripts=enabled
     ports:
       - "8080:8080/tcp"
@@ -548,7 +546,7 @@ services:
     image: vault:latest
     profiles: [ "utility", "everything" ]
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: myroot
+      VAULT_DEV_ROOT_TOKEN_ID: "${VAULT_DEV_ROOT_TOKEN_ID:?set in .env}"
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
   #    ports:
   #      - "8200:8200/tcp"
@@ -603,7 +601,7 @@ services:
     environment:
       DECK_ANALYTICS: "off"
       DECK_KONG_ADDR: "http://kong-cp:48001"
-      DECK_HEADERS: "kong-admin-token:password"
+      DECK_HEADERS: "kong-admin-token:${KONG_ADMIN_TOKEN:?set in .env}"
     depends_on:
       kong-cp:
         condition: service_healthy
@@ -680,7 +678,7 @@ services:
         condition: service_healthy
     environment:
       # CHANGE ME (must be at least 16 characters)!
-      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+      GRAYLOG_PASSWORD_SECRET: "${GRAYLOG_PASSWORD_SECRET:?set in .env}"
       # Password: admin
       GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
       GRAYLOG_HTTP_EXTERNAL_URI: https://graylog.kong.lan/
@@ -714,7 +712,7 @@ services:
       - ./pgadmin/config_local.py:/pgadmin4/config_local.py #  - ./pgadmin_data/pgadmin:/var/lib/pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: "stu@konghq.com"
-      PGADMIN_DEFAULT_PASSWORD: "password"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD:?set in .env}"
       PGADMIN_LISTEN_PORT: 7071
     ports:
       - "7071:7071"
@@ -772,7 +770,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=password
+      - "GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:?set in .env}"
       - GF_SERVER_DOMAIN=grafana.kong.lan
 
   opa:
@@ -857,8 +855,8 @@ services:
     profiles: [ "splunk", "everything" ]
     environment:
       SPLUNK_START_ARGS: "--accept-license"
-      SPLUNK_HEC_TOKEN: "abcd1234"
-      SPLUNK_PASSWORD: "K1ngK0ng"
+      SPLUNK_HEC_TOKEN: "${SPLUNK_HEC_TOKEN:?set in .env}"
+      SPLUNK_PASSWORD: "${SPLUNK_PASSWORD:?set in .env}"
       SPLUNK_LICENSE_URI: "Free"
 #    ports:
 #      - 8300:8000
@@ -916,7 +914,7 @@ services:
     environment:
       KONNECT_API_HOSTNAME: "us.api.konghq.com"
       KONNECT_CONTROL_PLANE_ID: "36ba42a3-0351-4539-8172-b960efe71c90"
-      KONNECT_API_TOKEN: "kpat_82hBAhcZGbdpGF5kltVB7H9cdw0dfFACaFGTMaX8enqgAFSRS"
+      KONNECT_API_TOKEN: "${KONNECT_API_TOKEN:?set in .env}"
       KNEP__RUNTIME__DRAIN_DURATION: 1s # makes shutdown quicker, not recommended to be set like this in production 
       KNEP__OBSERVABILITY__LOG_FLAGS: "info,knep=debug" # Uncomment for debug logging
     ports:
@@ -999,7 +997,7 @@ services:
 #      - ./ssl-certs/smallstep:/tmp/certs
     environment:
       username_admin_globalaccesslevel: "admin"
-      username_admin_password: "admin"
+      username_admin_password: "${SOLACE_ADMIN_PASSWORD:?set in .env}"
     ports:
       - 8080:8080  # Use this port when configuring the message broker container with Solace PubSub+ Broker Manager.
       - 55555:55555 # Your applications can use Solace APIs to connect to the message broker on this port

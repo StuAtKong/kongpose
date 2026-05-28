@@ -1,4 +1,5 @@
 .DS_Store
+.env
 setup.sh
 license.json
 locust/__pycache__/*
