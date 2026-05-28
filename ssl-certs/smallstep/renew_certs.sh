@@ -341,10 +341,12 @@ generate_leaf() {
     shift 3
 
     local unique_sans=()
-    local s existing found
+    local s existing found i
     for s in "$cn" "$@"; do
         found=0
-        for existing in "${unique_sans[@]}"; do
+        # Index-based loop avoids empty-array expansion issues with `set -u`.
+        for ((i=0; i<${#unique_sans[@]}; i++)); do
+            existing="${unique_sans[i]}"
             [[ "$existing" == "$s" ]] && { found=1; break; }
         done
         [[ $found -eq 0 ]] && unique_sans+=("$s")
@@ -360,8 +362,8 @@ generate_leaf() {
         --not-after "${LEAF_HOURS}h"
         --no-password --insecure --force
     )
-    for s in "${unique_sans[@]}"; do
-        args+=(--san "$s")
+    for ((i=0; i<${#unique_sans[@]}; i++)); do
+        args+=(--san "${unique_sans[i]}")
     done
     run_step step certificate create "${args[@]}"
 }
