@@ -84,6 +84,12 @@ Set and env var for the license;
 export KONG_LICENSE_DATA=`cat ./license.json`;
 ~~~
 
+Create a local `.env` file from the example and set the required secret values;
+
+~~~shell
+cp .env.example .env
+~~~
+
 Then start the utility services & kong containers
 
 ~~~shell
