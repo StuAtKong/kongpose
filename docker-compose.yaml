@@ -40,14 +40,19 @@ secrets:
 
 # Specify which Kong image to run
 x-kong-image:
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.26}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.11}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.0.27}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.12}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.11}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.6}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.4}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.12}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.5}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.7}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.5}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.4}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.4}
+
+
+
 
 x-kong-license:
   &kong-license
