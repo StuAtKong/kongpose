@@ -18,11 +18,12 @@
 --      cache_ttl has elapsed, and kept (stale-if-error) until the
 --      response's own nextUpdate time - so a flaky responder degrades to
 --      a stale-but-valid staple, never an expired one and rarely none.
---   5. Certificate/SNI changes (CRUD events) purge the affected cache
---      entries immediately; TTLs are only the fallback bound.
+--   5. Certificate/SNI/ca_certificates changes (CRUD events) purge the
+--      affected cache entries immediately; TTLs are only the fallback bound.
 --
 -- Requirement: the certificate entity's `cert` field must contain the full
--- chain (leaf + issuer), OR conf.trusted_certificate must contain the
+-- chain (leaf + issuer), OR the configured trust anchors
+-- (conf.ca_certificates / conf.trusted_certificate) must contain the
 -- issuer. The issuer cert is needed to build the OCSP request.
 --
 -- It is NOT officially supported by Kong Inc.
@@ -88,7 +89,8 @@ pcall(ffi.cdef, [[
 
 local OCSPStaplingHandler = {
   PRIORITY = 1000,
-  VERSION = "0.4.0",
+  -- keep in sync with the kong-plugin-ocsp-stapling rockspec version
+  VERSION = "0.4.1",
 }
 
 
@@ -103,29 +105,41 @@ local function response_validity(resp_der)
       return nil
     end
 
-    local secs
-    local basic = C.OCSP_response_get1_basic(resp)
-    if basic ~= nil then
-      local single = C.OCSP_resp_get0(basic, 0)
-      if single ~= nil then
-        local nextupd = ffi.new("void*[1]")
-        local thisupd = ffi.new("void*[1]")
-        local revtime = ffi.new("void*[1]")
-        local reason = ffi.new("int[1]")
-        C.OCSP_single_get0_status(single, reason, revtime, thisupd, nextupd)
-        if nextupd[0] ~= nil then
-          local pday = ffi.new("int[1]")
-          local psec = ffi.new("int[1]")
-          -- from = NULL means "now"
-          if C.ASN1_TIME_diff(pday, psec, nil, nextupd[0]) == 1 then
-            secs = pday[0] * 86400 + psec[0]
-          end
-        end
+    -- inner pcall so resp/basic are freed even if a symbol is missing or
+    -- parsing throws part-way through
+    local basic
+    local parsed, secs = pcall(function()
+      basic = C.OCSP_response_get1_basic(resp)
+      if basic == nil then
+        return nil
       end
+      local single = C.OCSP_resp_get0(basic, 0)
+      if single == nil then
+        return nil
+      end
+      local nextupd = ffi.new("void*[1]")
+      local thisupd = ffi.new("void*[1]")
+      local revtime = ffi.new("void*[1]")
+      local reason = ffi.new("int[1]")
+      C.OCSP_single_get0_status(single, reason, revtime, thisupd, nextupd)
+      if nextupd[0] == nil then
+        return nil
+      end
+      local pday = ffi.new("int[1]")
+      local psec = ffi.new("int[1]")
+      -- from = NULL means "now"
+      if C.ASN1_TIME_diff(pday, psec, nil, nextupd[0]) ~= 1 then
+        return nil
+      end
+      return pday[0] * 86400 + psec[0]
+    end)
+
+    if basic ~= nil then
       C.OCSP_BASICRESP_free(basic)
     end
     C.OCSP_RESPONSE_free(resp)
-    return secs
+
+    return parsed and secs or nil
   end)
 
   if not ok then
@@ -187,8 +201,9 @@ end
 
 
 local function get_cert_pem(sni_name, conf)
+  -- `or 300` guards against plugin rows created before cert_cache_ttl existed
   return kong.cache:get(PEM_PREFIX .. sni_name,
-                        { ttl = conf.cert_cache_ttl },
+                        { ttl = conf.cert_cache_ttl or 300 },
                         db_lookup_cert_pem, sni_name)
 end
 
@@ -208,8 +223,18 @@ end
 -- ca_certificates ID is an error: better to fail the fetch (fail-open,
 -- logged) than to silently validate against fewer anchors than configured.
 local function get_trust_bundle(conf)
+  -- unset optional fields can surface as ngx.null (a truthy userdata)
+  -- instead of nil depending on how the config was stored - normalize
   local ids = conf.ca_certificates
-  if (not ids or #ids == 0) and not conf.trusted_certificate then
+  if ids == ngx.null then
+    ids = nil
+  end
+  local inline = conf.trusted_certificate
+  if inline == ngx.null then
+    inline = nil
+  end
+
+  if (not ids or #ids == 0) and not inline then
     return nil
   end
 
@@ -228,8 +253,8 @@ local function get_trust_bundle(conf)
       parts[#parts + 1] = pem
     end
   end
-  if conf.trusted_certificate then
-    parts[#parts + 1] = conf.trusted_certificate
+  if inline then
+    parts[#parts + 1] = inline
   end
 
   return table.concat(parts, "\n")
@@ -380,6 +405,8 @@ end
 -- happy path. The scan fallback covers edge cases the key misses (e.g.
 -- the plugin entity created in a non-default workspace) and is only run
 -- when the caller asks for it.
+-- Returns conf, found: `found` is true once the plugin entity has been
+-- located (even if disabled), so the caller can stop retrying.
 local function find_plugin_conf(include_scan)
   local key = kong.db.plugins:cache_key("ocsp-stapling")
   local plugin, err = kong.db.plugins:select_by_cache_key(key)
@@ -387,23 +414,23 @@ local function find_plugin_conf(include_scan)
     kong.log.warn("OCSP prewarm: plugin lookup failed: ", err)
   end
   if plugin then
-    return plugin.enabled ~= false and plugin.config or nil
+    return plugin.enabled ~= false and plugin.config or nil, true
   end
 
   if not include_scan then
-    return nil
+    return nil, false
   end
 
   for p, serr in kong.db.plugins:each(1000) do
     if serr then
       kong.log.warn("OCSP prewarm: cannot read plugins: ", serr)
-      return nil
+      return nil, false
     end
-    if p.name == "ocsp-stapling" and p.enabled ~= false then
-      return p.config
+    if p.name == "ocsp-stapling" then
+      return p.enabled ~= false and p.config or nil, true
     end
   end
-  return nil
+  return nil, false
 end
 
 
@@ -416,10 +443,12 @@ local function prewarm(premature, attempt)
     return
   end
 
-  local conf = find_plugin_conf(attempt >= PREWARM_MAX_ATTEMPTS)
+  local conf, found = find_plugin_conf(attempt >= PREWARM_MAX_ATTEMPTS)
 
   if not conf then
-    if attempt < PREWARM_MAX_ATTEMPTS then
+    -- retry only while the entity hasn't been seen at all (config still
+    -- syncing); a found-but-disabled plugin ends the search
+    if not found and attempt < PREWARM_MAX_ATTEMPTS then
       timer_at(PREWARM_RETRY_DELAY, prewarm, attempt + 1)
     end
     return

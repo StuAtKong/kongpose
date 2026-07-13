@@ -240,6 +240,60 @@ for _, strategy in helpers.each_strategy() do
   end)
 
 
+  describe(PLUGIN_NAME .. ": (responder, background refresh) [#" .. strategy .. "]", function()
+
+    lazy_setup(function()
+      local bp = helpers.get_db_utils(strategy,
+                                      { "certificates", "snis", "plugins" },
+                                      { PLUGIN_NAME })
+
+      local cert = bp.certificates:insert({
+        cert = LEAF_CERT .. CA_CERT,
+        key = LEAF_KEY,
+      })
+
+      bp.snis:insert({ name = "stapled.test", certificate = { id = cert.id } })
+
+      -- cache_ttl=1 -> the fresh window is 0.75s, so handshakes shortly
+      -- after the pre-warm trigger the background refresh path
+      bp.plugins:insert({
+        name = PLUGIN_NAME,
+        config = { cache_ttl = 1 },
+      })
+
+      assert(helpers.start_kong({
+        database = strategy,
+        plugins = "bundled," .. PLUGIN_NAME,
+        log_level = "debug",
+        nginx_conf = "spec/fixtures/custom_nginx.template",
+      }, nil, nil, fixtures))
+    end)
+
+    lazy_teardown(function()
+      helpers.stop_kong()
+    end)
+
+
+    it("refreshes the cached response in the background once the fresh window elapses", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
+      -- first fill: the startup pre-warm
+      assert.logfile().has.line("cached OCSP staple for stapled.test", true, 30)
+
+      -- handshakes after the 0.75s fresh window serve the cached staple
+      -- and schedule a refresh; a second "cached" line proves it ran
+      helpers.wait_until(function()
+        local output = s_client_status("stapled.test")
+        assert.matches("Cert Status: good", output, nil, true)
+        return count_log_lines("cached OCSP staple for stapled.test") >= 2
+      end, 15)
+    end)
+
+  end)
+
+
   describe(PLUGIN_NAME .. ": (responder, strict validation) [#" .. strategy .. "]", function()
 
     lazy_setup(function()

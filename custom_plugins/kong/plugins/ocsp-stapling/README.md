@@ -77,9 +77,9 @@ and the reason is logged. Nothing is ever blocked.
 - The certificate entity's `cert` field must contain the **full chain**
   (leaf + intermediate). The issuer certificate is required to build the
   OCSP request; a leaf-only PEM fails with
-  `failed to create OCSP request` — unless `config.trusted_certificate`
-  is set and contains the issuer (see
-  [Response validation](#response-validation)).
+  `failed to create OCSP request` — unless trust anchors are configured
+  (`config.ca_certificates` or `config.trusted_certificate`) and contain
+  the issuer (see [Response validation](#response-validation)).
 - The data plane must be able to reach the OCSP responder over HTTP
   (outbound, usually port 80).
 - Must be enabled **globally** — the `certificate` phase runs before any
@@ -215,9 +215,13 @@ A [Pongo](https://github.com/Kong/kong-pongo) test suite lives in
 
 ```bash
 cd custom_plugins
-KONG_VERSION=3.10.x pongo up
-pongo run -- kong/plugins/ocsp-stapling/spec
+KONG_VERSION=3.10.0.6 pongo up
+KONG_VERSION=3.10.0.6 pongo run -- kong/plugins/ocsp-stapling/spec
 ```
+
+The version must be one Pongo supports (`pongo build` prints the list on
+a mismatch); there is no CE `3.10.x`, so the Enterprise `3.10.0.6` —
+matching this repo's gateway image — is the validated pin.
 
 - `01-schema_spec.lua` — config schema: defaults, bounds, UUID
   validation for `ca_certificates`.
@@ -230,6 +234,7 @@ pongo run -- kong/plugins/ocsp-stapling/spec
   the port the test leaf's AIA points at; the plugin sends no nonce, so
   a canned response validates): startup pre-warm, a `Cert Status: good`
   staple on the first handshake, cache hits on subsequent handshakes,
+  the background refresh after the fresh window elapses (`cache_ttl=1`),
   and strict-validation rejection when `ca_certificates` references the
   wrong CA. Staple assertions shell out to the `openssl` CLI and are
   skipped if it's missing.
@@ -252,6 +257,12 @@ The embedded fixtures (test CA, leaf, canned response) are valid until
   `ngx.ocsp` API; TLS streams are served without staples.
 - The plugin trusts the responder URL in the certificate's AIA extension
   and fetches over plain HTTP (standard for OCSP; responses are signed).
+- **Security:** because the responder URL comes from the certificate
+  itself, anyone who can create certificate entities can make data
+  planes POST to arbitrary URLs, including internal ones — an SSRF
+  vector where Admin API access is delegated (RBAC, multi-team).
+  Restrict who may manage certificates; an `allowed_responders`
+  allowlist would be a sensible hardening step before production use.
 - Plugin **config** changes (e.g. `trusted_certificate`, `cache_ttl`) do
   not purge already-cached responses; they take effect on the next fetch.
   Certificate/SNI/`ca_certificates` **entity** changes do purge

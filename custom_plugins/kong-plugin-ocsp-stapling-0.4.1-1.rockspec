@@ -1,5 +1,6 @@
 package = "kong-plugin-ocsp-stapling"
-version = "0.4.0-1"
+-- keep in sync with VERSION in kong/plugins/ocsp-stapling/handler.lua
+version = "0.4.1-1"
 
 source = {
   url = "git+https://example.com/kong-plugin-ocsp-stapling.git",

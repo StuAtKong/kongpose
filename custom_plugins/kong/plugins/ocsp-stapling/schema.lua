@@ -33,7 +33,7 @@ local schema = {
               type = "number",
               default = 3600,
               gt = 0,
-              description = "How long (seconds) a fetched OCSP response is served from the shared-dict cache. A background refresh is triggered at 75% of this TTL so warm traffic never sees a cache miss."
+              description = "Refresh interval in seconds: a background refresh of the cached OCSP response triggers at 75% of this. The response itself is served until its own nextUpdate time (stale-if-error), or up to 2x this value if nextUpdate cannot be parsed."
           }},
           { http_timeout = {
               type = "number",
