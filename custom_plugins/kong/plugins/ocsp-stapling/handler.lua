@@ -705,6 +705,8 @@ function OCSPStaplingHandler:certificate(conf)
   elseif err == "no status req" then
     -- client did not include the status_request extension; nothing sent
     kong.log.debug("client did not request OCSP stapling for ", sni_name)
+  else
+    kong.log.debug("stapled OCSP response for ", sni_name)
   end
 end
 

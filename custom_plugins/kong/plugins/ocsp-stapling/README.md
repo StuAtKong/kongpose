@@ -243,6 +243,31 @@ log, all plugin failures are logged with the SNI and reason:
 docker logs kongpose-kong-dp-1 2>&1 | grep ocsp-stapling
 ```
 
+### Testing with and without a stapling request
+
+`-status` is what makes `openssl s_client` send the `status_request`
+extension in its ClientHello. Omit it and the client never asks — the
+plugin still prepares the staple (lookup, cache, fetch), but OpenSSL
+withholds it per protocol:
+
+```bash
+# client requests stapling (staple expected)
+echo | openssl s_client -connect localhost:8443 -servername <sni> -status
+
+# client does NOT request stapling (no OCSP block in the output)
+echo | openssl s_client -connect localhost:8443 -servername <sni>
+```
+
+The three observable states, for telling "client didn't ask" apart from
+"server had nothing to staple" (log lines marked *debug* need
+`log_level = debug`):
+
+| client | DP log | s_client output |
+|---|---|---|
+| `-status` | `stapled OCSP response for <sni>` *(debug)* | `OCSP Response Status: successful` |
+| no `-status` | `client did not request OCSP stapling for <sni>` *(debug)* | no OCSP block at all |
+| `-status`, but fetch failed/refused | `OCSP fetch for <sni> failed: …` *(error)* | `OCSP response: no response sent` |
+
 ## Testing
 
 A [Pongo](https://github.com/Kong/kong-pongo) test suite lives in
