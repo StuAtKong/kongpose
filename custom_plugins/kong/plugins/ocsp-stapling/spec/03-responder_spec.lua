@@ -294,6 +294,80 @@ for _, strategy in helpers.each_strategy() do
   end)
 
 
+  describe(PLUGIN_NAME .. ": (responder, allowed_responders) [#" .. strategy .. "]", function()
+
+    local plugin_id
+
+    lazy_setup(function()
+      local bp = helpers.get_db_utils(strategy,
+                                      { "certificates", "snis", "plugins" },
+                                      { PLUGIN_NAME })
+
+      local cert = bp.certificates:insert({
+        cert = LEAF_CERT .. CA_CERT,
+        key = LEAF_KEY,
+      })
+
+      bp.snis:insert({ name = "stapled.test", certificate = { id = cert.id } })
+
+      -- allowlist that does NOT cover the mock responder (127.0.0.1);
+      -- failure_ttl=1 so the negative cache clears quickly after the
+      -- allowlist is fixed mid-test
+      local plugin = bp.plugins:insert({
+        name = PLUGIN_NAME,
+        config = {
+          prewarm = false,
+          failure_ttl = 1,
+          allowed_responders = { "http://ocsp.allowed.example.com" },
+        },
+      })
+      plugin_id = plugin.id
+
+      assert(helpers.start_kong({
+        database = strategy,
+        plugins = "bundled," .. PLUGIN_NAME,
+        nginx_conf = "spec/fixtures/custom_nginx.template",
+      }, nil, nil, fixtures))
+    end)
+
+    lazy_teardown(function()
+      helpers.stop_kong()
+    end)
+
+
+    it("refuses a responder that is not on the allowlist", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
+      local output = s_client_status("stapled.test")
+      assert.matches("no response sent", output, nil, true)
+      assert.logfile().has.line("is not in allowed_responders", true, 5)
+    end)
+
+    it("staples once the allowlist covers the responder host", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
+      local admin = helpers.admin_client()
+      local res = admin:patch("/plugins/" .. plugin_id, {
+        headers = { ["Content-Type"] = "application/json" },
+        body = { config = { allowed_responders = { "127.0.0.1" } } },
+      })
+      assert.res_status(200, res)
+      admin:close()
+
+      -- wait out config propagation and the 1s failure marker
+      helpers.wait_until(function()
+        local output = s_client_status("stapled.test")
+        return output:find("Cert Status: good", 1, true) ~= nil
+      end, 15)
+    end)
+
+  end)
+
+
   describe(PLUGIN_NAME .. ": (responder, strict validation) [#" .. strategy .. "]", function()
 
     lazy_setup(function()

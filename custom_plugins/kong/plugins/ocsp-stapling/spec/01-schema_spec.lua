@@ -68,6 +68,20 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     assert.is_truthy(entity)
   end)
 
+  it("accepts allowed_responders as hostnames and URLs", function()
+    local entity, err = validate({
+      allowed_responders = { "ocsp.example.com", "http://ocsp2.example.com:8080" },
+    })
+    assert.is_nil(err)
+    assert.equal(2, #entity.config.allowed_responders)
+  end)
+
+  it("rejects an empty string in allowed_responders", function()
+    local entity, err = validate({ allowed_responders = { "" } })
+    assert.is_nil(entity)
+    assert.is_truthy(err)
+  end)
+
   it("rejects cache_ttl of zero", function()
     local entity, err = validate({ cache_ttl = 0 })
     assert.is_nil(entity)

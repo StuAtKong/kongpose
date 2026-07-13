@@ -90,7 +90,7 @@ pcall(ffi.cdef, [[
 local OCSPStaplingHandler = {
   PRIORITY = 1000,
   -- keep in sync with the kong-plugin-ocsp-stapling rockspec version
-  VERSION = "0.4.1",
+  VERSION = "0.5.0",
 }
 
 
@@ -268,6 +268,32 @@ local function leaf_pem(cert_pem)
 end
 
 
+-- Does the responder URL match an allowlist entry? Entries are bare
+-- hostnames ("ocsp.example.com") or scheme://host[:port] URLs. Comparison
+-- is on PARSED components, never raw string prefixes - a prefix check
+-- would let http://ocsp.example.com.evil.com through.
+local function responder_allowed(responder_url, allowed)
+  local parsed, err = http:parse_uri(responder_url, false)
+  if not parsed then
+    return false, "cannot parse responder URL: " .. tostring(err)
+  end
+  local scheme, host, port = parsed[1], parsed[2]:lower(), parsed[3]
+
+  for _, entry in ipairs(allowed) do
+    if entry:find("://", 1, true) then
+      local e = http:parse_uri(entry, false)
+      if e and e[1] == scheme and e[2]:lower() == host and e[3] == port then
+        return true
+      end
+    elseif entry:lower() == host then
+      return true
+    end
+  end
+
+  return false
+end
+
+
 -- Fetch a validated, DER-encoded OCSP response for the given PEM chain.
 local function fetch_ocsp_response(cert_pem, conf)
   local der_chain, err = ssl.cert_pem_to_der(cert_pem)
@@ -295,6 +321,21 @@ local function fetch_ocsp_response(cert_pem, conf)
   local responder_url, err = ocsp.get_ocsp_responder_from_der_chain(der_chain)
   if not responder_url then
     return nil, "no OCSP responder in certificate (AIA): " .. tostring(err)
+  end
+
+  -- the AIA URL is attacker-influenced data (it comes from the uploaded
+  -- certificate); with an allowlist configured, refuse anything else
+  local allowed = conf.allowed_responders
+  if allowed == ngx.null then
+    allowed = nil
+  end
+  if allowed and #allowed > 0 then
+    local ok, aerr = responder_allowed(responder_url, allowed)
+    if not ok then
+      return nil, "OCSP responder " .. responder_url ..
+                  " is not in allowed_responders" ..
+                  (aerr and (": " .. aerr) or "")
+    end
   end
 
   local ocsp_req, err = ocsp.create_ocsp_request(der_chain)

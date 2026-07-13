@@ -116,6 +116,7 @@ curl -X POST http://localhost:8001/plugins \
 | `config.failure_ttl` | number | `30` | Seconds a fetch failure is negative-cached; during this window handshakes for that SNI go unstapled without re-contacting the responder. |
 | `config.cert_cache_ttl` | number | `300` | Seconds the SNI→certificate DB lookup is cached. Bounds how quickly a rotated certificate picks up a fresh staple. |
 | `config.shm_name` | string | `"kong"` | Name of the `lua_shared_dict` used to cache OCSP responses. Must exist in the nginx config; if it doesn't, stapling is disabled (fail-open) and an error is logged once per worker. |
+| `config.allowed_responders` | array of strings | (unset) | Allowlist of OCSP responders the plugin may contact — bare hostnames or `scheme://host[:port]` URLs. Unset allows any responder. See [Restricting responders](#restricting-responders-ssrf). |
 | `config.ca_certificates` | array of UUIDs | (unset) | IDs of Kong `ca_certificates` entities used as trust anchors when validating OCSP responses — the preferred mechanism. See [Response validation](#response-validation). |
 | `config.trusted_certificate` | string | (unset) | Inline PEM alternative/addition to `ca_certificates`. Kept for anchors that aren't CA certs (e.g. a delegated responder cert) and quick tests. |
 
@@ -164,6 +165,38 @@ anchors than configured. Updating or deleting a referenced
 `ca_certificates` entity purges cached responses immediately (CRUD
 events); changing the plugin's own config does not — that applies from
 the next fetch.
+
+### Restricting responders (SSRF)
+
+The responder URL comes from the certificate's AIA extension — i.e. from
+whoever uploaded the certificate. Without restrictions, anyone who can
+create certificate entities can make every data plane POST to arbitrary
+URLs, including internal ones (cloud metadata endpoints, internal admin
+APIs) — and the startup pre-warm does it automatically, no handshake
+required. That's an SSRF vector wherever Admin API access is delegated
+(RBAC roles, team pipelines).
+
+`config.allowed_responders` closes it. Entries are either bare hostnames
+or full `scheme://host[:port]` URLs; the AIA URL must match one or the
+fetch is refused (fail-open: logged as
+`... is not in allowed_responders`, negative-cached, handshake proceeds
+unstapled):
+
+```bash
+curl -X PATCH http://localhost:8001/plugins/<plugin-id> \
+  -H "kong-admin-token: $KONG_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"config":{"allowed_responders":["ocsp.zerossl.com","ocsp.sectigo.com"]}}'
+```
+
+Matching is on parsed URL components (scheme/host/port for URL entries,
+host for bare entries), never raw string prefixes — a prefix check would
+wave through `http://ocsp.zerossl.com.evil.com`. Organizations use a
+small, stable set of CAs, so the list stays short.
+
+Unset means any responder is allowed (the POC-friendly default). Set it
+before using this plugin anywhere certificate management is delegated;
+network egress policy on the data planes is the complementary control.
 
 ### Using a dedicated shared dict
 
@@ -235,9 +268,10 @@ matching this repo's gateway image — is the validated pin.
   a canned response validates): startup pre-warm, a `Cert Status: good`
   staple on the first handshake, cache hits on subsequent handshakes,
   the background refresh after the fresh window elapses (`cache_ttl=1`),
-  and strict-validation rejection when `ca_certificates` references the
-  wrong CA. Staple assertions shell out to the `openssl` CLI and are
-  skipped if it's missing.
+  `allowed_responders` enforcement (refusal, then recovery after the
+  allowlist is fixed via the Admin API), and strict-validation rejection
+  when `ca_certificates` references the wrong CA. Staple assertions
+  shell out to the `openssl` CLI and are skipped if it's missing.
 
 The embedded fixtures (test CA, leaf, canned response) are valid until
 2036+; regenerate with `openssl` if they ever expire.
@@ -258,11 +292,11 @@ The embedded fixtures (test CA, leaf, canned response) are valid until
 - The plugin trusts the responder URL in the certificate's AIA extension
   and fetches over plain HTTP (standard for OCSP; responses are signed).
 - **Security:** because the responder URL comes from the certificate
-  itself, anyone who can create certificate entities can make data
-  planes POST to arbitrary URLs, including internal ones — an SSRF
-  vector where Admin API access is delegated (RBAC, multi-team).
-  Restrict who may manage certificates; an `allowed_responders`
-  allowlist would be a sensible hardening step before production use.
+  itself, anyone who can create certificate entities can direct data
+  plane requests — an SSRF vector where Admin API access is delegated
+  (RBAC, multi-team). Mitigate with `config.allowed_responders` (see
+  [Restricting responders](#restricting-responders-ssrf)); it is unset
+  (allow-all) by default.
 - Plugin **config** changes (e.g. `trusted_certificate`, `cache_ttl`) do
   not purge already-cached responses; they take effect on the next fetch.
   Certificate/SNI/`ca_certificates` **entity** changes do purge

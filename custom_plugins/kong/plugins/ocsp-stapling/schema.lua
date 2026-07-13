@@ -63,6 +63,12 @@ local schema = {
               default = "kong",
               description = "Name of the lua_shared_dict used to cache OCSP responses. Must exist in the nginx config; add a dedicated one via nginx_http_lua_shared_dict (e.g. 'ocsp_stapling 5m') or leave the default to use Kong's general-purpose 'kong' dict."
           }},
+          { allowed_responders = {
+              type = "array",
+              required = false,
+              elements = { type = "string", len_min = 1 },
+              description = "Allowlist of OCSP responders the plugin may contact. Entries are bare hostnames ('ocsp.example.com') or scheme://host[:port] URLs; the responder URL from the certificate's AIA extension must match one or the fetch is refused (fail-open, logged). Unset allows any responder - set this wherever certificate management is delegated, to close the SSRF vector."
+          }},
           { ca_certificates = {
               type = "array",
               required = false,
