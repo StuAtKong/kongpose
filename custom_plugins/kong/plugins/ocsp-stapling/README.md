@@ -282,7 +282,10 @@ KONG_VERSION=3.10.0.6 pongo run -- kong/plugins/ocsp-stapling/spec
 
 The version must be one Pongo supports (`pongo build` prints the list on
 a mismatch); there is no CE `3.10.x`, so the Enterprise `3.10.0.6` —
-matching this repo's gateway image — is the validated pin.
+matching this repo's gateway image — is the primary pin. The suite also
+passes unchanged on Enterprise `3.15.0.0` (no plugin code changes were
+needed; the specs avoid `helpers.proxy_ssl_client`, whose 3.15+ version
+verifies server certificates, by handshaking via the `openssl` CLI).
 
 - `01-schema_spec.lua` — config schema: defaults, bounds, UUID
   validation for `ca_certificates`.

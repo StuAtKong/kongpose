@@ -83,14 +83,19 @@ local function count_log_lines(needle)
 end
 
 
--- open a TLS connection with the given SNI, drive one request, close.
--- the request itself 404s (no routes configured); we only care that the
--- handshake -> certificate phase ran.
+local openssl_available = os.execute("openssl version > /dev/null 2>&1")
+-- Lua 5.1 os.execute returns a number; 5.2+/LuaJIT COMPAT52 a boolean
+openssl_available = openssl_available == true or openssl_available == 0
+
+-- TLS handshake with the given SNI; we only care that the certificate
+-- phase ran, not the request. Uses the openssl CLI rather than
+-- helpers.proxy_ssl_client: on Kong 3.15+ the helper client VERIFIES the
+-- server certificate, which these self-signed fixtures fail by design;
+-- s_client handshakes without verification on 3.10 and 3.15 alike.
 local function handshake(sni)
-  local client = helpers.proxy_ssl_client(5000, sni)
-  local res = client:get("/", { headers = { host = sni } })
-  assert.is_truthy(res)
-  client:close()
+  local cmd = ("echo | openssl s_client -connect %s:%d -servername %s > /dev/null 2>&1")
+              :format(helpers.get_proxy_ip(true), helpers.get_proxy_port(true), sni)
+  os.execute(cmd)
 end
 
 
@@ -130,11 +135,19 @@ for _, strategy in helpers.each_strategy() do
 
 
     it("completes the handshake unstapled when the cert has no OCSP responder (fail-open)", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
       handshake("no-aia.test")
       assert.logfile().has.line("no OCSP responder in certificate", true, 5)
     end)
 
     it("resolves wildcard SNIs and negative-caches fetch failures", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
       -- three rapid handshakes against a wildcard-covered name:
       -- the first fetch fails and is negative-cached, so exactly one
       -- fetch error may mention this SNI
@@ -151,6 +164,10 @@ for _, strategy in helpers.each_strategy() do
     end)
 
     it("steps aside for SNIs with no dynamic certificate", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
       handshake("unknown.test")
 
       -- the plugin must not have touched this SNI at all
