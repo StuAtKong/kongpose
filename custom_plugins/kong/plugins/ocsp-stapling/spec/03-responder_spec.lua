@@ -296,7 +296,7 @@ for _, strategy in helpers.each_strategy() do
 
   describe(PLUGIN_NAME .. ": (responder, allowed_responders) [#" .. strategy .. "]", function()
 
-    local plugin_id
+    local plugin_id, cert_id
 
     lazy_setup(function()
       local bp = helpers.get_db_utils(strategy,
@@ -307,6 +307,7 @@ for _, strategy in helpers.each_strategy() do
         cert = LEAF_CERT .. CA_CERT,
         key = LEAF_KEY,
       })
+      cert_id = cert.id
 
       bp.snis:insert({ name = "stapled.test", certificate = { id = cert.id } })
 
@@ -326,6 +327,8 @@ for _, strategy in helpers.each_strategy() do
       assert(helpers.start_kong({
         database = strategy,
         plugins = "bundled," .. PLUGIN_NAME,
+        -- debug: the URL-form test counts "cached OCSP staple" debug lines
+        log_level = "debug",
         nginx_conf = "spec/fixtures/custom_nginx.template",
       }, nil, nil, fixtures))
     end)
@@ -363,6 +366,40 @@ for _, strategy in helpers.each_strategy() do
         local output = s_client_status("stapled.test")
         return output:find("Cert Status: good", 1, true) ~= nil
       end, 15)
+    end)
+
+    it("matches URL-form entries (scheme://host:port) on a fresh fetch", function()
+      if not openssl_available then
+        return pending("openssl CLI not available")
+      end
+
+      local admin = helpers.admin_client()
+
+      -- switch to a URL-form entry matching the mock responder exactly
+      local res = admin:patch("/plugins/" .. plugin_id, {
+        headers = { ["Content-Type"] = "application/json" },
+        body = { config = { allowed_responders = { "http://127.0.0.1:10500" } } },
+      })
+      assert.res_status(200, res)
+
+      -- touch the certificate entity: its CRUD event purges the cached
+      -- staple, so the next handshake must FETCH through the new allowlist
+      -- (this also exercises the event-driven purge path end to end)
+      res = admin:patch("/certificates/" .. cert_id, {
+        headers = { ["Content-Type"] = "application/json" },
+        body = { tags = { "allowlist-url-form" } },
+      })
+      assert.res_status(200, res)
+      admin:close()
+
+      helpers.wait_until(function()
+        local output = s_client_status("stapled.test")
+        return output:find("Cert Status: good", 1, true) ~= nil
+      end, 15)
+
+      -- the staple must come from a fresh post-purge fetch, not the old
+      -- cache entry: at least two cache fills for this SNI by now
+      assert.is_true(count_log_lines("cached OCSP staple for stapled.test") >= 2)
     end)
 
   end)
