@@ -3,7 +3,9 @@ package = "kong-plugin-ocsp-stapling"
 version = "0.5.1-1"
 
 source = {
-  url = "git+https://example.com/kong-plugin-ocsp-stapling.git",
+  url = "git+https://github.com/StuAtKong/kongpose.git",
+  branch = "ocsp-stapling-plugin",
+  -- the plugin lives under custom_plugins/ within the kongpose repo
 }
 
 description = {
