@@ -194,9 +194,12 @@ host for bare entries), never raw string prefixes — a prefix check would
 wave through `http://ocsp.zerossl.com.evil.com`. Organizations use a
 small, stable set of CAs, so the list stays short.
 
-Unset means any responder is allowed (the POC-friendly default). Set it
-before using this plugin anywhere certificate management is delegated;
-network egress policy on the data planes is the complementary control.
+Unset means any responder is allowed (the POC-friendly default). An
+**empty array is rejected at config time** — it would read as
+locked-down while behaving as allow-all, so allow-all must be the
+explicit absence of the field. Set the list before using this plugin
+anywhere certificate management is delegated; network egress policy on
+the data planes is the complementary control.
 
 ### Using a dedicated shared dict
 
@@ -278,10 +281,29 @@ The embedded fixtures (test CA, leaf, canned response) are valid until
 
 ## Limitations
 
+- **Workspaces (Enterprise):** all datastore lookups — the handshake's
+  SNI→certificate resolution, the pre-warm sweep, and the pre-warm's
+  plugin-config lookup — run without a workspace context, i.e. against
+  the **default workspace only**. SNIs and certificates created in other
+  workspaces are not found: those handshakes are served unstapled (the
+  plugin steps aside as if no dynamic cert existed) and they are never
+  pre-warmed.
 - Wildcard SNI matching is leftmost-label only (`*.example.com`); Kong's
   rightmost wildcards (`example.*`) are not matched. Wildcard SNIs are
   also not pre-warmed — the concrete hostnames aren't known until a
   client presents one, so their first handshake fetches inline.
+- On data planes using **full config sync** (incremental sync disabled),
+  every config push fires the `declarative reconfigure` event and purges
+  all cached staples — even pushes touching nothing TLS-related — after
+  which staples repopulate lazily, one inline fetch per SNI per node.
+  With incremental sync (as in this repo, `KONG_INCREMENTAL_SYNC: on`)
+  only actual certificate/SNI/CA entity changes purge.
+- A hostname that was looked up **before** its wildcard SNI existed
+  (client handshaked `foo.example.com`, `*.example.com` created
+  afterwards) keeps its negative "no certificate" lookup entry for up to
+  `cert_cache_ttl` — the wildcard-triggered `purge_all` only invalidates
+  lookup entries for names that had a cached response. Exact-name SNI
+  creation is unaffected (its CRUD event purges that name directly).
 - A responder outage on a cold cache means unstapled handshakes until the
   responder recovers (fail-open by design; retried at most once per
   `failure_ttl`). There is no persistent cache across restarts.

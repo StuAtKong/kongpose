@@ -66,8 +66,12 @@ local schema = {
           { allowed_responders = {
               type = "array",
               required = false,
+              -- an empty array is rejected: it would read as "locked down"
+              -- while behaving as allow-all; allow-all must be the explicit
+              -- absence of this field
+              len_min = 1,
               elements = { type = "string", len_min = 1 },
-              description = "Allowlist of OCSP responders the plugin may contact. Entries are bare hostnames ('ocsp.example.com') or scheme://host[:port] URLs; the responder URL from the certificate's AIA extension must match one or the fetch is refused (fail-open, logged). Unset allows any responder - set this wherever certificate management is delegated, to close the SSRF vector."
+              description = "Allowlist of OCSP responders the plugin may contact (at least one entry when set). Entries are bare hostnames ('ocsp.example.com') or scheme://host[:port] URLs; the responder URL from the certificate's AIA extension must match one or the fetch is refused (fail-open, logged). Unset allows any responder - set this wherever certificate management is delegated, to close the SSRF vector."
           }},
           { ca_certificates = {
               type = "array",

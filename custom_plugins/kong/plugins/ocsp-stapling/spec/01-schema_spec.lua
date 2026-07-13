@@ -82,6 +82,13 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     assert.is_truthy(err)
   end)
 
+  it("rejects an empty allowed_responders array", function()
+    -- an empty list would read as locked-down while behaving as allow-all
+    local entity, err = validate({ allowed_responders = {} })
+    assert.is_nil(entity)
+    assert.is_truthy(err)
+  end)
+
   it("rejects cache_ttl of zero", function()
     local entity, err = validate({ cache_ttl = 0 })
     assert.is_nil(entity)

@@ -90,7 +90,7 @@ pcall(ffi.cdef, [[
 local OCSPStaplingHandler = {
   PRIORITY = 1000,
   -- keep in sync with the kong-plugin-ocsp-stapling rockspec version
-  VERSION = "0.5.0",
+  VERSION = "0.5.1",
 }
 
 
@@ -277,12 +277,16 @@ local function responder_allowed(responder_url, allowed)
   if not parsed then
     return false, "cannot parse responder URL: " .. tostring(err)
   end
-  local scheme, host, port = parsed[1], parsed[2]:lower(), parsed[3]
+  local scheme, host, port = parsed[1]:lower(), parsed[2]:lower(), parsed[3]
 
   for _, entry in ipairs(allowed) do
     if entry:find("://", 1, true) then
       local e = http:parse_uri(entry, false)
-      if e and e[1] == scheme and e[2]:lower() == host and e[3] == port then
+      if not e then
+        -- a typo'd entry must not silently masquerade as a denial
+        kong.log.warn("allowed_responders entry '", entry,
+                      "' is not a parseable URL; ignoring it")
+      elseif e[1]:lower() == scheme and e[2]:lower() == host and e[3] == port then
         return true
       end
     elseif entry:lower() == host then
