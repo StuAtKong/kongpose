@@ -4,3 +4,6 @@
 [submodule "custom_plugins/kong-plugin-log-filter"]
 	path = custom_plugins/kong-plugin-log-filter
 	url = https://github.com/KongHQ-CX/kong-plugin-log-filter.git
+[submodule "custom_plugins/kong-plugin-udp-gelf-log"]
+	path = custom_plugins/kong-plugin-udp-gelf-log
+	url = https://github.com/StuAtKong/kong-plugin-udp-gelf-log.git
