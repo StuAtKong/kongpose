@@ -1,5 +1,5 @@
 x-custom-plugins-env: &custom-plugins-env
-  KONG_PLUGINS: "bundled, ocsp-stapling, log-filter"
+  KONG_PLUGINS: "bundled, ocsp-stapling, log-filter, udp-gelf-log"
   KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/?.lua;/usr/local/custom_plugins/?/init.lua;;"
 
 services:
@@ -9,6 +9,7 @@ services:
     volumes:
       - ./custom_plugins/kong-plugin-ocsp-stapling/kong/plugins/ocsp-stapling:/usr/local/custom_plugins/kong/plugins/ocsp-stapling
       - ./custom_plugins/kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/custom_plugins/kong/plugins/log-filter
+      - ./custom_plugins/kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/custom_plugins/kong/plugins/udp-gelf-log
 
   kong-dp:
     environment:
@@ -16,3 +17,4 @@ services:
     volumes:
       - ./custom_plugins/kong-plugin-ocsp-stapling/kong/plugins/ocsp-stapling:/usr/local/custom_plugins/kong/plugins/ocsp-stapling
       - ./custom_plugins/kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/custom_plugins/kong/plugins/log-filter
+      - ./custom_plugins/kong-plugin-udp-gelf-log/kong/plugins/udp-gelf-log:/usr/local/custom_plugins/kong/plugins/udp-gelf-log
