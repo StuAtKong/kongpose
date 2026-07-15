@@ -1,3 +1,4 @@
 [submodule "custom_plugins/kong-plugin-ocsp-stapling"]
 	path = custom_plugins/kong-plugin-ocsp-stapling
 	url = https://github.com/StuAtKong/kong-plugin-ocsp-stapling.git
+	branch = main
