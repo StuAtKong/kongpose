@@ -56,7 +56,7 @@ x-kong-image:
 
 x-kong-license:
   &kong-license
-  KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?err}
+  KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?set in .env}
   #KONG_LICENSE_PATH: /run/secrets/kong_license
   KONG_PORTAL_AND_VITALS_KEY: "${KONG_PORTAL_AND_VITALS_KEY:-}"
 
@@ -109,13 +109,6 @@ x-kong-common-config:
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "off"
 #  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
-  KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/kong-plugin-ocsp-stapling/?.lua;/usr/local/custom_plugins/?.lua;;"
-  KONG_PLUGINS: "bundled, ocsp-stapling"
-#  KONG_PLUGINS: "bundled, service-protection"
-#  KONG_PLUGINS: "bundled, log-filter, custom-handler"
-#  KONG_PLUGINS: "bundled, custom-handler"
-#  KONG_PLUGINS: "bundled, openid-connect_1051"
-#  KONG_PLUGINS: "bundled, custom_admin_api"
 #  KONG_NGINX_PROXY_KEEPALIVE_REQUESTS: 0
 #  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
 

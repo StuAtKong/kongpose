@@ -1,0 +1,18 @@
+x-custom-plugins-env: &custom-plugins-env
+  KONG_PLUGINS: "bundled, ocsp-stapling, log-filter"
+  KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/?.lua;/usr/local/custom_plugins/?/init.lua;;"
+
+services:
+  kong-cp:
+    environment:
+      <<: *custom-plugins-env
+    volumes:
+      - ./custom_plugins/kong-plugin-ocsp-stapling/kong/plugins/ocsp-stapling:/usr/local/custom_plugins/kong/plugins/ocsp-stapling
+      - ./custom_plugins/kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/custom_plugins/kong/plugins/log-filter
+
+  kong-dp:
+    environment:
+      <<: *custom-plugins-env
+    volumes:
+      - ./custom_plugins/kong-plugin-ocsp-stapling/kong/plugins/ocsp-stapling:/usr/local/custom_plugins/kong/plugins/ocsp-stapling
+      - ./custom_plugins/kong-plugin-log-filter/kong/plugins/log-filter:/usr/local/custom_plugins/kong/plugins/log-filter

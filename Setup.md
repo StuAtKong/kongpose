@@ -13,7 +13,7 @@ Try using the ```image: wizzn/keycloak:14``` image for the keycloak container
 
 ### DNS Resolution
 
-:anger: IMPORTANT :anger:
+⚠️ **IMPORTANT** ⚠️
 The assumption is that Kong will be accessible via several domain names. These are used for Kong Manager, https proxy connections, mutual tls, etc. Configure the below hostnames, either directly in /etc/hosts of via your DNS provider. All these hostnames should resolve to the host running Kong. If using OSX, then it is possible to use a local dnsmasq server to answer all queries for a particular domain. For example, resolve all hostname for kong.lan to the IP of the host as per [this](https://passingcuriosity.com/2013/dnsmasq-dev-osx/)
 
 Hostname | Purpose |
@@ -78,13 +78,15 @@ After importing, **fully restart your browser** — Chrome and Firefox cache tru
 
 ## Start containers
 
-Set and env var for the license;
+Set an env var for the license;
 
 ~~~shell
 export KONG_LICENSE_DATA=`cat ./license.json`;
 ~~~
 
-Create a local `.env` file from the example and set the required secret values;
+Create a local `.env` file from the example — it already ships with working demo
+defaults for everything required, so this alone is usually enough to get started.
+Only the commented-out OIDC blocks need real values if you want to use them;
 
 ~~~shell
 cp .env.example .env
@@ -95,6 +97,19 @@ Then start the utility services & kong containers
 ~~~shell
 docker compose up -d
 ~~~
+
+### Custom plugins
+
+By default, Kong runs with only bundled plugins — no custom plugin code or Lua package path is configured. Custom plugins (currently `ocsp-stapling` and `log-filter`, as examples) are checked out as git submodules under `custom_plugins/` — see [README.md](README.md#custom-plugins-git-submodules) for details on each. Fetch the submodules, then start with the custom-plugins config layered on top via an extra `-f`:
+
+~~~shell
+git submodule update --init --recursive
+docker compose -f docker-compose.yaml -f docker-compose.custom-plugins.yaml up -d
+~~~
+
+If you skip the `submodule update` step, the containers will mount empty directories and the plugins will fail to load.
+
+This enables the plugin(s) in `KONG_PLUGINS`, sets `KONG_LUA_PACKAGE_PATH`, and mounts each plugin's submodule directory into the `kong-cp`/`kong-dp` containers. If you add a new custom plugin submodule, add its `KONG_PLUGINS` entry and volume mount to `docker-compose.custom-plugins.yaml` rather than editing the base `docker-compose.yaml`.
 
 Then stop all running kongpose containers
 
