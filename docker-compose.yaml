@@ -40,18 +40,23 @@ secrets:
 
 # Specify which Kong image to run
 x-kong-image:
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.3.26}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.11}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.4.0.27}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.10.0.12}
   #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.11}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.6}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.4}
-  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.11.0.12}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.5}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.12.0.7}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.13.0.5}
+  #image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.4}
   &kong-image
-  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.3}
+  image: ${KONG_DOCKER_IMAGE:-kong/kong-gateway:3.14.0.4}
+
+
+
 
 x-kong-license:
   &kong-license
-  KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?err}
+  KONG_LICENSE_DATA: ${KONG_LICENSE_DATA:?set in .env}
   #KONG_LICENSE_PATH: /run/secrets/kong_license
   KONG_PORTAL_AND_VITALS_KEY: "${KONG_PORTAL_AND_VITALS_KEY:-}"
 
@@ -104,12 +109,6 @@ x-kong-common-config:
 #  KONG_REAL_IP_HEADER: "proxy-protocol"
   KONG_REAL_IP_RECURSIVE: "off"
 #  KONG_NGINX_HTTP_LUA_TRANSFORM_UNDERSCORES_IN_RESPONSE_HEADERS: "off"
-  KONG_LUA_PACKAGE_PATH: "/usr/local/custom_plugins/?.lua;;"
-#  KONG_PLUGINS: "bundled, service-protection"
-#  KONG_PLUGINS: "bundled, log-filter, custom-handler"
-#  KONG_PLUGINS: "bundled, custom-handler"
-#  KONG_PLUGINS: "bundled, openid-connect_1051"
-#  KONG_PLUGINS: "bundled, custom_admin_api"
 #  KONG_NGINX_PROXY_KEEPALIVE_REQUESTS: 0
 #  KONG_NGINX_HTTP_MORE_CLEAR_HEADERS: "x-kong-admin-request-id"
 
